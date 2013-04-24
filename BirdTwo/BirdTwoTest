@@ -1,0 +1,9 @@
+s.quit
+OSCFunc.trace
+NetAddr("1.2.3.117", 50004).sendMsg('/hei')
+NetAddr("1.2.3.117", 50004).sendMsg('/stretch/direction', 'in')
+NetAddr("1.2.3.117", 50004).sendMsg('/stretch/direction', "out")
+NetAddr("1.2.3.117", 50004).sendMsg('/stretch/speed', 0)
+NetAddr("1.2.3.117", 50004).sendMsg('/stretch/speed', 1)
+NetAddr("1.2.3.117", 50004).sendMsg('/stretch:range/bounds', 300, 800)
+NetAddr("1.2.3.117", 50004).sendMsg('/stretch:stepper/interval', 600)
