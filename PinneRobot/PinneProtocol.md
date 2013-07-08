@@ -34,43 +34,43 @@ Vi får følgende beskjeder sendt til pinnerobot: ('x' betyr at bit ikke er vikt
     * Left motor go up:                     11010001 0xxxxx01 = D1 01 0D 0A
     * Left motor go down:                 11010001 0xxxxx11 = D1 03 0D 0A
     * Left motor stop:                       10010000                = 90 0D 0A
-    * Left motor set speed:               11011000 0nnnnnnn 0nnnnnnn 0nnnnnnn = D8 nn nn nn 0D 0A
-    * Left motor set current position: 11010100 0nnnnnnn 0nnnnnnn 0nnnnnnn = D4 nn nn nn 0D 0A
-    * Left motor set target position:   11010010 0nnnnnnn 0nnnnnnn 0nnnnnnn = D2 nn nn nn 0D 0A
+    * Left motor set speed:               11011000 0nnnnnnn 0nnnnnnn = D8 nn nn nn 0D 0A
+    * Left motor set current position: 11010100 0nnnnnnn 0nnnnnnn  = D4 nn nn nn 0D 0A
+    * Left motor set target position:   11010010 0nnnnnnn 0nnnnnnn  = D2 nn nn nn 0D 0A
   
    * Right motor go up:                     11110001 00000001 = F1 01 0D 0A
    * Right motor go down:                 11110001 00000011 = F1 03 0D 0A
    * Right motor stop:                       10110000                = B0 0D 0A
-   * Right motor set speed:               11111000 0nnnnnnn 0nnnnnnn 0nnnnnnn = F8 nn nn nn 0D 0A
-   * Right motor set current position: 11110100 0nnnnnnn 0nnnnnnn 0nnnnnnn = F4 nn nn nn 0D 0A
-   * Right motor set target position:   11110010 0nnnnnnn 0nnnnnnn 0nnnnnnn = F2 nn nn nn 0D 0A
+   * Right motor set speed:               11111000 0nnnnnnn 0nnnnnnn  = F8 nn nn nn 0D 0A
+   * Right motor set current position: 11110100 0nnnnnnn 0nnnnnnn  = F4 nn nn nn 0D 0A
+   * Right motor set target position:   11110010 0nnnnnnn 0nnnnnnn  = F2 nn nn nn 0D 0A
   
-   * Rotation servo set position:        10x10101 0nnnnnnn 0nnnnnnn 0nnnnnnn = 95 nn nn nn 0D 0A
-   * Rotation servo set speed:           10x11100 0nnnnnnn 0nnnnnnn 0nnnnnnn = 9C nn nn nn 0D 0A
+   * Rotation servo set position:        10x10101 0nnnnnnn 0nnnnnnn  = 95 nn nn nn 0D 0A
+   * Rotation servo set speed:           10x11100 0nnnnnnn 0nnnnnnn  = 9C nn nn nn 0D 0A
 
 * Replying commands:
    * Left motor get state:                  10000001 = 81 0D 0A 
       * ->> (returnerer) 11000001 0xxxxx<direction><on|off> = C1 nn 0D 0A
    * Left motor get target position:        10000010 = 82 0D 0A
-      * ->> 11000010 0nnnnnnn 0nnnnnnn 0nnnnnnn = C2 nn nn nn 0D 0A
+      * ->> 11000010 0nnnnnnn 0nnnnnnn = C2 nn nn nn 0D 0A
    * Left motor get current position:     10000100 = 84 0D 0A
-      * ->> 11000100 0nnnnnnn 0nnnnnnn 0nnnnnnn = C4 nn nn nn 0D 0A
+      * ->> 11000100 0nnnnnnn 0nnnnnnn = C4 nn nn nn 0D 0A
    * Left motor get speed:                 10001000 = 88 0D 0A
-      * ->> 11001000 0nnnnnnn 0nnnnnnn 0nnnnnnn = C8 nn nn nn 0D 0A
+      * ->> 11001000 0nnnnnnn 0nnnnnnn = C8 nn nn nn 0D 0A
   
    * Right motor get state:                  10100001 = A1 0D 0A 
       * ->> (returnerer) 11100001 0xxxxx<direction><on|off> = E1 nn 0D 0A
    * Right motor get target position:        10100010 = A2 0D 0A
-      * ->> 11100010 0nnnnnnn 0nnnnnnn 0nnnnnnn = E2 nn nn nn 0D 0A
+      * ->> 11100010 0nnnnnnn 0nnnnnnn = E2 nn nn nn 0D 0A
    * Right motor get current position:     10100100 = A4 0D 0A
-      * ->> 11100100 0nnnnnnn 0nnnnnnn 0nnnnnnn = E4 nn nn nn 0D 0A
+      * ->> 11100100 0nnnnnnn 0nnnnnnn = E4 nn nn nn 0D 0A
    * Right motor get speed:                 10101000 = A8 0D 0A
-      * ->> 11101000 0nnnnnnn 0nnnnnnn 0nnnnnnn = E8 nn nn nn 0D 0A
+      * ->> 11101000 0nnnnnnn 0nnnnnnn = E8 nn nn nn 0D 0A
 
    * Servo motor get speed:               10x01100 = 8C 0D 0A
-      * ->> 11x01100 0nnnnnnn 0nnnnnnn 0nnnnnnn = CC nn nn nn 0D 0A
+      * ->> 11x01100 0nnnnnnn 0nnnnnnn = CC nn nn nn 0D 0A
    * Servo motor get position:            10x00101 = 85 0D 0A
-      * ->> 11x00101 0nnnnnnn 0nnnnnnn 0nnnnnnn = C5 nn nn nn 0D 0A
+      * ->> 11x00101 0nnnnnnn 0nnnnnnn = C5 nn nn nn 0D 0A
 
 
 Det er et par punkter jeg ville bare nevne utover dette:
