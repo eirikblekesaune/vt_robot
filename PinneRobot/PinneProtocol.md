@@ -2,18 +2,18 @@ Legger det opp slik at det kan bli ganske lett for deg å parse beskjeder i kode
 Du kan jo se over dette og komme med tilbakemeldinger. Hvis du heller vil ha en mer lesbar protokoll, så er jeg med på den.
 
 
-bit7: 1=kommando byte, 0=data byte. i.e. 1nnn nnnn er en kommando byte, 0nnn nnnn er en data byte
-bit6: 1=denne byten blir ettefulgt av data bytes, 0= denne byten har ingen etterfølgende bytes
-bit5: 0=kommando gjelder venstre pinne, 1=byten gjelder høyre pinne
-bit4: 1=set data byte, 0=get data byte
-bit0-3: hvilken beskjed det er av følgende muligheter:
-0001: state
-0010: target posisjon
-0100: telleverk, for enkodere, current position
-1000: speed
-0101: Posisjon for rotasjonsservomotor
-1100: Speed for rotasjonsservomotor
-0000: Stopp
+* bit7: 1=kommando byte, 0=data byte. i.e. 1nnn nnnn er en kommando byte, 0nnn nnnn er en data byte
+* bit6: 1=denne byten blir ettefulgt av data bytes, 0= denne byten har ingen etterfølgende bytes
+* bit5: 0=kommando gjelder venstre pinne, 1=byten gjelder høyre pinne
+* bit4: 1=set data byte, 0=get data byte
+* bit0-3: hvilken beskjed det er av følgende muligheter:
+* 0001: state
+* 0010: target posisjon
+* 0100: telleverk, for enkodere, current position
+* 1000: speed
+* 0101: Posisjon for rotasjonsservomotor
+* 1100: Speed for rotasjonsservomotor
+* 0000: Stopp
 
 Vi har plass til flere typer kommandoer i bit 0 - 3, hvis det skulle være behov for det. 
 
@@ -21,7 +21,7 @@ Det første som kommer inn er alltid en kommando byte med bit8==1. Hvis beskjede
 
 Data bytes varierer med hvilken kommando som er sendt. 
 State data byte: Data om hvilken state pinne motoren er i, er bygd opp slik: 
-0 0 0 0 0 0 <Direction bit: up:0,down:1> <Motor off:0,on:1> 
+`0 0 0 0 0 0 <Direction bit: up:0,down:1> <Motor off:0,on:1> `
 
 Telleverk/Target position/speed data bytes:
 0<bits:20,19,18,17,16,15,14> 0<bits:13,12,11,10,9,8,7> 0<bits:6,5,4,3,2,1,0>
@@ -30,13 +30,13 @@ Dette utgjør en unsigned 32 bit type, selv om oppløsning kun går til 21-bits 
 
 Vi får følgende beskjeder sendt til pinnerobot: ('x' betyr at bit ikke er viktig, men settes til 0 pr default, '->>' indikerer hva som pinnerobot skal returnere)
 
-*Non-replying commands: 
-Left motor go up:                     11010001 0xxxxx01 = D1 01 0D 0A
-Left motor go down:                 11010001 0xxxxx11 = D1 03 0D 0A
-Left motor stop:                       10010000                = 90 0D 0A
-Left motor set speed:               11011000 0nnnnnnn 0nnnnnnn 0nnnnnnn = D8 nn nn nn 0D 0A
-Left motor set current position: 11010100 0nnnnnnn 0nnnnnnn 0nnnnnnn = D4 nn nn nn 0D 0A
-Left motor set target position:   11010010 0nnnnnnn 0nnnnnnn 0nnnnnnn = D2 nn nn nn 0D 0A
+* Non-replying commands: 
+    * Left motor go up:                     11010001 0xxxxx01 = D1 01 0D 0A
+    * Left motor go down:                 11010001 0xxxxx11 = D1 03 0D 0A
+    * Left motor stop:                       10010000                = 90 0D 0A
+    * Left motor set speed:               11011000 0nnnnnnn 0nnnnnnn 0nnnnnnn = D8 nn nn nn 0D 0A
+    * Left motor set current position: 11010100 0nnnnnnn 0nnnnnnn 0nnnnnnn = D4 nn nn nn 0D 0A
+    * Left motor set target position:   11010010 0nnnnnnn 0nnnnnnn 0nnnnnnn = D2 nn nn nn 0D 0A
 
 Right motor go up:                     11110001 00000001 = F1 01 0D 0A
 Right motor go down:                 11110001 00000011 = F1 03 0D 0A
