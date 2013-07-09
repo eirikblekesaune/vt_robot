@@ -13,4 +13,4 @@ NetAddr("1.2.3.117", 50004).sendMsg('/stretch/speed', 6)//000 > 0
 
 
 NetAddr("1.2.3.117", 50004).sendMsg('/stretch:range/bounds', 300, 800)
-NetAddr("1.2.3.117", 50004).sendMsg('/stretch:stepper/interval', 1600)
+NetAddr("1.2.3.117", 50004).sendMsg('/stretch:stepper/interval', 100)
