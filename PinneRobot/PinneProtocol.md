@@ -2,7 +2,7 @@ Legger det opp slik at det kan bli ganske lett for deg å parse beskjeder i kode
 Du kan jo se over dette og komme med tilbakemeldinger. Hvis du heller vil ha en mer lesbar protokoll, så er jeg med på den.
 
 
-* bit7: 1=kommando byte, 0=data byte. i.e. 1nnn nnnn er en kommando byte, 0nnn nnnn er en data byte
+* bit7: 1=kommando byte, 0=value byte. i.e. 1nnn nnnn er en kommando byte, 0nnn nnnn er en data byte
 * bit6: 1=denne byten blir ettefulgt av data bytes, 0= denne byten har ingen etterfølgende bytes
 * bit5: 0=kommando gjelder venstre pinne, 1=byten gjelder høyre pinne
 * bit4: 1=set data byte, 0=get data byte
@@ -19,9 +19,32 @@ Vi har plass til flere typer kommandoer i bit 0 - 3, hvis det skulle være behov
 
 Det første som kommer inn er alltid en kommando byte med bit8==1. Hvis beskjeden har tilhørende data, f.eks. sett posisjon i etterfølgende bytes, så er bit7==1. Beskjeden vil i så tilfelle bli etterfulgt av data bytes hvor bit8==0.
 
-Data bytes varierer med hvilken kommando som er sendt. 
-State data byte: Data om hvilken state pinne motoren er i, er bygd opp slik: 
-`0 0 0 0 0 0 <Direction bit: up:0,down:1> <Motor off:0,on:1> `
+Data bytes varierer med hvilken kommando som er sendt.
+State data byte: Value byte for state er bygd opp slik: 
+```
+Command byte:
+bit 0: 1 (Since it is a command byte)
+bit 1: 1 (Since this will be followed by more bytes)
+bit 2: <Left motor: 0, right motor: 1>
+bit 3: NA
+bit 4: 0
+bit 5: 0
+bit 6: 0
+bit 8: 1  (0001 signifies a state value message)
+
+Value byte:
+bit 0: 0 (Since it is a value byte)
+bit 1: 0 (Since it is the last byte in the transmission)
+bit 2 - 7:
+xx000000: stopped
+xx000001: going up
+xx000010: going down
+xx000011: reached target
+xx000100: blocked by sensor
+xx000101: blocked by min position
+xx000110: blocked by max position
+cc000111: motor driver fault 
+```
 
 Telleverk/Target position/speed data bytes:
 0<bits:20,19,18,17,16,15,14> 0<bits:13,12,11,10,9,8,7> 0<bits:6,5,4,3,2,1,0>
