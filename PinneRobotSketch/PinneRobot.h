@@ -43,7 +43,7 @@ typedef enum _stateChange_t
 
 typedef int position_t;
 typedef int speed_t;
-typedef enum _direction_t { DIRECTION_UP = -1, DIRECTION_DOWN = 1 } direction_t;
+typedef enum _direction_t { DIRECTION_DOWN, DIRECTION_UP } direction_t;
 typedef enum _stopSensor_t { BUTTON_IN, BUTTON_OUT } stopSensor_t;
 const position_t POSITION_ALL_UP = 0;
 const position_t POSITION_DEFAULT_MAX = 1024;
@@ -61,6 +61,7 @@ typedef struct _pinneMotor
   position_t target;
   position_t minPosition;
   position_t maxPosition;
+  direction_t direction;
   int stopButtonValue;
   boolean blocked;
   

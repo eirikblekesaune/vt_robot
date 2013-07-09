@@ -66,7 +66,7 @@ void parseCommand(byte inByte)
           processGetCurrentPositionCommand();
           break;
         case CMD_BRAKE:
-          processSetBrakeCommand();
+          processGetBrakeCommand();
           break;
         case CMD_STATE:
           processGetStateCommand();
@@ -142,8 +142,9 @@ void processGetSpeedCommand()
   switch(parser.currentAddress)
   {
     case ADDRESS_LEFT:
+      Serial.print("Left motor speed: ");
       speed = parser.robot->getLeftMotorSpeed();
-      Serial.print("Left motor speed: "); Serial.println(speed);
+      Serial.println(speed);
       break;
     default:
       Serial.println("Unknown address");

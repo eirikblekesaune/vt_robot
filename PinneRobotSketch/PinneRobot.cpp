@@ -8,19 +8,17 @@ DualVNH5019MotorShield md(
 
 volatile position_t posM1 = 0;
 volatile position_t posM2 = 0;
-volatile direction_t directionM1 = DIRECTION_DOWN;
-volatile direction_t directionM2 = DIRECTION_DOWN;
+volatile int encoder1TickValue = 1;
+volatile int encoder2TickValue = 1;
 
-//Encoder reading ISR code based on:
-//http://makeatronics.blogspot.no/2013/02/efficiently-reading-quadrature-with.html
 void encoder1_ISR()
 {
-  posM1 = posM1 + directionM1;
+  posM1 = posM1 + encoder1TickValue;
 }
 
 void encoder2_ISR()
 {
-  posM2 = posM2 + directionM2;
+  posM2 = posM2 + encoder2TickValue;
 }
 
 void PinneRobot::init()
@@ -44,7 +42,7 @@ void PinneRobot::init()
 void PinneRobot::_initLeftMotor()
 {
   _leftMotor.speed = SPEED_STOP;
-  directionM1 = DIRECTION_DOWN;
+  _leftMotor.direction = DIRECTION_DOWN;
   _leftMotor.target = TARGET_NONE;
   _leftMotor.minPosition = POSITION_ALL_UP;
   _leftMotor.maxPosition = POSITION_DEFAULT_MAX;
@@ -126,19 +124,32 @@ void PinneRobot::leftMotorStop()
 
 void PinneRobot::setLeftMotorDirection(direction_t direction)
 {
-  directionM1 = direction;
-  _leftMotorCalculateAndSetSpeed();
-  if(getLeftMotorDirection() == DIRECTION_UP)
+  if(direction != _leftMotor.direction)
   {
-    _notifyStateChange(LEFT_MOTOR_GOING_UP);
-  } else {
-    _notifyStateChange(LEFT_MOTOR_GOING_DOWN);
+    if(direction == DIRECTION_DOWN)
+    {
+      if(direction != _leftMotor.direction)
+      {
+        _notifyStateChange(LEFT_MOTOR_GOING_DOWN);
+      }
+      _leftMotor.direction = direction;
+      encoder1TickValue = 1;
+    } else if(direction == DIRECTION_UP) {
+          if(direction != _leftMotor.direction)
+      {
+        _notifyStateChange(LEFT_MOTOR_GOING_DOWN);
+      }
+      _leftMotor.direction = direction;
+      encoder1TickValue = -1;
+      _notifyStateChange(LEFT_MOTOR_GOING_UP);
+    }
   }
+  _leftMotorCalculateAndSetSpeed();
 }
 
 direction_t PinneRobot::getLeftMotorDirection()
 {
-  return directionM1;
+  return _leftMotor.direction;
 }
 
 void PinneRobot::setLeftMotorTargetPosition(position_t position)
