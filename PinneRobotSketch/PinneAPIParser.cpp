@@ -1,5 +1,163 @@
-#include "PinneRobot.h"
-PinneRobot robot;
+#include "PinneAPIParser.h"
+
+extern PinneParser parser;
+
+void parseCommand(byte inByte)
+{
+  if(parser.state == WAITING_FOR_COMMAND_BYTE)
+  {
+    parseIncomingByte(inByte);
+  }
+}
+
+void parseIncomingByte(byte inByte)
+{
+  parser.currentCommand = (command_t)(inByte & PARSE_MASK_COMMAND);
+  parser.currentAddress = (address_t)(inByte & PARSE_MASK_ADDRESS);
+  parser.currentSetGet = (setGet_t)(inByte & PARSE_MASK_SETGET);
+  switch(parser.currentSetGet)
+  {
+    case SET_MESSAGE:
+      Serial.print("SET: ");
+      if(parser.currentCommand == CMD_STOP)
+      {
+        processSetStopCommand();
+      } else {
+        if(getDataBytes())
+        {
+          switch(parser.currentCommand)
+          {
+            case CMD_SPEED:
+              processSetSpeedCommand();
+              break;
+            case CMD_DIRECTION:
+              processSetDirectionCommand();
+              break;
+            case CMD_TARGET_POSITION:
+              processSetTargetPositionCommand();
+              break;
+            case CMD_CURRENT_POSITION:
+              processSetCurrentPositionCommand();
+              break;
+            case CMD_BRAKE:
+              processSetBrakeCommand();
+              break;
+            default:
+              Serial.print("Unknown command"); Serial.println(parser.currentCommand);
+          }
+        } else {
+          Serial.println("Error getting data bytes");
+        }
+      }
+      break;
+    case GET_MESSAGE:
+      switch(parser.currentCommand)
+      {
+        case CMD_SPEED:
+          processGetSpeedCommand();
+          break;
+        case CMD_DIRECTION:
+          processGetDirectionCommand();
+          break;
+        case CMD_TARGET_POSITION:
+          processGetTargetPositionCommand();
+          break;
+        case CMD_CURRENT_POSITION:
+          processGetCurrentPositionCommand();
+          break;
+        case CMD_BRAKE:
+          processSetBrakeCommand();
+          break;
+        case CMD_STATE:
+          processGetStateCommand();
+          break;  
+        default:
+          Serial.print("Unknown command"); Serial.println(parser.currentCommand);
+      }
+      break;
+  }
+}
+
+boolean getDataBytes()
+{
+  boolean result;
+  result = Serial.readBytes(parser.dataByteBuffer, 2) == 2;
+  return result;
+}
+
+int parseDataValue()
+{
+  int result;
+  result = parser.dataByteBuffer[1] | (parser.dataByteBuffer[0] << 7);
+  return result;
+}
+
+void processSetStopCommand()
+{
+  switch(parser.currentAddress)
+  {
+    case ADDRESS_LEFT:
+      Serial.print("Stopping left motor");
+      parser.robot->leftMotorStop();
+      break;
+    case ADDRESS_RIGHT:
+      Serial.print("Stopping right motor");
+      break;
+    case ADDRESS_ROTATION:
+      Serial.print("Stopping rotation motor");
+      break;
+    case ADDRESS_GLOBAL:
+      Serial.print("Stopping all motors");
+    default:
+      Serial.println("Unknown address");
+  }
+}
+
+void processSetSpeedCommand()
+{
+  speed_t speed;
+  speed = (speed_t)parseDataValue();
+  switch(parser.currentAddress)
+  {
+    case ADDRESS_LEFT:
+      Serial.print("Setting left speed"); Serial.println(speed);
+      parser.robot->setLeftMotorSpeed(speed);
+      break;
+    case ADDRESS_RIGHT:
+      Serial.print("Setting right speed"); Serial.println(speed);
+      break;
+    case ADDRESS_ROTATION:
+      Serial.print("Setting rotation speed"); Serial.println(speed);
+      break;
+    default:
+      Serial.println("Unknown address");
+  }
+}
+
+void processGetSpeedCommand(){}
+
+void processSetDirectionCommand()
+{
+  direction_t direction;
+  direction = (direction_t)parseDataValue();
+  switch(parser.currentAddress)
+  {
+    case ADDRESS_LEFT:
+      Serial.print("Setting left direction"); Serial.println(direction);
+      parser.robot->setLeftMotorDirection(direction);
+      break;
+    case ADDRESS_RIGHT:
+      Serial.print("Setting right direction"); Serial.println(direction);
+      break;
+    case ADDRESS_ROTATION:
+      Serial.print("Setting rotation direction"); Serial.println(direction);
+      break;
+    default:
+      Serial.println("Unknown address");
+  }
+}
+
+void processGetDirectionCommand(){}
 
 void processSetTargetPositionCommand()
 {
@@ -76,5 +234,10 @@ void processSetBrakeCommand()
 
 void processGetBrakeCommand()
 {
-  Serial.print("Brake command: ");
+  Serial.println("Brake command");
+}
+
+void processGetStateCommand()
+{
+  Serial.println("State command");
 }

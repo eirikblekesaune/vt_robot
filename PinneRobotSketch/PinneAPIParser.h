@@ -73,6 +73,7 @@ void processSetCurrentPositionCommand();
 void processGetCurrentPositionCommand();
 void processSetBrakeCommand();
 void processGetBrakeCommand();
+void processGetStateCommand();
 
 
 #endif

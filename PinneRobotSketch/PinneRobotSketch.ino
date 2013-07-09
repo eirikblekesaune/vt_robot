@@ -16,7 +16,7 @@ void setup(){
   Serial.begin(115200);
   Serial.setTimeout(100);
   while (!Serial);
-  //robot.init();
+  robot.init();
   Serial.println("online");
 }
 
