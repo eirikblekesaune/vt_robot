@@ -27,38 +27,77 @@ const int L293_EN = 11;//3;Changed because of interrupt
 
 const int ROT_POT = A2;
 
-typedef unsigned int position_t;
+
+//Notification states
+typedef enum _stateChange_t
+{
+  LEFT_MOTOR_STOPPED,//
+  LEFT_MOTOR_GOING_UP,
+  LEFT_MOTOR_GOING_DOWN,
+  LEFT_MOTOR_REACHED_TARGET,
+  LEFT_MOTOR_BLOCKED_BY_SENSOR,
+  LEFT_MOTOR_BLOCKED_BY_MIN_POSITION,
+  LEFT_MOTOR_BLOCKED_BY_MAX_POSITION,
+  LEFT_MOTOR_DRIVER_FAULT
+} stateChange_t;
+
+typedef int position_t;
 typedef int speed_t;
-typedef enum _direction_t { DIRECTION_UP = 1, DIRECTION_DOWN = -1 } direction_t;
+typedef enum _direction_t { DIRECTION_UP = -1, DIRECTION_DOWN = 1 } direction_t;
+typedef enum _stopSensor_t { BUTTON_IN, BUTTON_OUT } stopSensor_t;
+const position_t POSITION_ALL_UP = 0;
+const position_t POSITION_DEFAULT_MAX = 1024;
+const speed_t BRAKE_FULL = 400;
+const speed_t BRAKE_NONE = 0;
+const speed_t SPEED_MAX = 400;
+const speed_t SPEED_MIN = 0;
+const speed_t SPEED_STOP = 0;
+const position_t TARGET_NONE = -1;
 
 typedef struct _pinneMotor
 {
   speed_t speed;
-  direction_t direction;
+  speed_t brake;
   position_t target;
+  position_t minPosition;
+  position_t maxPosition;
+  int stopButtonValue;
+  boolean blocked;
+  
 } PinneMotor;
 
 typedef struct _motorData
 {
   speed_t speed;
+  speed_t brake;
   direction_t direction;
   position_t target;
-} MotorData;
+} RotationMotor;
 
 class PinneRobot
 {
 public:
-  PinneRobot();
+  PinneRobot() {};
   void init();
+  
+  void checkSensors();
+  void updatePositions();
   
   void setLeftMotorSpeed(speed_t speed);
   speed_t getLeftMotorSpeed();
+  void leftMotorStop();
   void setLeftMotorDirection(direction_t direction);
   direction_t getLeftMotorDirection();
   void setLeftMotorTargetPosition(position_t pos);
   position_t getLeftMotorTargetPosition();
-  void setLeftMotorCurrentPosition(int pos);
+  void setLeftMotorCurrentPosition(position_t pos);
   position_t getLeftMotorCurrentPosition();
+  void setLeftMotorBrake(speed_t brake);
+  speed_t getLeftMotorBrake();
+  void setLeftMotorMaxPosition(position_t maxPos);
+  position_t getLeftMotorMaxPosition();  
+  void setLeftMotorMinPosition(position_t minPos);
+  position_t getLeftMotorMinPosition();
   
   void setRightMotorSpeed(speed_t speed);
   speed_t getRightMotorSpeed();
@@ -79,9 +118,21 @@ public:
   position_t getRotationMotorCurrentPosition();
   
 private:  
-  MotorData motor1;
-  MotorData motor2;
-  MotorData rotMotor;
+  PinneMotor _leftMotor;
+  PinneMotor _rightMotor;
+  RotationMotor _rotMotor;
+  
+  void _initLeftMotor();
+  void _leftMotorTargetReached();
+  void _leftMotorStopSensorHit();
+  void _leftMotorCalculateAndSetSpeed();
+  void _leftMotorSetBlocked(boolean block);
+  
+  void _rightMotorTargetReached();
+  void _rotationMotorTargetReached();
+  
+  void _notifyStateChange(stateChange_t);
+    
 };
 
 

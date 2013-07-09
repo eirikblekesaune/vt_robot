@@ -1,84 +1,80 @@
-#include "PinneAPIParser.h"
+#include "PinneRobot.h"
+PinneRobot robot;
 
-PinneParser parser = {WAITING_FOR_COMMAND_BYTE, CMD_NONE};
-
-void parseIncomingByte(byte inByte)
+void processSetTargetPositionCommand()
 {
-  pinneCommand_t cmd;
-  if(parser.state == WAITING_FOR_COMMAND_BYTE)
-  {    
-    Serial.println("Got command: ");
-    parseCommand(inByte);
-  } else if(parser.state == WAITING_FOR_VALUE)
+  position_t targetPosition;
+  targetPosition = (position_t)parseDataValue();
+  switch(parser.currentAddress)
   {
-    Serial.print("Got value byte:"); Serial.println(inByte);
-  }
-}
-
-void parseCommand(byte inByte)
-{
-  byte cmdByte;
-  cmdByte = inByte & 0x0F;
-  Serial.println("PROCESSING ");
-  switch(cmdByte)
-  {
-    case CMD_STATE:
-      processStateMsg(inByte);
+    case ADDRESS_LEFT:
+      Serial.print("Setting left targetPosition"); Serial.println(targetPosition);
+      parser.robot->setLeftMotorTargetPosition(targetPosition);
       break;
-    case CMD_TARGET_POS:
-      processTargetPositionMsg(inByte);
-      break;      
-    case CMD_POS_COUNTER:
-      processPositionCounterMsg(inByte);
-      break;      
-    case CMD_SPEED:
-      processSpeedMsg(inByte);
-      break;      
-    case CMD_ROT_POS:
-      processRotationPositionMsg(inByte);
-      break;      
-    case CMD_ROT_SPEED:
-      processRotationSpeedMsg(inByte);
-      break;      
-    case CMD_STOP:
-      processStopMsg(inByte);
-      break;      
+    case ADDRESS_RIGHT:
+      Serial.print("Setting right targetPosition"); Serial.println(targetPosition);
+      break;
+    case ADDRESS_ROTATION:
+      Serial.print("Setting rotation targetPosition"); Serial.println(targetPosition);
+      break;
     default:
-      Serial.print("CMD_NONE");
+      Serial.println("Unknown address");
   }
 }
 
-void processStateMsg(byte inByte)
+void processGetTargetPositionCommand()
 {
-  Serial.println("STATE MSG");
+  Serial.print("Target position command: ");
 }
 
-void processTargetPositionMsg(byte inByte)
+void processSetCurrentPositionCommand()
 {
-  Serial.println("TARGET_POSITION_MSG");
+  position_t currentPosition;
+  currentPosition = (position_t)parseDataValue();
+  switch(parser.currentAddress)
+  {
+    case ADDRESS_LEFT:
+      Serial.print("Setting left currentPosition"); Serial.println(currentPosition);
+      parser.robot->setLeftMotorCurrentPosition(currentPosition);
+      break;
+    case ADDRESS_RIGHT:
+      Serial.print("Setting right currentPosition"); Serial.println(currentPosition);
+      break;
+    case ADDRESS_ROTATION:
+      Serial.print("Setting rotation currentPosition"); Serial.println(currentPosition);
+      break;
+    default:
+      Serial.println("Unknown address");
+  }
 }
 
-void processPositionCounterMsg(byte inByte)
+void processGetCurrentPositionCommand()
 {
-  Serial.println("POSITION_COUNTER_MSG");
+  Serial.print("Current position command: ");
 }
 
-void processSpeedMsg(byte inByte)
+void processSetBrakeCommand()
 {
-  Serial.println("SPEED MSG");
+  speed_t brake;
+  brake = (speed_t)parseDataValue();
+  switch(parser.currentAddress)
+  {
+    case ADDRESS_LEFT:
+      Serial.print("Setting left brake"); Serial.println(brake);
+      parser.robot->setLeftMotorBrake(brake);
+      break;
+    case ADDRESS_RIGHT:
+      Serial.print("Setting right brake"); Serial.println(brake);
+      break;
+    case ADDRESS_ROTATION:
+      Serial.print("Setting rotation brake"); Serial.println(brake);
+      break;
+    default:
+      Serial.println("Unknown address");
+  }
 }
 
-void processRotationPositionMsg(byte inByte)
+void processGetBrakeCommand()
 {
-  Serial.println("ROTATION POSITION MSG");
-}
-
-void processRotationSpeedMsg(byte inByte)
-{
-  Serial.println("ROTATION SPEED MSG");
-}
-
-void processStopMsg(byte inByte)
-{
-  Serial.println("STOP MSG");
+  Serial.print("Brake command: ");
 }
