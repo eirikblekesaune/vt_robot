@@ -2,15 +2,15 @@
 
 extern PinneParser parser;
 
-void parseCommand(byte inByte)
+void parseIncomingByte(byte inByte)
 {
   if(parser.state == WAITING_FOR_COMMAND_BYTE)
   {
-    parseIncomingByte(inByte);
+    parseCommand(inByte);
   }
 }
 
-void parseIncomingByte(byte inByte)
+void parseCommand(byte inByte)
 {
   parser.currentCommand = (command_t)(inByte & PARSE_MASK_COMMAND);
   parser.currentAddress = (address_t)(inByte & PARSE_MASK_ADDRESS);
@@ -75,6 +75,8 @@ void parseIncomingByte(byte inByte)
           Serial.print("Unknown command"); Serial.println(parser.currentCommand);
       }
       break;
+    default:
+      Serial.println("SetGet fault");
   }
 }
 
@@ -134,7 +136,19 @@ void processSetSpeedCommand()
   }
 }
 
-void processGetSpeedCommand(){}
+void processGetSpeedCommand()
+{
+  speed_t speed;
+  switch(parser.currentAddress)
+  {
+    case ADDRESS_LEFT:
+      speed = parser.robot->getLeftMotorSpeed();
+      Serial.print("Left motor speed: "); Serial.println(speed);
+      break;
+    default:
+      Serial.println("Unknown address");
+  }
+}
 
 void processSetDirectionCommand()
 {
@@ -157,7 +171,19 @@ void processSetDirectionCommand()
   }
 }
 
-void processGetDirectionCommand(){}
+void processGetDirectionCommand()
+{
+  direction_t direction;
+  switch(parser.currentAddress)
+  {
+    case ADDRESS_LEFT:
+      direction = parser.robot->getLeftMotorDirection();
+      Serial.print("Left motor direction: "); Serial.println(direction);
+      break;
+    default:
+      Serial.println("Unknown address");
+  }
+}
 
 void processSetTargetPositionCommand()
 {
@@ -182,7 +208,16 @@ void processSetTargetPositionCommand()
 
 void processGetTargetPositionCommand()
 {
-  Serial.print("Target position command: ");
+  position_t targetPosition;
+  switch(parser.currentAddress)
+  {
+    case ADDRESS_LEFT:
+      targetPosition = parser.robot->getLeftMotorTargetPosition();
+      Serial.print("Left motor targetPosition: "); Serial.println(targetPosition);
+      break;
+    default:
+      Serial.println("Unknown address");
+  }
 }
 
 void processSetCurrentPositionCommand()
@@ -208,7 +243,16 @@ void processSetCurrentPositionCommand()
 
 void processGetCurrentPositionCommand()
 {
-  Serial.print("Current position command: ");
+  position_t currentPosition;
+  switch(parser.currentAddress)
+  {
+    case ADDRESS_LEFT:
+      currentPosition = parser.robot->getLeftMotorCurrentPosition();
+      Serial.print("Left motor currentPosition: "); Serial.println(currentPosition);
+      break;
+    default:
+      Serial.println("Unknown address");
+  }
 }
 
 void processSetBrakeCommand()
@@ -234,7 +278,16 @@ void processSetBrakeCommand()
 
 void processGetBrakeCommand()
 {
-  Serial.println("Brake command");
+  speed_t brake;
+  switch(parser.currentAddress)
+  {
+    case ADDRESS_LEFT:
+      brake = parser.robot->getLeftMotorBrake();
+      Serial.print("Left motor brake: "); Serial.println(brake);
+      break;
+    default:
+      Serial.println("Unknown address");
+  }
 }
 
 void processGetStateCommand()
