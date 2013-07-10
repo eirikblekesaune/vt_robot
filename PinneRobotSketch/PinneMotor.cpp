@@ -45,21 +45,27 @@ void PinneMotor::init()
   pinMode(_stopButtonPin, INPUT);
   _stopButtonValue = digitalRead(_stopButtonPin);
   _driver->init();
+  _blocked = false;
 }
 
 void PinneMotor::Stop()
 {
+  Serial.println("PinneMotor::Stop");
   _driver->SetSpeed(MotorDriver::SPEED_STOP);
 }
 
 void PinneMotor::SetSpeed(speed_t speed)
 {
-  if(speed == 0)
+  Serial.print("PinneMotor::SetSpeed"); Serial.println(speed);
+  Serial.print("blocked: "); Serial.println(_blocked);
+  if(speed <= 0)
   {
     Stop();
   } else {
     if(!_blocked)
+    {
       _driver->SetSpeed(speed);
+    }
   }
 }
 

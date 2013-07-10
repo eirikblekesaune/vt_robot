@@ -32,18 +32,17 @@ void VNH5019Driver::init()
   TCCR1B = 0b00010001;
   ICR1 = 400;
   #endif
-
+  SetSpeed(SPEED_STOP);
+  SetDirection(0);
 }
 
 void VNH5019Driver::SetSpeed(int speed)
 {
-  unsigned char reverse = 0;
-  
   if (speed < 0)
     speed = 0;
   if (speed > 400)  // Max PWM dutycycle
     speed = 400;
-    
+  Serial.println("VNH5019Driver::SetSpeed");Serial.println(speed);
   _speed = speed;
   #if defined(__AVR_ATmega168__)|| defined(__AVR_ATmega328P__) || defined(__AVR_ATmega32U4__)
   //temp hack..
@@ -61,6 +60,8 @@ void VNH5019Driver::SetSpeed(int speed)
   {
     digitalWrite(_INA, LOW);   // Make the motor coast no
     digitalWrite(_INB, LOW);   // matter which direction it is spinning.
+  } else {
+    _UpdateDirection();
   }
 }
 
@@ -71,7 +72,12 @@ void VNH5019Driver::SetDirection(int direction)
   if(direction > 1)
     direction = 1;
   _direction = direction;
-  if (!direction)
+  _UpdateDirection();
+}
+
+void VNH5019Driver::_UpdateDirection()
+{
+  if (!_direction)
   {
     digitalWrite(_INA, LOW);
     digitalWrite(_INB, HIGH);

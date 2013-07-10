@@ -54,6 +54,8 @@ class VNH5019Driver: public MotorDriver
     unsigned char _INB;
     unsigned char _PWM;
     unsigned char _ENDIAG;
-    unsigned char _CS;    
+    unsigned char _CS;
+    
+    void _UpdateDirection();
 };
 #endif

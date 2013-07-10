@@ -144,7 +144,7 @@ void PinneAPIParser::_processSetSpeedCommand()
   {
     case ADDRESS_LEFT:
       Serial.print("Setting left speed"); Serial.println(speed);
-      //_robot->setLeftMotorSpeed(speed);
+      _robot->leftMotor->SetSpeed(speed);
       break;
     case ADDRESS_RIGHT:
       Serial.print("Setting right speed"); Serial.println(speed);
