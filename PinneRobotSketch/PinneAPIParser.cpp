@@ -1,5 +1,13 @@
 #include "PinneAPIParser.h"
 
+PinneAPIParser::PinneAPIParser(PinneRobot* robot) :
+  _robot(robot),
+  _currentCommand(CMD_UNKNOWN),
+  _currentSetGet(SETGET_UNKNOWN),
+  _currentAddress(ADDRESS_UNKNOWN)
+{
+}
+
 void PinneAPIParser::parseIncomingByte(byte inByte)
 {
   _parseCommand(inByte);
@@ -10,7 +18,82 @@ void PinneAPIParser::_parseCommand(byte inByte)
   _currentCommand = (command_t)(inByte & PARSE_MASK_COMMAND);
   _currentAddress = (address_t)(inByte & PARSE_MASK_ADDRESS);
   _currentSetGet = (setGet_t)(inByte & PARSE_MASK_SETGET);
-  Serial.print("Got command"); Serial.println(inByte);
+  
+  switch(_currentSetGet)
+  {
+    case SET_MESSAGE:
+      Serial.print("SET: ");
+      if(_currentCommand == CMD_STOP)
+      {
+        Serial.println("SET STOP COMMAND");
+        //processSetStopCommand();
+      } else {
+        if(_getDataBytes())
+        {
+          switch(_currentCommand)
+          {
+            case CMD_SPEED:
+              Serial.println("SET SPEED COMMAND");
+              //processSetSpeedCommand();
+              break;
+            case CMD_DIRECTION:
+              Serial.println("SET DIRECTION COMMAND");
+              //processSetDirectionCommand();
+              break;
+            case CMD_TARGET_POSITION:
+            Serial.println("SET TARGET POSITION COMMAND");
+              //processSetTargetPositionCommand();
+              break;
+            case CMD_CURRENT_POSITION:
+              Serial.println("SET CURRENT POSITION COMMAND");
+              //processSetCurrentPositionCommand();
+              break;
+            case CMD_BRAKE:
+              Serial.println("SET BRAKE COMMAND");
+              //processSetBrakeCommand();
+              break;
+            default:
+              Serial.print("Unknown command"); Serial.println(_currentCommand);
+          }
+        } else {
+          Serial.println("Error getting data bytes");
+        }
+      }
+      break;
+    case GET_MESSAGE:
+      switch(_currentCommand)
+      {
+        case CMD_SPEED:
+          Serial.println("GET SPEED COMMAND");
+          //processGetSpeedCommand();
+          break;
+        case CMD_DIRECTION:
+          Serial.println("GET DIRECTION COMMAND");
+          //processGetDirectionCommand();
+          break;
+        case CMD_TARGET_POSITION:
+          Serial.println("GET TARGET POSITION COMMAND");
+          //processGetTargetPositionCommand();
+          break;
+        case CMD_CURRENT_POSITION:
+          Serial.println("GET TARGET POSITION COMMAND");
+          //processGetCurrentPositionCommand();
+          break;
+        case CMD_BRAKE:
+          Serial.println("GET BRAKE COMMAND");
+          //processGetBrakeCommand();
+          break;
+        case CMD_STATE:
+          Serial.println("GET BRAKE COMMAND");
+          //processGetStateCommand();
+          break;  
+        default:
+          Serial.print("Unknown command"); Serial.println(_currentCommand);
+      }
+      break;
+    default:
+      Serial.println("SetGet fault");
+  }  
 }
 
 boolean PinneAPIParser::_getDataBytes()
@@ -26,71 +109,6 @@ int PinneAPIParser::_parseDataValue()
   result = _dataByteBuffer[1] | (_dataByteBuffer[0] << 7);
   return result;
 }
-
-//  switch(parser.currentSetGet)
-//  {
-//    case SET_MESSAGE:
-//      Serial.print("SET: ");
-//      if(parser.currentCommand == CMD_STOP)
-//      {
-//        processSetStopCommand();
-//      } else {
-//        if(getDataBytes())
-//        {
-//          switch(parser.currentCommand)
-//          {
-//            case CMD_SPEED:
-//              processSetSpeedCommand();
-//              break;
-//            case CMD_DIRECTION:
-//              processSetDirectionCommand();
-//              break;
-//            case CMD_TARGET_POSITION:
-//              processSetTargetPositionCommand();
-//              break;
-//            case CMD_CURRENT_POSITION:
-//              processSetCurrentPositionCommand();
-//              break;
-//            case CMD_BRAKE:
-//              processSetBrakeCommand();
-//              break;
-//            default:
-//              Serial.print("Unknown command"); Serial.println(parser.currentCommand);
-//          }
-//        } else {
-//          Serial.println("Error getting data bytes");
-//        }
-//      }
-//      break;
-//    case GET_MESSAGE:
-//      switch(parser.currentCommand)
-//      {
-//        case CMD_SPEED:
-//          processGetSpeedCommand();
-//          break;
-//        case CMD_DIRECTION:
-//          processGetDirectionCommand();
-//          break;
-//        case CMD_TARGET_POSITION:
-//          processGetTargetPositionCommand();
-//          break;
-//        case CMD_CURRENT_POSITION:
-//          processGetCurrentPositionCommand();
-//          break;
-//        case CMD_BRAKE:
-//          processGetBrakeCommand();
-//          break;
-//        case CMD_STATE:
-//          processGetStateCommand();
-//          break;  
-//        default:
-//          Serial.print("Unknown command"); Serial.println(parser.currentCommand);
-//      }
-//      break;
-//    default:
-//      Serial.println("SetGet fault");
-//  }
-//}
 
 //
 //void processSetStopCommand()

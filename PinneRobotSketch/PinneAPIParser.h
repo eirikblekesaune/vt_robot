@@ -8,7 +8,7 @@
 class PinneAPIParser
 {
   public:
-    PinneAPIParser(){};
+    PinneAPIParser(PinneRobot* robot);
     enum command_t
     {
       CMD_STOP = 0x00,
@@ -40,6 +40,12 @@ class PinneAPIParser
     void parseIncomingByte(byte inByte);
     
   private:
+    PinneRobot *_robot;
+    command_t _currentCommand;
+    setGet_t _currentSetGet;
+    address_t _currentAddress;
+    char _dataByteBuffer[2];
+    
     void _parseCommand(byte inByte);
     boolean _getDataBytes();
     int _parseDataValue();
@@ -55,10 +61,6 @@ class PinneAPIParser
     void _processSetBrakeCommand();
     void _processGetBrakeCommand();
     void _processGetStateCommand();
-    command_t _currentCommand;
-    setGet_t _currentSetGet;
-    address_t _currentAddress;
-    PinneRobot *_robot;
-    char _dataByteBuffer[2];
+
 };
 #endif
