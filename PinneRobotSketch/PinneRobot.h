@@ -1,6 +1,7 @@
 #ifndef PINNE_ROBOT_H
 #define PINNE_ROBOT_H
 #include <Arduino.h>
+#include "PinneMotor.h"
 #include "DualVNH5019MotorShieldVTMod.h"
 #include "lm293.h"
 
@@ -28,44 +29,7 @@ const int L293_EN = 11;//3;Changed because of interrupt
 const int ROT_POT = A2;
 
 
-//Notification states
-typedef enum _stateChange_t
-{
-  LEFT_MOTOR_STOPPED,//
-  LEFT_MOTOR_GOING_UP,
-  LEFT_MOTOR_GOING_DOWN,
-  LEFT_MOTOR_REACHED_TARGET,
-  LEFT_MOTOR_BLOCKED_BY_SENSOR,
-  LEFT_MOTOR_BLOCKED_BY_MIN_POSITION,
-  LEFT_MOTOR_BLOCKED_BY_MAX_POSITION,
-  LEFT_MOTOR_DRIVER_FAULT
-} stateChange_t;
 
-typedef int position_t;
-typedef int speed_t;
-typedef enum _direction_t { DIRECTION_DOWN, DIRECTION_UP } direction_t;
-typedef enum _stopSensor_t { BUTTON_IN, BUTTON_OUT } stopSensor_t;
-const position_t POSITION_ALL_UP = 0;
-const position_t POSITION_DEFAULT_MAX = 1024;
-const speed_t BRAKE_FULL = 400;
-const speed_t BRAKE_NONE = 0;
-const speed_t SPEED_MAX = 400;
-const speed_t SPEED_MIN = 0;
-const speed_t SPEED_STOP = 0;
-const position_t TARGET_NONE = -1;
-
-typedef struct _pinneMotor
-{
-  speed_t speed;
-  speed_t brake;
-  position_t target;
-  position_t minPosition;
-  position_t maxPosition;
-  direction_t direction;
-  int stopButtonValue;
-  boolean blocked;
-  
-} PinneMotor;
 
 typedef struct _motorData
 {
