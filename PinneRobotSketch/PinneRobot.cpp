@@ -21,45 +21,27 @@ const int rotationDriver1A = A3;
 const int rotationDriver2A = A4;
 const int rotationDriverPWM = 11;
 
-VNH5019Driver leftDriver(leftDriverINA, leftDriverINB, leftDriverENDIAG, leftDriverCS, leftDriverPWM);
-VNH5019Driver rightDriver(rightDriverINA, rightDriverINB, rightDriverENDIAG, rightDriverCS, rightDriverPWM);
+PinneRobot::PinneRobot()
+{
+  VNH5019Driver *leftDriver = new VNH5019Driver(leftDriverINA, leftDriverINB, leftDriverENDIAG, leftDriverCS, leftDriverPWM);
+  VNH5019Driver *rightDriver = new VNH5019Driver(rightDriverINA, rightDriverINB, rightDriverENDIAG, rightDriverCS, rightDriverPWM);
+  leftMotor = new PinneMotor(leftMotorSTOP, leftMotorEncoderInterruptIndex, leftDriver);
+  rightMotor = new PinneMotor(rightMotorSTOP, rightMotorEncoderInterruptIndex, rightDriver);
+}
 
-PinneMotor leftMotor(leftMotorSTOP, leftMotorEncoderInterruptIndex, &leftDriver);
-//PinneMotor rightMotor(rightMotorSTOP, rightMotorEncoderInterruptIndex, &rightDriver);
+void PinneRobot::init()
+{
+  leftMotor->init();
+  rightMotor->init();
+}
 
-//
-//volatile position_t posM1 = 0;
-//volatile position_t posM2 = 0;
-//volatile int encoder1TickValue = 1;
-//volatile int encoder2TickValue = 1;
-//
-//void encoder1_ISR()
-//{
-//  posM1 = posM1 + encoder1TickValue;
-//}
-//
-//void encoder2_ISR()
-//{
-//  posM2 = posM2 + encoder2TickValue;
-//}
-//
-//void PinneRobot::init()
-//{
-//  md.init();
-//  attachInterrupt(0, encoder1_ISR, CHANGE);
-//  attachInterrupt(1, encoder2_ISR, CHANGE);
-//  pinMode(M1_HALLA, INPUT);
-//  pinMode(M1_HALLB, INPUT);
-//  pinMode(M1_STOP, INPUT);
-//  pinMode(M2_HALLA, INPUT);
-//  pinMode(M2_HALLB, INPUT);
-//  pinMode(M2_STOP, INPUT);
-//  pinMode(L293_1A, OUTPUT);
-//  pinMode(L293_2A, OUTPUT);
-//  pinMode(L293_EN, OUTPUT);
-//  
-//  _initLeftMotor();
-//}
+void PinneRobot::_NotifyStateChange(stateChange_t stateChange, address_t address)
+{
+  Serial.write(BYTE_COMMAND | SET_MESSAGE | address | CMD_STATE_CHANGE);
+  Serial.write(stateChange);
+//  Serial.println();
+}
+
 //
 //void PinneRobot::_initLeftMotor()
 //{

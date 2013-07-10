@@ -1,11 +1,65 @@
 #include "Motor.h"
 
-PinneMotor::PinneMotor(int stopButtonPin, int encoderInterruptIndex, VNH5019Driver* driver) :
-  _targetPosition(TARGET_NONE),
-  _minPosition(POSITION_ALL_UP),
-  _maxPosition(POSITION_DEFAULT_MAX),
-  _stopButtonPin(stopButtonPin)
+volatile int encoderCounter1 = 0;
+volatile int encoderCounter2 = 0;
+volatile int encoderIncrement1 = 1;
+volatile int encoderIncrement2 = 1;
+
+void encoderISR1()
 {
-  pinMode(stopButtonPin, INPUT);
-  _stopButtonValue = digitalRead(stopButtonPin);
+  encoderCounter1 = encoderCounter1 + encoderIncrement1;
 }
+
+void encoderISR2()
+{
+  encoderCounter2 = encoderCounter2 + encoderIncrement2;
+}
+
+PinneMotor::PinneMotor(int stopButtonPin, int encoderInterruptIndex, VNH5019Driver* driver) :
+  _currentPosition(POSITION_ALL_UP), 
+  _targetPosition(TARGET_NONE), 
+  _minPosition(POSITION_ALL_UP), 
+  _maxPosition(POSITION_DEFAULT_MAX),
+  _stopButtonPin(stopButtonPin),
+  _driver(driver),
+  _encoderInterruptIndex(_encoderInterruptIndex)
+{
+  
+}
+
+void PinneMotor::init()
+{
+  switch(_encoderInterruptIndex)
+  {
+    case 0:
+      attachInterrupt(_encoderInterruptIndex, encoderISR1, CHANGE);
+      _encoderCounter = &encoderCounter1;
+      _encoderIncrement = &encoderIncrement1;
+      break;
+    case 1:
+      attachInterrupt(_encoderInterruptIndex, encoderISR2, CHANGE);
+      _encoderCounter = &encoderCounter2;
+      _encoderIncrement = &encoderIncrement2;
+      break;
+  }
+  pinMode(_stopButtonPin, INPUT);
+  _stopButtonValue = digitalRead(_stopButtonPin);
+  _driver->init();
+}
+
+void PinneMotor::Stop()
+{
+  _driver->SetSpeed(MotorDriver::SPEED_STOP);
+}
+
+void PinneMotor::SetSpeed(speed_t speed)
+{
+  if(speed == 0)
+  {
+    Stop();
+  } else {
+    if(!_blocked)
+      _driver->SetSpeed(speed);
+  }
+}
+

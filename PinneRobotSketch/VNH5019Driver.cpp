@@ -1,3 +1,6 @@
+///Much of this code is based on Pololu's DualVNH5019Motorshield.h code from:
+//https://github.com/pololu/Dual-VNH5019-Motor-Shield
+
 #include "MotorDriver.h"
 
 VNH5019Driver::VNH5019Driver(

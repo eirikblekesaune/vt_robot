@@ -9,7 +9,11 @@ typedef int brake_t;
 class MotorDriver
 {
   public:  
-    MotorDriver() {};
+    MotorDriver() : _speed(SPEED_STOP), _direction(0), _brake(BRAKE_NONE) {};
+    
+    enum BRAKE { BRAKE_NONE = 0, BRAKE_FULL = 400 };
+    enum SPEED { SPEED_STOP = 0, SPEED_MIN = 0, SPEED_MAX = 400};
+    
     virtual void init() = 0;// Set pin directions etc.
     
     virtual void SetSpeed(speed_t speed) = 0;
@@ -30,6 +34,10 @@ class L293Driver: public MotorDriver
    L293Driver(){};
 };
 
+
+//The main task for the driver is to set the proper pins
+//It clip values to within ranges, but it doesn't take the motors state into account.
+//The latter is the sole responsibility of the Motor class itself
 class VNH5019Driver: public MotorDriver
 {
   public:  
@@ -37,10 +45,10 @@ class VNH5019Driver: public MotorDriver
                   unsigned char CS1, unsigned char PWM);
     unsigned int GetCurrentMilliamps();
     unsigned char GetFault();
-    virtual void init();
-    virtual void SetSpeed(int speed);
-    virtual void SetDirection(int direction);
-    virtual void SetBrake(int brake);
+    void init();
+    void SetSpeed(int speed);
+    void SetDirection(int direction);
+    void SetBrake(int brake);
   private:
     unsigned char _INA;
     unsigned char _INB;

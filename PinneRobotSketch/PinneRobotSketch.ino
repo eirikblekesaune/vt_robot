@@ -1,3 +1,4 @@
+#include "PinneAPI.h"
 #include "PinneRobot.h"
 #include "PinneAPIParser.h"
 
