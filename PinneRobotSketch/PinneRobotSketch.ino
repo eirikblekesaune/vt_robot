@@ -1,7 +1,4 @@
-#include "VNH5019Driver.h"
-#include "PinneMotor.h"
 #include "PinneRobot.h"
-#include "PinneAPIParser.h"
 
 //pin connections
 const int leftDriverPWM = 9;
@@ -24,13 +21,13 @@ const int rotationDriver1A = A3;
 const int rotationDriver2A = A4;
 const int rotationDriverPWM = 11;
 
-VNH5019Driver leftDriver(leftDriverINA, leftDriverINB, leftDriverENDIAG, leftDriverCS, leftDriverPWM);
-VNH5019Driver rightDriver(rightDriverINA, rightDriverINB, rightDriverENDIAG, rightDriverCS, rightDriverPWM);
+//VNH5019Driver leftDriver(leftDriverINA, leftDriverINB, leftDriverENDIAG, leftDriverCS, leftDriverPWM);
+//VNH5019Driver rightDriver(rightDriverINA, rightDriverINB, rightDriverENDIAG, rightDriverCS, rightDriverPWM);
 
-PinneMotor leftMotor(leftMotorSTOP, leftMotorEncoderInterruptIndex, &leftDriver);
-PinneMotor rightMotor(rightMotorSTOP, rightMotorEncoderInterruptIndex, &rightDriver);
+//PinneMotor leftMotor(leftMotorSTOP, leftMotorEncoderInterruptIndex, &leftDriver);
+//PinneMotor rightMotor(rightMotorSTOP, rightMotorEncoderInterruptIndex, &rightDriver);
 
-PinneRobot robot(&leftMotor, &rightMotor);
+//PinneRobot robot(&leftMotor, &rightMotor);
 
 void setup()
 {
@@ -39,10 +36,4 @@ void setup()
 }
 void loop()
 {
-  delay(3000);
-  Serial.print("With direct call");
-  delay(3000);
-  Serial.print("With func poitner");
-  
-  
 }

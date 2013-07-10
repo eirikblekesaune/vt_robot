@@ -1,10 +1,10 @@
-#include "VNH5019Driver.h"
+#include "MotorDriver.h"
 
 VNH5019Driver::VNH5019Driver(
             unsigned char INA, unsigned char INB, 
             unsigned char ENDIAG, unsigned char CS, 
-            unsigned char PWM
-            ) : _INA(INA), _INB(INB), _ENDIAG(ENDIAG), _CS(CS), _PWM(PWM)
+            unsigned char PWM) 
+   : _INA(INA), _INB(INB), _ENDIAG(ENDIAG), _CS(CS), _PWM(PWM)
 {
   
 }
