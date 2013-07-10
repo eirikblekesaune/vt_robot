@@ -100,7 +100,6 @@ void processSetStopCommand()
   {
     case ADDRESS_LEFT:
       Serial.print("Stopping left motor");
-      parser.robot->leftMotorStop();
       break;
     case ADDRESS_RIGHT:
       Serial.print("Stopping right motor");
@@ -117,13 +116,13 @@ void processSetStopCommand()
 
 void processSetSpeedCommand()
 {
-  speed_t speed;
-  speed = (speed_t)parseDataValue();
+  int speed;
+  speed = parseDataValue();
   switch(parser.currentAddress)
   {
     case ADDRESS_LEFT:
       Serial.print("Setting left speed"); Serial.println(speed);
-      parser.robot->setLeftMotorSpeed(speed);
+      //parser.robot->setLeftMotorSpeed(speed);
       break;
     case ADDRESS_RIGHT:
       Serial.print("Setting right speed"); Serial.println(speed);
@@ -138,12 +137,12 @@ void processSetSpeedCommand()
 
 void processGetSpeedCommand()
 {
-  speed_t speed;
+  int speed;
   switch(parser.currentAddress)
   {
     case ADDRESS_LEFT:
       Serial.print("Left motor speed: ");
-      speed = parser.robot->getLeftMotorSpeed();
+      //speed = parser.robot->getLeftMotorSpeed();
       Serial.println(speed);
       break;
     default:
@@ -153,13 +152,13 @@ void processGetSpeedCommand()
 
 void processSetDirectionCommand()
 {
-  direction_t direction;
-  direction = (direction_t)parseDataValue();
+  int direction;
+  direction = parseDataValue();
   switch(parser.currentAddress)
   {
     case ADDRESS_LEFT:
       Serial.print("Setting left direction"); Serial.println(direction);
-      parser.robot->setLeftMotorDirection(direction);
+      //parser.robot->setLeftMotorDirection(direction);
       break;
     case ADDRESS_RIGHT:
       Serial.print("Setting right direction"); Serial.println(direction);
@@ -174,11 +173,11 @@ void processSetDirectionCommand()
 
 void processGetDirectionCommand()
 {
-  direction_t direction;
+  int direction;
   switch(parser.currentAddress)
   {
     case ADDRESS_LEFT:
-      direction = parser.robot->getLeftMotorDirection();
+      //direction = parser.robot->getLeftMotorDirection();
       Serial.print("Left motor direction: "); Serial.println(direction);
       break;
     default:
@@ -188,13 +187,13 @@ void processGetDirectionCommand()
 
 void processSetTargetPositionCommand()
 {
-  position_t targetPosition;
-  targetPosition = (position_t)parseDataValue();
+  int targetPosition;
+  targetPosition = parseDataValue();
   switch(parser.currentAddress)
   {
     case ADDRESS_LEFT:
       Serial.print("Setting left targetPosition"); Serial.println(targetPosition);
-      parser.robot->setLeftMotorTargetPosition(targetPosition);
+      //parser.robot->setLeftMotorTargetPosition(targetPosition);
       break;
     case ADDRESS_RIGHT:
       Serial.print("Setting right targetPosition"); Serial.println(targetPosition);
@@ -209,11 +208,11 @@ void processSetTargetPositionCommand()
 
 void processGetTargetPositionCommand()
 {
-  position_t targetPosition;
+  int targetPosition;
   switch(parser.currentAddress)
   {
     case ADDRESS_LEFT:
-      targetPosition = parser.robot->getLeftMotorTargetPosition();
+      //targetPosition = parser.robot->getLeftMotorTargetPosition();
       Serial.print("Left motor targetPosition: "); Serial.println(targetPosition);
       break;
     default:
@@ -223,13 +222,13 @@ void processGetTargetPositionCommand()
 
 void processSetCurrentPositionCommand()
 {
-  position_t currentPosition;
-  currentPosition = (position_t)parseDataValue();
+  int currentPosition;
+  currentPosition = parseDataValue();
   switch(parser.currentAddress)
   {
     case ADDRESS_LEFT:
       Serial.print("Setting left currentPosition"); Serial.println(currentPosition);
-      parser.robot->setLeftMotorCurrentPosition(currentPosition);
+      //parser.robot->setLeftMotorCurrentPosition(currentPosition);
       break;
     case ADDRESS_RIGHT:
       Serial.print("Setting right currentPosition"); Serial.println(currentPosition);
@@ -244,11 +243,11 @@ void processSetCurrentPositionCommand()
 
 void processGetCurrentPositionCommand()
 {
-  position_t currentPosition;
+  int currentPosition;
   switch(parser.currentAddress)
   {
     case ADDRESS_LEFT:
-      currentPosition = parser.robot->getLeftMotorCurrentPosition();
+      //currentPosition = parser.robot->getLeftMotorCurrentPosition();
       Serial.print("Left motor currentPosition: "); Serial.println(currentPosition);
       break;
     default:
@@ -258,13 +257,13 @@ void processGetCurrentPositionCommand()
 
 void processSetBrakeCommand()
 {
-  speed_t brake;
-  brake = (speed_t)parseDataValue();
+  int brake;
+  brake = parseDataValue();
   switch(parser.currentAddress)
   {
     case ADDRESS_LEFT:
       Serial.print("Setting left brake"); Serial.println(brake);
-      parser.robot->setLeftMotorBrake(brake);
+      //parser.robot->setLeftMotorBrake(brake);
       break;
     case ADDRESS_RIGHT:
       Serial.print("Setting right brake"); Serial.println(brake);
@@ -279,11 +278,11 @@ void processSetBrakeCommand()
 
 void processGetBrakeCommand()
 {
-  speed_t brake;
+  int brake;
   switch(parser.currentAddress)
   {
     case ADDRESS_LEFT:
-      brake = parser.robot->getLeftMotorBrake();
+      //brake = parser.robot->getLeftMotorBrake();
       Serial.print("Left motor brake: "); Serial.println(brake);
       break;
     default:

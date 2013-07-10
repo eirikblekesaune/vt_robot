@@ -1,13 +1,13 @@
 #ifndef PINNE_MOTOR_H
 #define PINNE_MOTOR_H
 #include <Arduino.h>
-
+#include "VNH5019Driver.h"
 //Notification states
 
 class PinneMotor
 {
 public:
-  PinneMotor(int stopButtonPin);
+  PinneMotor(int stopButtonPin, int encoderInterruptIndex, VNH5019Driver* driver);
   
   enum stateChange_t
   {

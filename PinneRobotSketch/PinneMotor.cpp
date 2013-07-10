@@ -1,6 +1,6 @@
 #include "PinneMotor.h"
 
-PinneMotor::PinneMotor(int stopButtonPin) :
+PinneMotor::PinneMotor(int stopButtonPin, int encoderInterruptIndex, VNH5019Driver* driver) :
   _speed(SPEED_STOP),
   _brake(BRAKE_FULL),
   _targetPosition(TARGET_NONE),
