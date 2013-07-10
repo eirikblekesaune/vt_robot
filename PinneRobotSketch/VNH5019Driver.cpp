@@ -42,15 +42,17 @@ void VNH5019Driver::SetSpeed(int speed)
     speed = 0;
   if (speed > 400)  // Max PWM dutycycle
     speed = 400;
-  Serial.println("VNH5019Driver::SetSpeed");Serial.println(speed);
+  DEBUG_PRINT("VNH5019Driver::SetSpeed");DEBUG_PRINT(speed);
   _speed = speed;
   #if defined(__AVR_ATmega168__)|| defined(__AVR_ATmega328P__) || defined(__AVR_ATmega32U4__)
   //temp hack..
   if(_PWM == 9)
   {
+    DEBUG_PRINT("OCR1A\n");
     OCR1A = speed;
   } else if(_PWM == 10)
   {
+    DEBUG_PRINT("OCR1B\n");
     OCR1B = speed;
   }
   #else

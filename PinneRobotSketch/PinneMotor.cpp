@@ -50,14 +50,14 @@ void PinneMotor::init()
 
 void PinneMotor::Stop()
 {
-  Serial.println("PinneMotor::Stop");
+  DEBUG_PRINT("PinneMotor::Stop");
   _driver->SetSpeed(MotorDriver::SPEED_STOP);
 }
 
 void PinneMotor::SetSpeed(speed_t speed)
 {
-  Serial.print("PinneMotor::SetSpeed"); Serial.println(speed);
-  Serial.print("blocked: "); Serial.println(_blocked);
+  DEBUG_PRINT("PinneMotor::SetSpeed"); DEBUG_PRINT(speed);
+  DEBUG_PRINT("blocked: "); DEBUG_PRINT(_blocked);
   if(speed <= 0)
   {
     Stop();

@@ -22,10 +22,10 @@ void PinneAPIParser::_parseCommand(byte inByte)
   switch(_currentSetGet)
   {
     case SET_MESSAGE:
-      Serial.print("SET: ");
+      DEBUG_PRINT("SET: ");
       if(_currentCommand == CMD_STOP)
       {
-        Serial.println("SET STOP COMMAND");
+        DEBUG_PRINT("STOP COMMAND");
         _processSetStopCommand();
       } else {
         if(_getDataBytes())
@@ -33,30 +33,30 @@ void PinneAPIParser::_parseCommand(byte inByte)
           switch(_currentCommand)
           {
             case CMD_SPEED:
-              Serial.println("SET SPEED COMMAND");
+              DEBUG_PRINT("SET SPEED COMMAND");
               _processSetSpeedCommand();
               break;
             case CMD_DIRECTION:
-              Serial.println("SET DIRECTION COMMAND");
+              DEBUG_PRINT("SET DIRECTION COMMAND");
               _processSetDirectionCommand();
               break;
             case CMD_TARGET_POSITION:
-            Serial.println("SET TARGET POSITION COMMAND");
+            DEBUG_PRINT("SET TARGET POSITION COMMAND");
               _processSetTargetPositionCommand();
               break;
             case CMD_CURRENT_POSITION:
-              Serial.println("SET CURRENT POSITION COMMAND");
+              DEBUG_PRINT("SET CURRENT POSITION COMMAND");
               _processSetCurrentPositionCommand();
               break;
             case CMD_BRAKE:
-              Serial.println("SET BRAKE COMMAND");
+              DEBUG_PRINT("SET BRAKE COMMAND");
               _processSetBrakeCommand();
               break;
             default:
-              Serial.print("Unknown command"); Serial.println(_currentCommand);
+              DEBUG_PRINT("Unknown command"); DEBUG_PRINT(_currentCommand);
           }
         } else {
-          Serial.println("Error getting data bytes");
+          DEBUG_PRINT("Error getting data bytes");
         }
       }
       break;
@@ -64,40 +64,45 @@ void PinneAPIParser::_parseCommand(byte inByte)
       switch(_currentCommand)
       {
         case CMD_SPEED:
-          Serial.println("GET SPEED COMMAND");
+          DEBUG_PRINT("GET SPEED COMMAND");
           _processGetSpeedCommand();
           break;
         case CMD_DIRECTION:
-          Serial.println("GET DIRECTION COMMAND");
+          DEBUG_PRINT("GET DIRECTION COMMAND");
           _processGetDirectionCommand();
           break;
         case CMD_TARGET_POSITION:
-          Serial.println("GET TARGET POSITION COMMAND");
+          DEBUG_PRINT("GET TARGET POSITION COMMAND");
           _processGetTargetPositionCommand();
           break;
         case CMD_CURRENT_POSITION:
-          Serial.println("GET TARGET POSITION COMMAND");
+          DEBUG_PRINT("GET TARGET POSITION COMMAND");
           _processGetCurrentPositionCommand();
           break;
         case CMD_BRAKE:
-          Serial.println("GET BRAKE COMMAND");
+          DEBUG_PRINT("GET BRAKE COMMAND");
           _processGetBrakeCommand();
           break;
         case CMD_STATE:
-          Serial.println("GET BRAKE COMMAND");
+          DEBUG_PRINT("GET BRAKE COMMAND");
           _processGetStateCommand();
           break;  
         default:
-          Serial.print("Unknown command"); Serial.println(_currentCommand);
+          DEBUG_PRINT("Unknown command"); DEBUG_PRINT(_currentCommand);
       }
       break;
     default:
-      Serial.println("SetGet fault");
+      DEBUG_PRINT("SetGet fault");
   }
   
   _currentCommand = CMD_UNKNOWN;
   _currentAddress = ADDRESS_UNKNOWN;
   _currentSetGet = SETGET_UNKNOWN;
+}
+
+void PinneAPIParser::Reply(const char* str)
+{
+  Serial.println(str);
 }
 
 boolean PinneAPIParser::_getDataBytes()
@@ -120,19 +125,25 @@ void PinneAPIParser::_processSetStopCommand()
   switch(_currentAddress)
   {
     case ADDRESS_LEFT:
-      Serial.print("Stopping left motor");
+      DEBUG_PRINT("Stopping left motor");
       _robot->leftMotor->Stop();
       break;
     case ADDRESS_RIGHT:
-      Serial.print("Stopping right motor");
+      DEBUG_PRINT("Stopping right motor");
+      _robot->rightMotor->Stop();
       break;
     case ADDRESS_ROTATION:
-      Serial.print("Stopping rotation motor");
+      DEBUG_PRINT("Stopping rotation motor");
+      Reply("TEST");
+      //_robot->rotationMotor->Stop();
       break;
     case ADDRESS_GLOBAL:
-      Serial.print("Stopping all motors");
+      DEBUG_PRINT("Stopping all motors");
+      _robot->leftMotor->Stop();
+      _robot->rightMotor->Stop();
+      //_robot->rotationMotor->Stop();
     default:
-      Serial.println("Unknown address");
+      DEBUG_PRINT("Unknown address");
   }
 }
 
@@ -143,32 +154,34 @@ void PinneAPIParser::_processSetSpeedCommand()
   switch(_currentAddress)
   {
     case ADDRESS_LEFT:
-      Serial.print("Setting left speed"); Serial.println(speed);
+      DEBUG_PRINT("Setting left speed"); DEBUG_PRINT(speed);
       _robot->leftMotor->SetSpeed(speed);
       break;
     case ADDRESS_RIGHT:
-      Serial.print("Setting right speed"); Serial.println(speed);
+      DEBUG_PRINT("Setting right speed"); DEBUG_PRINT(speed);
+      _robot->rightMotor->SetSpeed(speed);
       break;
     case ADDRESS_ROTATION:
-      Serial.print("Setting rotation speed"); Serial.println(speed);
+      DEBUG_PRINT("Setting rotation speed"); DEBUG_PRINT(speed);
+      //_robot->rotationMotor->SetSpeed(speed);
       break;
     default:
-      Serial.println("Unknown address");
+      DEBUG_PRINT("Unknown address");
   }
 }
 
 void PinneAPIParser::_processGetSpeedCommand()
 {
   int speed;
+  speed = -1;
   switch(_currentAddress)
   {
     case ADDRESS_LEFT:
-      Serial.print("Left motor speed: ");
-      //speed = _robot->getLeftMotorSpeed();
-      Serial.println(speed);
+      DEBUG_PRINT("Left motor speed: ");
+      speed = _robot->leftMotor->GetSpeed();
       break;
     default:
-      Serial.println("Unknown address");
+      DEBUG_PRINT("Unknown address");
   }
 }
 
@@ -179,17 +192,17 @@ void PinneAPIParser::_processSetDirectionCommand()
   switch(_currentAddress)
   {
     case ADDRESS_LEFT:
-      Serial.print("Setting left direction"); Serial.println(direction);
+      DEBUG_PRINT("Setting left direction"); DEBUG_PRINT(direction);
       //_robot->setLeftMotorDirection(direction);
       break;
     case ADDRESS_RIGHT:
-      Serial.print("Setting right direction"); Serial.println(direction);
+      DEBUG_PRINT("Setting right direction"); DEBUG_PRINT(direction);
       break;
     case ADDRESS_ROTATION:
-      Serial.print("Setting rotation direction"); Serial.println(direction);
+      DEBUG_PRINT("Setting rotation direction"); DEBUG_PRINT(direction);
       break;
     default:
-      Serial.println("Unknown address");
+      DEBUG_PRINT("Unknown address");
   }
 }
 
@@ -200,10 +213,10 @@ void PinneAPIParser::_processGetDirectionCommand()
   {
     case ADDRESS_LEFT:
       //direction = _robot->getLeftMotorDirection();
-      Serial.print("Left motor direction: "); Serial.println(direction);
+      DEBUG_PRINT("Left motor direction: "); DEBUG_PRINT(direction);
       break;
     default:
-      Serial.println("Unknown address");
+      DEBUG_PRINT("Unknown address");
   }
 }
 
@@ -214,17 +227,17 @@ void PinneAPIParser::_processSetTargetPositionCommand()
   switch(_currentAddress)
   {
     case ADDRESS_LEFT:
-      Serial.print("Setting left targetPosition"); Serial.println(targetPosition);
+      DEBUG_PRINT("Setting left targetPosition"); DEBUG_PRINT(targetPosition);
       //_robot->setLeftMotorTargetPosition(targetPosition);
       break;
     case ADDRESS_RIGHT:
-      Serial.print("Setting right targetPosition"); Serial.println(targetPosition);
+      DEBUG_PRINT("Setting right targetPosition"); DEBUG_PRINT(targetPosition);
       break;
     case ADDRESS_ROTATION:
-      Serial.print("Setting rotation targetPosition"); Serial.println(targetPosition);
+      DEBUG_PRINT("Setting rotation targetPosition"); DEBUG_PRINT(targetPosition);
       break;
     default:
-      Serial.println("Unknown address");
+      DEBUG_PRINT("Unknown address");
   }
 }
 
@@ -235,10 +248,10 @@ void PinneAPIParser::_processGetTargetPositionCommand()
   {
     case ADDRESS_LEFT:
       //targetPosition = _robot->getLeftMotorTargetPosition();
-      Serial.print("Left motor targetPosition: "); Serial.println(targetPosition);
+      DEBUG_PRINT("Left motor targetPosition: "); DEBUG_PRINT(targetPosition);
       break;
     default:
-      Serial.println("Unknown address");
+      DEBUG_PRINT("Unknown address");
   }
 }
 
@@ -249,17 +262,17 @@ void PinneAPIParser::_processSetCurrentPositionCommand()
   switch(_currentAddress)
   {
     case ADDRESS_LEFT:
-      Serial.print("Setting left currentPosition"); Serial.println(currentPosition);
+      DEBUG_PRINT("Setting left currentPosition"); DEBUG_PRINT(currentPosition);
       //_robot->setLeftMotorCurrentPosition(currentPosition);
       break;
     case ADDRESS_RIGHT:
-      Serial.print("Setting right currentPosition"); Serial.println(currentPosition);
+      DEBUG_PRINT("Setting right currentPosition"); DEBUG_PRINT(currentPosition);
       break;
     case ADDRESS_ROTATION:
-      Serial.print("Setting rotation currentPosition"); Serial.println(currentPosition);
+      DEBUG_PRINT("Setting rotation currentPosition"); DEBUG_PRINT(currentPosition);
       break;
     default:
-      Serial.println("Unknown address");
+      DEBUG_PRINT("Unknown address");
   }
 }
 
@@ -270,10 +283,10 @@ void PinneAPIParser::_processGetCurrentPositionCommand()
   {
     case ADDRESS_LEFT:
       //currentPosition = _robot->getLeftMotorCurrentPosition();
-      Serial.print("Left motor currentPosition: "); Serial.println(currentPosition);
+      DEBUG_PRINT("Left motor currentPosition: "); DEBUG_PRINT(currentPosition);
       break;
     default:
-      Serial.println("Unknown address");
+      DEBUG_PRINT("Unknown address");
   }
 }
 
@@ -284,17 +297,17 @@ void PinneAPIParser::_processSetBrakeCommand()
   switch(_currentAddress)
   {
     case ADDRESS_LEFT:
-      Serial.print("Setting left brake"); Serial.println(brake);
+      DEBUG_PRINT("Setting left brake"); DEBUG_PRINT(brake);
       //_robot->setLeftMotorBrake(brake);
       break;
     case ADDRESS_RIGHT:
-      Serial.print("Setting right brake"); Serial.println(brake);
+      DEBUG_PRINT("Setting right brake"); DEBUG_PRINT(brake);
       break;
     case ADDRESS_ROTATION:
-      Serial.print("Setting rotation brake"); Serial.println(brake);
+      DEBUG_PRINT("Setting rotation brake"); DEBUG_PRINT(brake);
       break;
     default:
-      Serial.println("Unknown address");
+      DEBUG_PRINT("Unknown address");
   }
 }
 
@@ -305,14 +318,16 @@ void PinneAPIParser::_processGetBrakeCommand()
   {
     case ADDRESS_LEFT:
       //brake = _robot->getLeftMotorBrake();
-      Serial.print("Left motor brake: "); Serial.println(brake);
+      DEBUG_PRINT("Left motor brake: "); DEBUG_PRINT(brake);
       break;
     default:
-      Serial.println("Unknown address");
+      DEBUG_PRINT("Unknown address");
   }
 }
 
 void PinneAPIParser::_processGetStateCommand()
 {
-  Serial.println("State command");
+  DEBUG_PRINT("State command");
 }
+
+

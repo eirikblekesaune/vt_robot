@@ -11,7 +11,7 @@ void setup()
   Serial.begin(115200);
   while(!Serial);
   robot.init();
-  Serial.println("hei");
+  DEBUG_PRINT("hei");
 }
 void loop()
 {
@@ -19,5 +19,6 @@ void loop()
   {
     parser.parseIncomingByte(Serial.read());
   }
-  delay(10);
+  delay(1);
 }
+

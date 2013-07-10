@@ -39,7 +39,7 @@ void PinneRobot::_NotifyStateChange(stateChange_t stateChange, address_t address
 {
   Serial.write(BYTE_COMMAND | SET_MESSAGE | address | CMD_STATE_CHANGE);
   Serial.write(stateChange);
-//  Serial.println();
+//  DEBUG_PRINT()
 }
 
 //
@@ -241,5 +241,5 @@ void PinneRobot::_NotifyStateChange(stateChange_t stateChange, address_t address
 //
 //void PinneRobot::_notifyStateChange(stateChange_t stateChange)
 //{
-//  Serial.print("State change:"); Serial.println(stateChange);
+//  DEBUG_PRINT("State change:"); DEBUG_PRINT(stateChange);
 //}

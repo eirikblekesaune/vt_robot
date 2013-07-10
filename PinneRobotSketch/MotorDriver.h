@@ -2,6 +2,7 @@
 #define MotorDriver_h
 
 #include <Arduino.h>
+#include "PinneAPI.h"
 
 typedef int speed_t;
 typedef int brake_t;

@@ -1,6 +1,14 @@
 #ifndef PINNE_API_H
 #define PINNE_API_H
 
+//This file contains all global definitions, macros, typedefs, enums etc.
+#define DEBUG
+#ifdef DEBUG 
+#define DEBUG_PRINT(x) Serial.print(x)
+#else
+#define DEBUG_PRINT(x)
+#endif
+
 typedef enum command_t
 {
   CMD_STOP = 0x00,
