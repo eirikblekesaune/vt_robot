@@ -7,12 +7,12 @@
 class PinneMotor
 {
   public:
-    PinneMotor(int stopButtonPin, int encoderInterruptIndex, VNH5019Driver* driver);
+    PinneMotor(int stopButtonPin, int encoderInterruptIndex, VNH5019Driver* driver, address_t address);
     ~PinneMotor() {};
     enum DIRECTION { DIRECTION_DOWN, DIRECTION_UP };
     enum BUTTON_POSITION { BUTTON_IN, BUTTON_OUT };
     enum POSITION { POSITION_ALL_UP = 0, POSITION_DEFAULT_MAX = 65535};
-    typedef unsigned int direction_t;
+    typedef int direction_t;
     typedef int position_t;
     typedef int buttonPosition_t;
     const static position_t TARGET_NONE = -1;
@@ -48,6 +48,7 @@ class PinneMotor
     position_t _maxPosition;
     boolean _blocked;
     MotorDriver* _driver;
+    address_t _address;
     int _encoderInterruptIndex;
     void _TargetReached() {};
     void _StopSensorHit() {};

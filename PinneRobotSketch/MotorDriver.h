@@ -24,6 +24,8 @@ class MotorDriver
     virtual int GetSpeed() { return _speed; };
     virtual int GetDirection() { return _direction; };
     virtual int GetBrake() { return _brake; };
+    
+    virtual void UpdateDirection();
   protected:
     int _speed;
     int _direction;
@@ -50,6 +52,7 @@ class VNH5019Driver: public MotorDriver
     void SetSpeed(int speed);
     void SetDirection(int direction);
     void SetBrake(int brake);
+    void UpdateDirection();
   private:
     unsigned char _INA;
     unsigned char _INB;
@@ -57,6 +60,6 @@ class VNH5019Driver: public MotorDriver
     unsigned char _ENDIAG;
     unsigned char _CS;
     
-    void _UpdateDirection();
+
 };
 #endif

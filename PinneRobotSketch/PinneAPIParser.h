@@ -10,7 +10,6 @@ class PinneAPIParser
   public:
     PinneAPIParser(PinneRobot* robot);
     void parseIncomingByte(byte inByte);
-    void Reply(const char* str);
     
   private:
     PinneRobot *_robot;

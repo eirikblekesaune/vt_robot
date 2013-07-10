@@ -48,11 +48,9 @@ void VNH5019Driver::SetSpeed(int speed)
   //temp hack..
   if(_PWM == 9)
   {
-    DEBUG_PRINT("OCR1A\n");
     OCR1A = speed;
   } else if(_PWM == 10)
   {
-    DEBUG_PRINT("OCR1B\n");
     OCR1B = speed;
   }
   #else
@@ -63,7 +61,7 @@ void VNH5019Driver::SetSpeed(int speed)
     digitalWrite(_INA, LOW);   // Make the motor coast no
     digitalWrite(_INB, LOW);   // matter which direction it is spinning.
   } else {
-    _UpdateDirection();
+    UpdateDirection();
   }
 }
 
@@ -74,10 +72,10 @@ void VNH5019Driver::SetDirection(int direction)
   if(direction > 1)
     direction = 1;
   _direction = direction;
-  _UpdateDirection();
+  UpdateDirection();
 }
 
-void VNH5019Driver::_UpdateDirection()
+void VNH5019Driver::UpdateDirection()
 {
   if (!_direction)
   {

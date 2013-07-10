@@ -100,11 +100,6 @@ void PinneAPIParser::_parseCommand(byte inByte)
   _currentSetGet = SETGET_UNKNOWN;
 }
 
-void PinneAPIParser::Reply(const char* str)
-{
-  Serial.println(str);
-}
-
 boolean PinneAPIParser::_getDataBytes()
 {
   boolean result;
@@ -125,25 +120,25 @@ void PinneAPIParser::_processSetStopCommand()
   switch(_currentAddress)
   {
     case ADDRESS_LEFT:
-      DEBUG_PRINT("Stopping left motor");
+      DEBUG_PRINT("Stopping left motor\n");
       _robot->leftMotor->Stop();
       break;
     case ADDRESS_RIGHT:
-      DEBUG_PRINT("Stopping right motor");
+      DEBUG_PRINT("Stopping right motor\n");
       _robot->rightMotor->Stop();
       break;
     case ADDRESS_ROTATION:
-      DEBUG_PRINT("Stopping rotation motor");
+      DEBUG_PRINT("Stopping rotation motor\n");
       Reply("TEST");
       //_robot->rotationMotor->Stop();
       break;
     case ADDRESS_GLOBAL:
-      DEBUG_PRINT("Stopping all motors");
+      DEBUG_PRINT("Stopping all motors\n");
       _robot->leftMotor->Stop();
       _robot->rightMotor->Stop();
       //_robot->rotationMotor->Stop();
     default:
-      DEBUG_PRINT("Unknown address");
+      DEBUG_PRINT("Unknown address\n");
   }
 }
 
@@ -154,19 +149,19 @@ void PinneAPIParser::_processSetSpeedCommand()
   switch(_currentAddress)
   {
     case ADDRESS_LEFT:
-      DEBUG_PRINT("Setting left speed"); DEBUG_PRINT(speed);
+      DEBUG_PRINT("Setting left speed\n"); DEBUG_PRINT(speed);
       _robot->leftMotor->SetSpeed(speed);
       break;
     case ADDRESS_RIGHT:
-      DEBUG_PRINT("Setting right speed"); DEBUG_PRINT(speed);
+      DEBUG_PRINT("Setting right speed\n"); DEBUG_PRINT(speed);
       _robot->rightMotor->SetSpeed(speed);
       break;
     case ADDRESS_ROTATION:
-      DEBUG_PRINT("Setting rotation speed"); DEBUG_PRINT(speed);
+      DEBUG_PRINT("Setting rotation speed\n"); DEBUG_PRINT(speed);
       //_robot->rotationMotor->SetSpeed(speed);
       break;
     default:
-      DEBUG_PRINT("Unknown address");
+      DEBUG_PRINT("Unknown address\n");
   }
 }
 
@@ -180,26 +175,41 @@ void PinneAPIParser::_processGetSpeedCommand()
       DEBUG_PRINT("Left motor speed: ");
       speed = _robot->leftMotor->GetSpeed();
       break;
+    case ADDRESS_RIGHT:
+      DEBUG_PRINT("Right motor speed: ");
+      speed = _robot->rightMotor->GetSpeed();
+      break;
+//    case ADDRESS_ROTATION:
+//      DEBUG_PRINT("Right motor speed: ");
+//      speed = _robot->rotationMotor->GetSpeed();
+//      break;
     default:
-      DEBUG_PRINT("Unknown address");
+      DEBUG_PRINT("Unknown address\n");
+  }
+  if(speed >= 0)
+  {
+    ReturnGetValue(_currentCommand, _currentAddress, speed);
+  } else {
+    DEBUG_PRINT("Something wrong with geting speed");
   }
 }
 
 void PinneAPIParser::_processSetDirectionCommand()
 {
-  int direction;
-  direction = _parseDataValue();
+  int direction = _parseDataValue();
   switch(_currentAddress)
   {
     case ADDRESS_LEFT:
       DEBUG_PRINT("Setting left direction"); DEBUG_PRINT(direction);
-      //_robot->setLeftMotorDirection(direction);
+      _robot->leftMotor->SetDirection(direction);
       break;
     case ADDRESS_RIGHT:
       DEBUG_PRINT("Setting right direction"); DEBUG_PRINT(direction);
+      _robot->rightMotor->SetDirection(direction);
       break;
     case ADDRESS_ROTATION:
       DEBUG_PRINT("Setting rotation direction"); DEBUG_PRINT(direction);
+      //_robot->rotationMotor->SetDirection(direction);
       break;
     default:
       DEBUG_PRINT("Unknown address");

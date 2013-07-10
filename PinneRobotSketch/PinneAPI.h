@@ -1,12 +1,14 @@
 #ifndef PINNE_API_H
 #define PINNE_API_H
-
+#include <Arduino.h>
 //This file contains all global definitions, macros, typedefs, enums etc.
-#define DEBUG
+//#define DEBUG
 #ifdef DEBUG 
 #define DEBUG_PRINT(x) Serial.print(x)
+#define DEBUG_NL Serial.print("\n")
 #else
 #define DEBUG_PRINT(x)
+#define DEBUG_NL
 #endif
 
 typedef enum command_t
@@ -23,7 +25,7 @@ typedef enum command_t
   CMD_UNKNOWN
 };
 
-enum ADDRESSES { 
+enum address_t { 
   ADDRESS_LEFT = 0x00, 
   ADDRESS_RIGHT = 0x10,
   ADDRESS_ROTATION = 0x20,
@@ -52,5 +54,38 @@ typedef enum parseMask_t {
   PARSE_MASK_COMMAND = 0x0F,
   PARSE_MASK_UNKNOWN
 };
+
+static void Reply(const char* str)
+{
+  Serial.println(str);
+}
+
+enum stateChange_t
+{
+  STOPPED,//Stopped manually
+  GOING_UP,//direction set to up
+  GOING_DOWN,//directiom set to down
+  STOPPED_AT_TARGET,//
+  BLOCKED_BY_SENSOR,//The stop sensor was hit
+  BLOCKED_BY_MIN_POSITION,//Position counter is below range
+  BLOCKED_BY_MAX_POSITION,//Position counter is above range
+  DRIVER_FAULT//Something is wrong with the driver itself
+};
+
+static void ReturnGetValue(command_t command, address_t address, int value)
+{
+  unsigned char data[2];
+  data[0] = (value >> 7) & 0x7F;
+  data[1] = lowByte(value) & 0x7F;
+  Serial.write(BYTE_COMMAND | SET_MESSAGE | address | command);
+  Serial.write(data[0]);
+  Serial.write(data[1]);
+}
+
+static void NotifyStateChange(stateChange_t stateChange, address_t address)
+{
+  Serial.write(BYTE_COMMAND | SET_MESSAGE | address | CMD_STATE_CHANGE);
+  Serial.write(stateChange);
+}
 
 #endif
