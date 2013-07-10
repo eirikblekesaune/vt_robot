@@ -1,6 +1,6 @@
 #include "PinneAPIParser.h"
 
-extern PinneParser parser;
+
 
 void parseIncomingByte(byte inByte)
 {
