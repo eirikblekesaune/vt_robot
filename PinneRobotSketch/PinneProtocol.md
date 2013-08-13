@@ -1,21 +1,21 @@
-Legger det opp slik at det kan bli ganske lett for deg å parse beskjeder i koden din. Definerer to hovedtyper bytes: kommandobyte og databytes. Ikke ulikt MIDI slik at du kun trenger å forholde deg til to hovedstates i parse funksjonen (f.eks. WAITING_FOR_COMMAND, WAITING_FOR_DATA). Alle beskjeder ender med CR/LF.
-Du kan jo se over dette og komme med tilbakemeldinger. Hvis du heller vil ha en mer lesbar protokoll, så er jeg med på den.
+Pinne API is separates between data and command byte, much like MIDI, and suports 14-bit value ranges.
 
 
-* bit7: 1=kommando byte, 0=value byte. i.e. 1nnn nnnn er en kommando byte, 0nnn nnnn er en data byte
-* bit6: 1=denne byten blir ettefulgt av data bytes, 0= denne byten har ingen etterfølgende bytes
-* bit5: 0=kommando gjelder venstre pinne, 1=byten gjelder høyre pinne
-* bit4: 1=set data byte, 0=get data byte
-* bit0-3: hvilken beskjed det er av følgende muligheter:
-* 0001: state
-* 0010: target posisjon
-* 0100: telleverk, for enkodere, current position
-* 1000: speed
-* 0101: Posisjon for rotasjonsservomotor
-* 1100: Speed for rotasjonsservomotor
-* 0000: Stopp
-
-Vi har plass til flere typer kommandoer i bit 0 - 3, hvis det skulle være behov for det. 
+* bit7: 1=command byte, 0=value byte. i.e. 1nnn nnnn is a command byte, 0nnn nnnn is a data byte
+* bit6: 0=set message, 1=get message
+* bit4-5: motor address, 
+	* 00: left motor
+	* 01: right motor
+	* 10: rotation motor
+	* 11: global command
+* bit0-3: Which command:
+	* 0000: stop
+	* 0001: speed
+	* 0010: direction
+	* 0011: targetPosition
+	* 0100: currentPosition
+	* 0101: brake
+	* 0110: state
 
 Det første som kommer inn er alltid en kommando byte med bit8==1. Hvis beskjeden har tilhørende data, f.eks. sett posisjon i etterfølgende bytes, så er bit7==1. Beskjeden vil i så tilfelle bli etterfulgt av data bytes hvor bit8==0.
 
