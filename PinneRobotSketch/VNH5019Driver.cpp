@@ -3,10 +3,8 @@
 
 #include "MotorDriver.h"
 
-VNH5019Driver::VNH5019Driver(
-                  unsigned char INA, unsigned char INB, unsigned char ENDIAG, 
-                  unsigned char CS, unsigned char PWM) 
-   : _INA(INA), _INB(INB), _ENDIAG(ENDIAG), _CS(CS), _PWM(PWM)
+VNH5019Driver::VNH5019Driver(unsigned char INA, unsigned char INB, unsigned char ENDIAG,  unsigned char PWM)
+   : _INA(INA), _INB(INB), _ENDIAG(ENDIAG), _PWM(PWM)
 {
 }
 
@@ -16,7 +14,6 @@ void VNH5019Driver::init()
   pinMode(_INB,OUTPUT);
   pinMode(_PWM,OUTPUT);
   pinMode(_ENDIAG,INPUT);
-  pinMode(_CS, INPUT);
   #if defined(__AVR_ATmega168__)|| defined(__AVR_ATmega328P__) || defined(__AVR_ATmega32U4__)
   // Timer 1 configuration
   // prescaler: clockI/O / 1
@@ -108,11 +105,6 @@ void VNH5019Driver::SetBrake(speed_t brake)
   #else
   analogWrite(_PWM, brake * 51 / 80); // default to using analogWrite, mapping 400 to 255
   #endif
-}
-
-unsigned int VNH5019Driver::GetCurrentMilliamps()
-{
-  return analogRead(_CS) * 34;
 }
 
 unsigned char VNH5019Driver::GetFault()

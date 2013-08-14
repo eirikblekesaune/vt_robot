@@ -8,7 +8,7 @@ PinneAPIParser parser(&robot);
 
 void setup()
 {
-  Serial.begin(115200);
+  Serial.begin(9600);
   while(!Serial);
   robot.init();
   DEBUG_PRINT("hei");
@@ -21,4 +21,3 @@ void loop()
   }
   delay(1);
 }
-

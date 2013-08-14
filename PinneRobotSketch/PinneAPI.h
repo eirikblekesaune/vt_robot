@@ -2,14 +2,7 @@
 #define PINNE_API_H
 #include <Arduino.h>
 //This file contains all global definitions, macros, typedefs, enums etc.
-//#define DEBUG
-#ifdef DEBUG 
-#define DEBUG_PRINT(x) Serial.print(x)
-#define DEBUG_NL Serial.print("\n")
-#else
-#define DEBUG_PRINT(x)
-#define DEBUG_NL
-#endif
+
 
 enum command_t
 {
@@ -89,5 +82,15 @@ static void NotifyStateChange(stateChange_t stateChange, address_t address)
   Serial.write(BYTE_COMMAND | SET_MESSAGE | address | CMD_STATE_CHANGE);
   Serial.write(stateChange);
 }
+
+//#define DEBUG
+#ifdef DEBUG 
+#define DEBUG_PRINT(x) Serial.print(x)
+#define DEBUG_NL Serial.print("\n")
+#else
+#define DEBUG_PRINT(x)
+#define DEBUG_NL
+#endif
+
 
 #endif

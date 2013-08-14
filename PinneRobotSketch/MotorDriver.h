@@ -39,12 +39,9 @@ class L293Driver: public MotorDriver
 class VNH5019Driver: public MotorDriver
 {
   public:  
-    VNH5019Driver(unsigned char INA, unsigned char INB, unsigned char ENDIAG, 
-                  unsigned char CS1, unsigned char PWM
-                  );
+    VNH5019Driver(unsigned char INA, unsigned char INB, unsigned char ENDIAG, unsigned char PWM);
     enum BRAKE { BRAKE_NONE = 0, BRAKE_FULL = 400 };
     enum SPEED { SPEED_STOP = 0, SPEED_MIN = 0, SPEED_MAX = 400};
-    unsigned int GetCurrentMilliamps();
     unsigned char GetFault();
     void init();
     void SetSpeed(speed_t speed);
@@ -56,7 +53,6 @@ class VNH5019Driver: public MotorDriver
     unsigned char _INB;
     unsigned char _PWM;
     unsigned char _ENDIAG;
-    unsigned char _CS;
     
 
 };

@@ -1,21 +1,22 @@
 #include "PinneRobot.h"
 
 //pin connections
+//left driver aka motor 1, right driver motor 2
 const int leftDriverPWM = 9;
 const int leftDriverINA = 5;//Remapped due to interrupt
 const int leftDriverINB = 4;
-const int leftDriverCS = A0;
+const int leftMotorSlackStopButton = A0; //todo: cut trace, was current sense pin
 const int leftDriverENDIAG = 6;
 const int leftMotorEncoderInterruptIndex = 0;// digital pin 2 implicitly
-const int leftMotorSTOP = A5;
+const int leftMotorTopStopButton = A5;
 
 const int rightDriverPWM = 10;
 const int rightDriverINA = 7;
 const int rightDriverINB = 8;
-const int rightDriverCS = A1;
+const int rightMotorSlackStopButton = A1;//todo cut trace, was current sense pin
 const int rightDriverENDIAG = 12;
 const int rightMotorEncoderInterruptIndex = 1;// digital pin 3 implicitly
-const int rightMotorSTOP = 13;
+const int rightMotorTopStopButton = 13;
 
 const int rotationDriver1A = A3;
 const int rotationDriver2A = A4;
@@ -23,10 +24,10 @@ const int rotationDriverPWM = 11;
 
 PinneRobot::PinneRobot()
 {
-  VNH5019Driver *leftDriver = new VNH5019Driver(leftDriverINA, leftDriverINB, leftDriverENDIAG, leftDriverCS, leftDriverPWM);
-  VNH5019Driver *rightDriver = new VNH5019Driver(rightDriverINA, rightDriverINB, rightDriverENDIAG, rightDriverCS, rightDriverPWM);
-  leftMotor = new PinneMotor(leftMotorSTOP, leftMotorEncoderInterruptIndex, leftDriver, ADDRESS_LEFT);
-  rightMotor = new PinneMotor(rightMotorSTOP, rightMotorEncoderInterruptIndex, rightDriver, ADDRESS_RIGHT);
+  VNH5019Driver *leftDriver = new VNH5019Driver(leftDriverINA, leftDriverINB, leftDriverENDIAG, leftDriverPWM);
+  VNH5019Driver *rightDriver = new VNH5019Driver(rightDriverINA, rightDriverINB, rightDriverENDIAG, rightDriverPWM);
+  leftMotor = new PinneMotor(leftMotorTopStopButton, leftMotorSlackStopButton, leftMotorEncoderInterruptIndex, leftDriver, ADDRESS_LEFT);
+  rightMotor = new PinneMotor(rightMotorTopStopButton, rightMotorSlackStopButton, rightMotorEncoderInterruptIndex, rightDriver, ADDRESS_RIGHT);
 }
 
 void PinneRobot::init()

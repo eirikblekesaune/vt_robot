@@ -120,7 +120,7 @@
 	doStateCommand: {|ev|
 		var state;
 		state = ~stateChanges.getID(ev[\valueBytes][0]);
-		"doing state command - state: %\n".postf(state);
+		"doing state command - address: % state: %\n".postf(ev[\currentAddress], state);
 		ev[\reset].value(ev);
 	},
 	reset: {|ev|
@@ -151,8 +151,10 @@ p.putAll(~buildMessage.value(\right, \set, \speed, 101));
 p.putAll(~buildMessage.value(\right, \get, \speed));
 
 p.putAll(~buildMessage.value(\left, \set, \direction, 0));
+p.putAll(~buildMessage.value(\left, \set, \direction, 1));
 p.putAll(~buildMessage.value(\left, \get, \direction));
 p.putAll(~buildMessage.value(\right, \set, \direction, 1));
+p.putAll(~buildMessage.value(\right, \set, \direction, 0));
 p.putAll(~buildMessage.value(\right, \get, \direction));
 
 p.putAll(~buildMessage.value(\left, \set, \brake, 132));
@@ -192,7 +194,7 @@ SerialPort.devices
 
 Tdef(\listenToSerial).stop;p.close
 
-p = SerialPort("/dev/tty.usbmodem1d11", 115200, crtscts:true,xonxoff:true);
+p = SerialPort("/dev/tty.usbserial-FT5QT6JNA", 9600, crtscts:true,xonxoff:true);
 (
 Tdef(\listenToSerial, {
 	loop{

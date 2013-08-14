@@ -15,12 +15,13 @@ void encoderISR2()
   encoderCounter2 = encoderCounter2 + encoderIncrement2;
 }
 
-PinneMotor::PinneMotor(int stopButtonPin, int encoderInterruptIndex, VNH5019Driver* driver, address_t address) :
+PinneMotor::PinneMotor(int topStopButtonPin, int slackStopButtonPin, int encoderInterruptIndex, VNH5019Driver* driver, address_t address) :
 _currentPosition(POSITION_ALL_UP), 
 _targetPosition(TARGET_NONE), 
 _minPosition(POSITION_ALL_UP), 
 _maxPosition(POSITION_DEFAULT_MAX),
-_stopButtonPin(stopButtonPin),
+_topStopButtonPin(topStopButtonPin),
+_slackStopButtonPin(slackStopButtonPin),
 _driver(driver),
 _address(address),
 _encoderInterruptIndex(_encoderInterruptIndex)
@@ -43,8 +44,10 @@ void PinneMotor::init()
     _encoderIncrement = &encoderIncrement2;
     break;
   }
-  pinMode(_stopButtonPin, INPUT);
-  _stopButtonValue = digitalRead(_stopButtonPin);
+  pinMode(_topStopButtonPin, INPUT);
+  pinMode(_slackStopButtonPin, INPUT);
+  _topStopButtonValue = digitalRead(_topStopButtonPin);
+  _slackStopButtonValue = digitalRead(_slackStopButtonPin);
   _driver->init();
   _blocked = false;
 }
@@ -87,7 +90,7 @@ void PinneMotor::SetDirection(int direction)
     {
       NotifyStateChange(GOING_DOWN, _address);
     } else if(dir == DIRECTION_UP) {
-      NotifyStateChange(GOING_DOWN, _address);
+      NotifyStateChange(GOING_UP, _address);
     }
   } 
   else {

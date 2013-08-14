@@ -7,7 +7,7 @@
 class PinneMotor
 {
   public:
-    PinneMotor(int stopButtonPin, int encoderInterruptIndex, VNH5019Driver* driver, address_t address);
+    PinneMotor(int topStopButtonPin, int slackStopButtonPin, int encoderInterruptIndex, VNH5019Driver* driver, address_t address);
     ~PinneMotor() {};
     enum DIRECTION { DIRECTION_DOWN, DIRECTION_UP };
     enum BUTTON_POSITION { BUTTON_IN, BUTTON_OUT };
@@ -40,8 +40,10 @@ class PinneMotor
     volatile int* _encoderCounter;
     volatile int* _encoderIncrement;
   private:
-    int _stopButtonPin;
-    buttonPosition_t _stopButtonValue;
+    int _topStopButtonPin;
+    int _slackStopButtonPin;
+    buttonPosition_t _topStopButtonValue;
+    buttonPosition_t _slackStopButtonValue;
     position_t _currentPosition;
     position_t _targetPosition;
     position_t _minPosition;
@@ -51,7 +53,8 @@ class PinneMotor
     address_t _address;
     int _encoderInterruptIndex;
     void _TargetReached() {};
-    void _StopSensorHit() {};
+    void _TopStopSensorHit() {};
+    void _SlackStopSensorHit() {};
     void _CalculateAndSetSpeed();
     void _SetBlocked(boolean block) {};
 };
