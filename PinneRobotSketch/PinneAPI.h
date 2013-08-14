@@ -86,8 +86,8 @@ static void ReturnGetValue(command_t command, address_t address, int value)
 
 static void NotifyStateChange(stateChange_t stateChange, address_t address)
 {
-  //Serial.write(BYTE_COMMAND | SET_MESSAGE | address | CMD_STATE_CHANGE);
-  //Serial.write(stateChange);
+  Serial.write(BYTE_COMMAND | SET_MESSAGE | address | CMD_STATE_CHANGE);
+  Serial.write(stateChange);
 }
 
 #endif
