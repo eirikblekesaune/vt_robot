@@ -4,12 +4,10 @@
 #include "MotorDriver.h"
 
 VNH5019Driver::VNH5019Driver(
-            unsigned char INA, unsigned char INB, 
-            unsigned char ENDIAG, unsigned char CS, 
-            unsigned char PWM) 
+                  unsigned char INA, unsigned char INB, unsigned char ENDIAG, 
+                  unsigned char CS, unsigned char PWM) 
    : _INA(INA), _INB(INB), _ENDIAG(ENDIAG), _CS(CS), _PWM(PWM)
 {
-  
 }
 
 void VNH5019Driver::init()
@@ -36,7 +34,7 @@ void VNH5019Driver::init()
   SetDirection(0);
 }
 
-void VNH5019Driver::SetSpeed(int speed)
+void VNH5019Driver::SetSpeed(speed_t speed)
 {
   if (speed < 0)
     speed = 0;
@@ -89,7 +87,7 @@ void VNH5019Driver::UpdateDirection()
   }
 }
 
-void VNH5019Driver::SetBrake(int brake)
+void VNH5019Driver::SetBrake(speed_t brake)
 {
   if (brake < 0)
     brake = 0;

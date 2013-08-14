@@ -52,10 +52,10 @@ void PinneMotor::init()
 void PinneMotor::Stop()
 {
   DEBUG_PRINT("PinneMotor::Stop\n");
-  _driver->SetSpeed(MotorDriver::SPEED_STOP);
+  _driver->SetSpeed(VNH5019Driver::SPEED_STOP);
 }
 
-void PinneMotor::SetSpeed(speed_t speed)
+void PinneMotor::SetSpeed(int speed)
 {
   DEBUG_PRINT("PinneMotor::SetSpeed:"); 
   DEBUG_PRINT(speed);
@@ -93,6 +93,31 @@ void PinneMotor::SetDirection(int direction)
   else {
     _driver->UpdateDirection();
   }
+}
+
+void PinneMotor::SetTargetPosition(int targetPosition)
+{
+  _targetPosition = targetPosition;
+}
+
+void PinneMotor::SetCurrentPosition(int currentPosition)
+{
+  _currentPosition = currentPosition;
+}
+
+void PinneMotor::SetBrake(int brake)
+{
+  _driver->SetBrake(brake);
+}
+
+void PinneMotor::SetMinPosition(int minPosition)
+{
+  _minPosition = minPosition;
+}
+
+void PinneMotor::SetMaxPosition(int maxPosition)
+{
+  _maxPosition = maxPosition;
 }
 
 

@@ -21,18 +21,25 @@ class PinneAPIParser
     void _parseCommand(byte inByte);
     boolean _getDataBytes();
     int _parseDataValue();
+    
     void _processSetStopCommand();
     void _processSetSpeedCommand();
-    void _processGetSpeedCommand();
     void _processSetDirectionCommand();
-    void _processGetDirectionCommand();
     void _processSetTargetPositionCommand();
-    void _processGetTargetPositionCommand();
     void _processSetCurrentPositionCommand();
-    void _processGetCurrentPositionCommand();
     void _processSetBrakeCommand();
-    void _processGetBrakeCommand();
+    void _processSetMinPositionCommand();
+    void _processSetMaxPositionCommand();
     void _processGetStateCommand();
+    
+    void _processGetSpeedCommand();    
+    void _processGetDirectionCommand();
+    void _processGetTargetPositionCommand();
+    void _processGetCurrentPositionCommand();
+    void _processGetBrakeCommand();
+    void _processGetMinPositionCommand();
+    void _processGetMaxPositionCommand();
+
 
 };
 #endif

@@ -1,4 +1,4 @@
-Pinne API is separates between data and command byte, much like MIDI, and suports 14-bit value ranges.
+Pinne API is separates between data and command byte, much like MIDI, and supports 14-bit value ranges.
 
 
 * bit7: 1=command byte, 0=value byte. i.e. 1nnn nnnn is a command byte, 0nnn nnnn is a data byte
@@ -15,7 +15,10 @@ Pinne API is separates between data and command byte, much like MIDI, and suport
 	* 0011: targetPosition
 	* 0100: currentPosition
 	* 0101: brake
-	* 0110: state
+	* 0110: state change
+	* 0111: info (debug)
+	* 1000: min position
+	* 1001: max position
 
 Det første som kommer inn er alltid en kommando byte med bit8==1. Hvis beskjeden har tilhørende data, f.eks. sett posisjon i etterfølgende bytes, så er bit7==1. Beskjeden vil i så tilfelle bli etterfulgt av data bytes hvor bit8==0.
 
@@ -23,27 +26,23 @@ Data bytes varierer med hvilken kommando som er sendt.
 State data byte: Value byte for state er bygd opp slik: 
 ```
 Command byte:
-bit 0: 1 (Since it is a command byte)
-bit 1: 1 (Since this will be followed by more bytes)
-bit 2: <Left motor: 0, right motor: 1>
-bit 3: NA
-bit 4: 0
-bit 5: 0
-bit 6: 0
-bit 8: 1  (0001 signifies a state value message)
+bit 0: 1 Since it is a command byte
+bit 1: 0 Since this is a set command
+bit 2-3: nn (Which motor(address) the state is concerning
+bit 4-8: 0001, signifies a state value message
 
 Value byte:
 bit 0: 0 (Since it is a value byte)
-bit 1: 0 (Since it is the last byte in the transmission)
-bit 2 - 7:
-xx000000: stopped
-xx000001: going up
-xx000010: going down
-xx000011: reached target
-xx000100: blocked by sensor
-xx000101: blocked by min position
-xx000110: blocked by max position
-cc000111: motor driver fault 
+bit 1 - 7:
+x0000000: stopped
+x0000001: going up
+x0000010: going down
+x0000011: stopped at target
+x0000100: blocked by top sensor
+x0000101: blocked by slack sensor
+x0000110: blocked by min position
+x0000111: blocked by max position
+x0000111: motor driver fault 
 ```
 
 Telleverk/Target position/speed data bytes:

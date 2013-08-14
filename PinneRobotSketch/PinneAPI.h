@@ -11,7 +11,7 @@
 #define DEBUG_NL
 #endif
 
-typedef enum command_t
+enum command_t
 {
   CMD_STOP = 0x00,
   CMD_SPEED = 0x01,
@@ -19,9 +19,10 @@ typedef enum command_t
   CMD_TARGET_POSITION = 0x03,
   CMD_CURRENT_POSITION = 0x04,
   CMD_BRAKE = 0x05,
-  CMD_STATE = 0x06,
+  CMD_STATE_CHANGE = 0x06,
   CMD_INFO = 0x07,//used for debugging, arbitrary numboer of asci characters
-  CMD_STATE_CHANGE = 0x08,
+  CMD_MIN_POSITION = 0x08,
+  CMD_MAX_POSITION = 0x09,
   CMD_UNKNOWN
 };
 
@@ -33,21 +34,21 @@ enum address_t {
   ADDRESS_UNKNOWN 
 };
     
-typedef enum setGet_t
+enum setGet_t
 {
   SET_MESSAGE = 0x00,
   GET_MESSAGE = 0x40,
   SETGET_UNKNOWN
 };
 
-typedef enum byteType_t
+enum byteType_t
 {
   BYTE_COMMAND = 0x80,
   BYTE_DATA = 0x00,
   BYTE_UNKNOWN
 };
 
-typedef enum parseMask_t {
+enum parseMask_t {
   PARSE_MASK_MESSAGE_TYPE = 0x80,//command byte of data byte
   PARSE_MASK_SETGET = 0x40,//setter or getter
   PARSE_MASK_ADDRESS = 0x30,//which motor is address
@@ -66,7 +67,8 @@ enum stateChange_t
   GOING_UP,//direction set to up
   GOING_DOWN,//directiom set to down
   STOPPED_AT_TARGET,//
-  BLOCKED_BY_SENSOR,//The stop sensor was hit
+  BLOCKED_BY_TOP_SENSOR,//The stop sensor was hit
+  BLOCKED_BY_SLACK_SENSOR,
   BLOCKED_BY_MIN_POSITION,//Position counter is below range
   BLOCKED_BY_MAX_POSITION,//Position counter is above range
   DRIVER_FAULT//Something is wrong with the driver itself
@@ -84,8 +86,8 @@ static void ReturnGetValue(command_t command, address_t address, int value)
 
 static void NotifyStateChange(stateChange_t stateChange, address_t address)
 {
-  Serial.write(BYTE_COMMAND | SET_MESSAGE | address | CMD_STATE_CHANGE);
-  Serial.write(stateChange);
+  //Serial.write(BYTE_COMMAND | SET_MESSAGE | address | CMD_STATE_CHANGE);
+  //Serial.write(stateChange);
 }
 
 #endif

@@ -5,31 +5,26 @@
 #include "PinneAPI.h"
 
 typedef int speed_t;
-typedef int brake_t;
 
 class MotorDriver
 {
   public:  
-    MotorDriver() : _speed(SPEED_STOP), _direction(0), _brake(BRAKE_NONE) {};
-    
-    enum BRAKE { BRAKE_NONE = 0, BRAKE_FULL = 400 };
-    enum SPEED { SPEED_STOP = 0, SPEED_MIN = 0, SPEED_MAX = 400};
-    
+    MotorDriver() {};
     virtual void init() = 0;// Set pin directions etc.
     
     virtual void SetSpeed(speed_t speed) = 0;
     virtual void SetDirection(int direction) = 0;
     virtual void SetBrake(speed_t brake) = 0;
     
-    virtual int GetSpeed() { return _speed; };
+    virtual speed_t GetSpeed() { return _speed; };
     virtual int GetDirection() { return _direction; };
-    virtual int GetBrake() { return _brake; };
+    virtual speed_t GetBrake() { return _brake; };
     
     virtual void UpdateDirection();
   protected:
-    int _speed;
+    speed_t _speed;
     int _direction;
-    int _brake;
+    speed_t _brake;
 };
 
 class L293Driver: public MotorDriver
@@ -45,13 +40,16 @@ class VNH5019Driver: public MotorDriver
 {
   public:  
     VNH5019Driver(unsigned char INA, unsigned char INB, unsigned char ENDIAG, 
-                  unsigned char CS1, unsigned char PWM);
+                  unsigned char CS1, unsigned char PWM
+                  );
+    enum BRAKE { BRAKE_NONE = 0, BRAKE_FULL = 400 };
+    enum SPEED { SPEED_STOP = 0, SPEED_MIN = 0, SPEED_MAX = 400};
     unsigned int GetCurrentMilliamps();
     unsigned char GetFault();
     void init();
-    void SetSpeed(int speed);
+    void SetSpeed(speed_t speed);
     void SetDirection(int direction);
-    void SetBrake(int brake);
+    void SetBrake(speed_t brake);
     void UpdateDirection();
   private:
     unsigned char _INA;
