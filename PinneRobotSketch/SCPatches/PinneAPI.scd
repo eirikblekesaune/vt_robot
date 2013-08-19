@@ -1,5 +1,16 @@
-
+SerialPort.devices.do(_.postln)
 (
+p = SerialPort("/dev/tty.usbserial-FT5QT6JNA", 9600, crtscts:true,xonxoff:true);
+//p = SerialPort("/dev/tty.usbmodem411", 9600, crtscts:true,xonxoff:true);
+Tdef(\listenToSerial, {
+	loop{
+		var byte;
+		byte = p.read;
+		byte.asAscii.post;
+		~pinneParser.putByte(byte);
+		//p.read.asBinaryString.postln;
+	}
+}).play;
 ~makeDataBytes = {|val|
 	[(val >> 7) & 0x7F, val & 0x7F];
 };
@@ -139,16 +150,13 @@
 );
 )
 
-~pinneParser.putByte(2r10000001)
-~pinneParser.putByte(2r10000001)
 
-~pinneParser.reset
-
-
-p.putAll(~buildMessage.value(\left, \set, \speed, 11));
+p.putAll(~buildMessage.value(\left, \set, \speed, 10));
 p.putAll(~buildMessage.value(\left, \get, \speed));
-p.putAll(~buildMessage.value(\right, \set, \speed, 101));
+p.putAll(~buildMessage.value(\right, \set, \speed, 10));
 p.putAll(~buildMessage.value(\right, \get, \speed));
+p.putAll(~buildMessage.value(\global, \set, \stop));
+
 
 p.putAll(~buildMessage.value(\left, \set, \direction, 0));
 p.putAll(~buildMessage.value(\left, \set, \direction, 1));
@@ -157,9 +165,9 @@ p.putAll(~buildMessage.value(\right, \set, \direction, 1));
 p.putAll(~buildMessage.value(\right, \set, \direction, 0));
 p.putAll(~buildMessage.value(\right, \get, \direction));
 
-p.putAll(~buildMessage.value(\left, \set, \brake, 132));
+p.putAll(~buildMessage.value(\left, \set, \brake, 0));
 p.putAll(~buildMessage.value(\left, \get, \brake));
-p.putAll(~buildMessage.value(\right, \set, \brake, 121));
+p.putAll(~buildMessage.value(\right, \set, \brake, 0));
 p.putAll(~buildMessage.value(\right, \get, \brake));
 
 p.putAll(~buildMessage.value(\left, \set, \targetPosition, 11));
@@ -194,16 +202,5 @@ SerialPort.devices
 
 Tdef(\listenToSerial).stop;p.close
 
-p = SerialPort("/dev/tty.usbserial-FT5QT6JNA", 9600, crtscts:true,xonxoff:true);
-(
-Tdef(\listenToSerial, {
-	loop{
-		var byte;
-		byte = p.read;
-		byte.asAscii.post;
-		~pinneParser.putByte(byte);
-		//p.read.asBinaryString.postln;
-	}
-}).play
-)
+
 Tdef(\listenToSerial).clear

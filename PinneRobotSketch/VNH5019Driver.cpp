@@ -3,6 +3,12 @@
 
 #include "MotorDriver.h"
 
+const speed_t VNH5019Driver::SPEED_STOP = 0;
+const speed_t VNH5019Driver::SPEED_MIN = 0;
+const speed_t VNH5019Driver::SPEED_MAX = 400;
+const speed_t VNH5019Driver::BRAKE_NONE = 0;
+const speed_t VNH5019Driver::BRAKE_FULL = 400;
+
 VNH5019Driver::VNH5019Driver(unsigned char INA, unsigned char INB, unsigned char ENDIAG,  unsigned char PWM)
    : _INA(INA), _INB(INB), _ENDIAG(ENDIAG), _PWM(PWM)
 {
@@ -27,8 +33,8 @@ void VNH5019Driver::init()
   TCCR1B = 0b00010001;
   ICR1 = 400;
   #endif
-  SetSpeed(SPEED_STOP);
-  SetDirection(0);
+  //SetSpeed(0);
+  //SetDirection(0);
 }
 
 void VNH5019Driver::SetSpeed(speed_t speed)

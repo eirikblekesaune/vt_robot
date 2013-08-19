@@ -3,7 +3,7 @@
 //pin connections
 //left driver aka motor 1, right driver motor 2
 const int leftDriverPWM = 9;
-const int leftDriverINA = 5;//Remapped due to interrupt
+const int leftDriverINA = 11;//Remapped due to interrupt
 const int leftDriverINB = 4;
 const int leftMotorSlackStopButton = A0; //todo: cut trace, was current sense pin
 const int leftDriverENDIAG = 6;
@@ -20,7 +20,7 @@ const int rightMotorTopStopButton = 13;
 
 const int rotationDriver1A = A3;
 const int rotationDriver2A = A4;
-const int rotationDriverPWM = 11;
+const int rotationDriverPWM = 5;
 
 PinneRobot::PinneRobot()
 {

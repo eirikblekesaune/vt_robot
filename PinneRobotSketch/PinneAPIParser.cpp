@@ -119,7 +119,7 @@ void PinneAPIParser::_parseCommand(byte inByte)
 boolean PinneAPIParser::_getDataBytes()
 {
   boolean result;
-  result = Serial.readBytes(_dataByteBuffer, 2) == 2;
+  result = Serial1.readBytes(_dataByteBuffer, 2) == 2;
   return result;
 }
 

@@ -9,13 +9,19 @@ class PinneMotor
   public:
     PinneMotor(int topStopButtonPin, int slackStopButtonPin, int encoderInterruptIndex, VNH5019Driver* driver, address_t address);
     ~PinneMotor() {};
-    enum DIRECTION { DIRECTION_DOWN, DIRECTION_UP };
-    enum BUTTON_POSITION { BUTTON_IN, BUTTON_OUT };
-    enum POSITION { POSITION_ALL_UP = 0, POSITION_DEFAULT_MAX = 65535};
+//    enum DIRECTION { DIRECTION_DOWN, DIRECTION_UP };
+    const static int DIRECTION_DOWN;
+    const static int DIRECTION_UP;
+    const static int TOP_SENSOR_IN;
+    const static int TOP_SENSOR_OUT;
+    const static int SLACK_SENSOR_IN;
+    const static int SLACK_SENSOR_OUT;
+    const static int POSITION_ALL_UP;
+    const static int POSITION_DEFAULT_MAX;
+//    enum BUTTON_POSITION { BUTTON_IN, BUTTON_OUT };
+//    enum POSITION { POSITION_ALL_UP = 0, POSITION_DEFAULT_MAX = 65535};
     typedef int position_t;
-    typedef int buttonPosition_t;
-    typedef int direction_t;
-    const static position_t TARGET_NONE = -1;
+    const static position_t TARGET_NONE;
     void init();
     void CheckSensor();
     void UpdatePosition();
@@ -42,8 +48,8 @@ class PinneMotor
   private:
     int _topStopButtonPin;
     int _slackStopButtonPin;
-    buttonPosition_t _topStopButtonValue;
-    buttonPosition_t _slackStopButtonValue;
+    int _topStopButtonValue;
+    int _slackStopButtonValue;
     position_t _currentPosition;
     position_t _targetPosition;
     position_t _minPosition;

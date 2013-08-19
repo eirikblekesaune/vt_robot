@@ -5,6 +5,17 @@ volatile int encoderCounter2 = 0;
 volatile int encoderIncrement1 = 1;
 volatile int encoderIncrement2 = 1;
 
+//init static variables
+const int PinneMotor::DIRECTION_DOWN = 0;
+const int PinneMotor::DIRECTION_UP = 1;
+const int PinneMotor::TOP_SENSOR_IN = 0;
+const int PinneMotor::TOP_SENSOR_OUT = 1;
+const int PinneMotor::SLACK_SENSOR_IN = 0;
+const int PinneMotor::SLACK_SENSOR_OUT = 1;
+const int PinneMotor::POSITION_ALL_UP = 0;
+const int PinneMotor::POSITION_DEFAULT_MAX = 65536;
+const int PinneMotor::TARGET_NONE = -1;
+
 void encoderISR1()
 {
   encoderCounter1 = encoderCounter1 + encoderIncrement1;
@@ -49,6 +60,8 @@ void PinneMotor::init()
   _topStopButtonValue = digitalRead(_topStopButtonPin);
   _slackStopButtonValue = digitalRead(_slackStopButtonPin);
   _driver->init();
+  Stop();
+  SetDirection(DIRECTION_DOWN);
   _blocked = false;
 }
 
@@ -82,7 +95,7 @@ void PinneMotor::SetDirection(int direction)
 {
   if(GetDirection() != direction)
   {
-    direction_t dir;
+    int dir;
     _driver->SetDirection(direction);
     dir = GetDirection();
     DEBUG_PRINT("Direction changed");

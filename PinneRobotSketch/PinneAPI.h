@@ -3,7 +3,6 @@
 #include <Arduino.h>
 //This file contains all global definitions, macros, typedefs, enums etc.
 
-
 enum command_t
 {
   CMD_STOP = 0x00,
@@ -49,11 +48,6 @@ enum parseMask_t {
   PARSE_MASK_UNKNOWN
 };
 
-static void Reply(const char* str)
-{
-  Serial.println(str);
-}
-
 enum stateChange_t
 {
   STOPPED,//Stopped manually
@@ -67,26 +61,31 @@ enum stateChange_t
   DRIVER_FAULT//Something is wrong with the driver itself
 };
 
+static void Reply(const char* str)
+{
+  Serial1.println(str);
+}
+
 static void ReturnGetValue(command_t command, address_t address, int value)
 {
   unsigned char data[2];
   data[0] = (value >> 7) & 0x7F;
   data[1] = lowByte(value) & 0x7F;
-  Serial.write(BYTE_COMMAND | SET_MESSAGE | address | command);
-  Serial.write(data[0]);
-  Serial.write(data[1]);
+  Serial1.write(BYTE_COMMAND | SET_MESSAGE | address | command);
+  Serial1.write(data[0]);
+  Serial1.write(data[1]);
 }
 
 static void NotifyStateChange(stateChange_t stateChange, address_t address)
 {
-  Serial.write(BYTE_COMMAND | SET_MESSAGE | address | CMD_STATE_CHANGE);
-  Serial.write(stateChange);
+  Serial1.write(BYTE_COMMAND | SET_MESSAGE | address | CMD_STATE_CHANGE);
+  Serial1.write(stateChange);
 }
 
 //#define DEBUG
 #ifdef DEBUG 
-#define DEBUG_PRINT(x) Serial.print(x)
-#define DEBUG_NL Serial.print("\n")
+#define DEBUG_PRINT(x) Serial1.print(x)
+#define DEBUG_NL Serial1.print("\n")
 #else
 #define DEBUG_PRINT(x)
 #define DEBUG_NL
