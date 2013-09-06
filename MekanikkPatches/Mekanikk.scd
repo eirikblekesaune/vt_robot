@@ -71,7 +71,7 @@ MIDIIn.connectAll;
 
 ~xbee.start;
 
-~xbeeRadio = (
+~togLED1 = (
 	xbee: ~xbee,
 	address: [0x00, 0x13, 0xA2, 0x00, 0x40, 0x90, 0x29, 0xEA],//TO
 	networkAddress: [0xFF, 0xFE],
@@ -111,12 +111,57 @@ MIDIIn.connectAll;
 	}
 );
 
+
+~togLED2 = (
+	xbee: ~xbee,
+	address: [0x00, 0x13, 0xA2, 0x00, 0x40, 0x8C, 0xCB, 0x3D],//TRE
+	networkAddress: [0x0A, 0x28],
+	theTask: Task.new({}),
+	runUpdateTask: {arg ev;
+		ev.use{
+			if(~theTask.isPlaying.not, {
+				~theTask = Task.new({
+					loop {
+						//~setLEDValue.value(~address, ~networkAddress, ~ledValue);
+						if(~ledValue != ~lastTransmittedValue, {
+							~xbee.sendTXFrame(~address, ~networkAddress, ["ms".ascii, ~ledValue, 13, 10].flatten, 1);
+							"sending: %\n".postf([~address, ~networkAddress, ~ledValue]);
+							~lastTransmittedValue = ~ledValue;
+						});
+						0.05.wait;
+					};
+				}.inEnvir).play;
+				SystemClock.sched(0.5, {
+					if(~theTask.isPlaying, {
+						~stopUpdateTask.value(currentEnvironment);
+					});
+				}.inEnvir);
+			});
+		}
+	},
+	stopUpdateTask: {arg ev;
+		ev.use{
+			~theTask.stop;
+		}
+	},
+	ledValue: 0,
+	lastTransmittedValue: 0,
+	setLEDValue: {arg ev, val;
+		ev[\ledValue] = val.clip(0, 250);
+		ev[\runUpdateTask].value(ev);
+	}
+);
+
 ~togCtrl.components.at('fader.8').action_({arg comp;
 	var val;
 	val = comp.value.linlin(0, 1023, 0, 250).asInteger;
-	~xbeeRadio.setLEDValue(val);
+	~togLED1.setLEDValue(val);
 });
-
+~togCtrl.components.at('fader.7').action_({arg comp;
+	var val;
+	val = comp.value.linlin(0, 1023, 0, 250).asInteger;
+	~togLED2.setLEDValue(val);
+});
 
 //Fuglen
 ~fuglAddr = NetAddr("1.2.3.112", 50004);
