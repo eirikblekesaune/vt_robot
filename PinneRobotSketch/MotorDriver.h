@@ -30,11 +30,14 @@ class MotorDriver
 class L293Driver: public MotorDriver
 {
   public:
-   L293Driver(unsigned char PIN_A, unsigned char PIN_B, unsigned char PIN_EN);
+   L293Driver(unsigned char INA, unsigned char INB, unsigned char PWM);
    virtual void SetSpeed(speed_t speed);
    virtual void SetDirection(int direction);
    virtual void SetBrake(speed_t brake);
   private:
+    unsigned char _INA;
+    unsigned char _INB;
+    unsigned char _PWM;
 };
 
 

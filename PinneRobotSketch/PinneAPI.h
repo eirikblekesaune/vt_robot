@@ -90,6 +90,13 @@ static void DebugUnitPrint(address_t address, const char* msg)
   Serial1.write(4);
 }
 
+static void DebugUnitPrint(address_t address, int msg)
+{
+  Serial1.write(BYTE_COMMAND | SET_MESSAGE | address | CMD_INFO );
+  Serial1.print(msg);
+  Serial1.write(4);
+}
+
 static void DebugPrint(const char* msg)
 {
   Serial1.write(BYTE_COMMAND | SET_MESSAGE | ADDRESS_GLOBAL | CMD_INFO );

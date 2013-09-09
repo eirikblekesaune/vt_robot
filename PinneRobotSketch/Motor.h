@@ -7,7 +7,7 @@
 class PinneMotor
 {
   public:
-    PinneMotor(int topStopButtonPin, int slackStopButtonPin, int encoderInterruptIndex, VNH5019Driver* driver, address_t address);
+    PinneMotor(int topStopSensorPin, int slackStopSensorPin, int encoderInterruptIndex, VNH5019Driver* driver, address_t address);
     ~PinneMotor() {};
 //    enum DIRECTION { DIRECTION_DOWN, DIRECTION_UP };
     const static int DIRECTION_DOWN;
@@ -20,7 +20,7 @@ class PinneMotor
     const static int POSITION_DEFAULT_MAX;
     const static int DIRECTION_DOWN_INCREMENT;
     const static int DIRECTION_UP_INCREMENT;
-//    enum BUTTON_POSITION { BUTTON_IN, BUTTON_OUT };
+//    enum Sensor_POSITION { Sensor_IN, Sensor_OUT };
 //    enum POSITION { POSITION_ALL_UP = 0, POSITION_DEFAULT_MAX = 65535};
     typedef int position_t;
     const static position_t TARGET_NONE;
@@ -47,14 +47,21 @@ class PinneMotor
     boolean IsBlocked();
     
     void UpdateState();
+    void ReadTopStopSensor();
+    void ReadSlackStopSensor();
 
     volatile int* _encoderCounter;
     volatile int* _encoderIncrement;
   private:
-    int _topStopButtonPin;
-    int _slackStopButtonPin;
-    int _topStopButtonValue;
-    int _slackStopButtonValue;
+    int _topStopSensorPin;
+    int _slackStopSensorPin;
+    int _topStopSensorValue;
+    int _slackStopSensorValue;
+    unsigned long _lastTopSensorReadTime;
+    int _lastTopSensorReading;
+    unsigned long _lastSlackSensorReadTime;
+    int _lastSlackSensorReading;
+    
     position_t _currentPosition;
     position_t _targetPosition;
     position_t _minPosition;
@@ -65,9 +72,11 @@ class PinneMotor
     int _encoderInterruptIndex;
     void _GoingUp();
     void _GoingDown();
-    void _TargetReached() {};
-    void _TopStopSensorHit() {};
-    void _SlackStopSensorHit() {};
+    void _TargetReached();
+    void _TopStopSensorIn();
+    void _TopStopSensorOut();
+    void _SlackStopSensorIn();
+    void _SlackStopSensorOut();
     void _AbsMinPositionReached();
     void _MinPositionReached();
     void _MaxPositionReached();
