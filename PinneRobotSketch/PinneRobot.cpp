@@ -7,7 +7,7 @@ const int leftDriverINA = 11;//Remapped due to interrupt
 const int leftDriverINB = 4;
 const int leftMotorSlackStopButton = A0; //todo: cut trace, was current sense pin
 const int leftDriverENDIAG = 6;
-const int leftMotorEncoderInterruptIndex = 0;// digital pin 2 implicitly
+const int leftMotorEncoderInterruptIndex = 1;// digital pin 3 on Leonardo implicitly
 const int leftMotorTopStopButton = A5;
 
 const int rightDriverPWM = 10;
@@ -15,7 +15,7 @@ const int rightDriverINA = 7;
 const int rightDriverINB = 8;
 const int rightMotorSlackStopButton = A1;//todo cut trace, was current sense pin
 const int rightDriverENDIAG = 12;
-const int rightMotorEncoderInterruptIndex = 1;// digital pin 3 implicitly
+const int rightMotorEncoderInterruptIndex = 0;// digital pin 2 on Leonardo implicitly
 const int rightMotorTopStopButton = 13;
 
 const int rotationDriver1A = A3;
@@ -34,6 +34,12 @@ void PinneRobot::init()
 {
   leftMotor->init();
   rightMotor->init();
+}
+
+void PinneRobot::update()
+{
+  leftMotor->UpdateState();
+  rightMotor->UpdateState();
 }
 
 

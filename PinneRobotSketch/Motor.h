@@ -18,13 +18,14 @@ class PinneMotor
     const static int SLACK_SENSOR_OUT;
     const static int POSITION_ALL_UP;
     const static int POSITION_DEFAULT_MAX;
+    const static int DIRECTION_DOWN_INCREMENT;
+    const static int DIRECTION_UP_INCREMENT;
 //    enum BUTTON_POSITION { BUTTON_IN, BUTTON_OUT };
 //    enum POSITION { POSITION_ALL_UP = 0, POSITION_DEFAULT_MAX = 65535};
     typedef int position_t;
     const static position_t TARGET_NONE;
     void init();
-    void CheckSensor();
-    void UpdatePosition();
+
     void Stop();
     
     void SetSpeed(int speed);
@@ -38,10 +39,14 @@ class PinneMotor
     int GetSpeed() { return static_cast<int>(_driver->GetSpeed()); };
     int GetDirection() { return static_cast<int>(_driver->GetDirection()); };
     int GetTargetPosition() { return static_cast<int>(_targetPosition); };
-    int GetCurrentPosition() { return static_cast<int>(_currentPosition); };
+    int GetCurrentPosition();
     int GetBrake() { return static_cast<int>(_driver->GetBrake()); };
     int GetMaxPosition() { return static_cast<int>(_maxPosition); };
     int GetMinPosition() { return static_cast<int>(_minPosition); };
+    
+    boolean IsBlocked();
+    
+    void UpdateState();
 
     volatile int* _encoderCounter;
     volatile int* _encoderIncrement;
@@ -58,11 +63,18 @@ class PinneMotor
     MotorDriver* _driver;
     address_t _address;
     int _encoderInterruptIndex;
+    void _GoingUp();
+    void _GoingDown();
     void _TargetReached() {};
     void _TopStopSensorHit() {};
     void _SlackStopSensorHit() {};
+    void _AbsMinPositionReached();
+    void _MinPositionReached();
+    void _MaxPositionReached();
     void _CalculateAndSetSpeed();
     void _SetBlocked(boolean block) {};
+    
+    int _state;
 };
 
 

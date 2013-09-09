@@ -6,7 +6,7 @@ Tdef(\listenToSerial, {
 	loop{
 		var byte;
 		byte = p.read;
-		byte.asAscii.post;
+		//byte.post;
 		~pinneParser.putByte(byte);
 		//p.read.asBinaryString.postln;
 	}
@@ -41,14 +41,16 @@ Tdef(\listenToSerial, {
 ];
 ~stateChanges = TwoWayIdentityDictionary[
 	\stopped ->   2r00000000,
-	\goingUp ->   2r00000001,
-	\goingDown -> 2r00000010,
+	\goingDown ->   2r00000001,
+	\goingUp -> 2r00000010,
 	\stoppedAtTarget -> 2r00000011,
 	\blockedByTopSensor -> 2r00000100,
 	\blockedBySlackSensor -> 2r00000101,
 	\blockedByMinPosition -> 2r00000110,
 	\blockedByMaxPosition -> 2r00000111,
-	\motorDriverFault -> 2r00001000
+	\blockedByAbsMinPosition -> 2r00001000,
+	\motorDriverFault -> 2r00001001
+
 ];
 ~buildMessage = {arg address, setGet, command, value;
 	var msg;
@@ -64,13 +66,19 @@ Tdef(\listenToSerial, {
 	msg;
 };
 ~pinneParser = (
-	parserStates: [\waitingForCommandByte, \waitingForDataByte, \waitingForStateByte],
+	parserStates: [
+		\waitingForCommandByte,
+		\waitingForDataByte,
+		\waitingForStateByte,
+		\waitingForInfoByte
+	],
 	dataBytesReceived: 0,
 	state: \waitingForCommandByte,
 	currentCommand: \none,
 	currentAddress: \none,
 	currentSetGet: \none,
 	valueBytes: Array.newClear(2),
+	infoBytes: Array.new,
 	putByte: {arg ev, byte;
 		if(byte.bitAnd(128) > 0 and: {ev[\state] == \waitingForCommandByte}, {//if first bit is 1
 			var command, nextParserState, address, setGet;
@@ -81,12 +89,12 @@ Tdef(\listenToSerial, {
 			setGet = ~setGetMasks.getID(byte.bitAnd(2r01000000));//get set or get command
 			switch(command,
 				\stop, {
-					"Received stop command".postln;
+					//"Received stop command".postln;
 					nextParserState = \waitingForCommandByte;
 					ev[\doCommand].value
 				},
 				\stateChange, {
-					"Receive state change command".postln;
+					//"Receive state change command".postln;
 					nextParserState = \waitingForStateByte;
 				},
 				\speed, {"Received speed command".postln},
@@ -95,7 +103,10 @@ Tdef(\listenToSerial, {
 				\currentPosition, {"Receive currentPosition command".postln;},
 				\brake, {"Received brake command".postln;},
 				\minPosition, {"Receive min position command".postln;},
-				\maxPosition, {"Receive max position command".postln;}
+				\maxPosition, {"Receive max position command".postln;},
+				\info, {
+					nextParserState = \waitingForInfoByte;
+				}
 			);
 			ev[\state] = nextParserState;
 			ev[\currentCommand] = command;
@@ -103,7 +114,7 @@ Tdef(\listenToSerial, {
 			ev[\currentSetGet] = setGet;
 			}, {
 				if(ev[\state] == \waitingForDataByte, {
-					"Data byte received".postln;
+					//"Data byte received".postln;
 					switch(ev[\dataBytesReceived],
 						0, {
 							ev[\valueBytes][0] = byte;
@@ -116,10 +127,20 @@ Tdef(\listenToSerial, {
 					)
 				});
 				if(ev[\state] == \waitingForStateByte, {
-					"State byte received".postln;
+					//"State byte received".postln;
 					ev[\valueBytes][0] = byte;
 					ev[\doStateCommand].value(ev);
-				})
+				});
+				if(ev[\state] == \waitingForInfoByte, {
+					if(byte != 4, {//4 is end of transimssion byte according to ASCII
+						ev[\infoBytes] = ev[\infoBytes].add(byte);
+					}, {
+							"INFO: [%]: ".postf(ev[\currentAddress]);
+							String.newFrom(ev[\infoBytes].collect(_.asAscii)).postln;
+							ev[\infoBytes] = Array.new;
+							ev[\reset].value(ev);
+					});
+				});
 		});
 	},
 	doCommand: {|ev|
@@ -151,12 +172,21 @@ Tdef(\listenToSerial, {
 )
 
 
-p.putAll(~buildMessage.value(\left, \set, \speed, 10));
+p.putAll(~buildMessage.value(\left, \set, \speed, 100));
 p.putAll(~buildMessage.value(\left, \get, \speed));
-p.putAll(~buildMessage.value(\right, \set, \speed, 10));
+p.putAll(~buildMessage.value(\left, \set, \stop));
+p.putAll(~buildMessage.value(\left, \set, \minPosition, 100));
+p.putAll(~buildMessage.value(\left, \set, \maxPosition, 300));
+p.putAll(~buildMessage.value(\left, \get, \currentPosition));
+
+p.putAll(~buildMessage.value(\right, \set, \speed, 120));
 p.putAll(~buildMessage.value(\right, \get, \speed));
 p.putAll(~buildMessage.value(\global, \set, \stop));
 
+p.putAll(~buildMessage.value(\left, \set, \currentPosition, hh));
+p.putAll(~buildMessage.value(\left, \get, \currentPosition));
+p.putAll(~buildMessage.value(\right, \set, \currentPosition, jdjd));
+p.putAll(~buildMessage.value(\right, \get, \currentPosition));
 
 p.putAll(~buildMessage.value(\left, \set, \direction, 0));
 p.putAll(~buildMessage.value(\left, \set, \direction, 1));
@@ -175,17 +205,12 @@ p.putAll(~buildMessage.value(\left, \get, \targetPosition));
 p.putAll(~buildMessage.value(\right, \set, \targetPosition, 24));
 p.putAll(~buildMessage.value(\right, \get, \targetPosition));
 
-p.putAll(~buildMessage.value(\left, \set, \currentPosition, 39));
-p.putAll(~buildMessage.value(\left, \get, \currentPosition));
-p.putAll(~buildMessage.value(\right, \set, \currentPosition, 98));
-p.putAll(~buildMessage.value(\right, \get, \currentPosition));
-
-p.putAll(~buildMessage.value(\left, \set, \minPosition, 123));
+p.putAll(~buildMessage.value(\left, \set, \minPosition, 100));
 p.putAll(~buildMessage.value(\left, \get, \minPosition));
 p.putAll(~buildMessage.value(\right, \set, \minPosition, 322));
 p.putAll(~buildMessage.value(\right, \get, \minPosition));
 
-p.putAll(~buildMessage.value(\left, \set, \maxPosition, 91));
+p.putAll(~buildMessage.value(\left, \set, \maxPosition, 400));
 p.putAll(~buildMessage.value(\left, \get, \maxPosition));
 p.putAll(~buildMessage.value(\right, \set, \maxPosition, 51));
 p.putAll(~buildMessage.value(\right, \get, \maxPosition));
@@ -204,3 +229,11 @@ Tdef(\listenToSerial).stop;p.close
 
 
 Tdef(\listenToSerial).clear
+
+
+"L0240".ascii
+
+16000000 / 1 / 2 / 800
+
+s.boot
+{SinOsc.ar(440)}.play

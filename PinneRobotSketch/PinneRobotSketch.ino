@@ -2,25 +2,35 @@
 #include "PinneRobot.h"
 #include "PinneAPIParser.h"
 
-PinneRobot robot;
-PinneAPIParser parser(&robot);
+PinneRobot *robot;
+PinneAPIParser *parser;
+
 
 void setup()
 { 
   Serial1.begin(9600);
   while(!Serial1);
+  
+//  Serial.begin(9600);
+//  while(!Serial);
+
   Serial1.println("STARTED");
-  robot.init();
+  Serial.println("USB COMM");
+  delay(100);
+  robot = new PinneRobot();
+  parser = new PinneAPIParser(robot);
+  robot->init();
   DEBUG_PRINT("hei");
-  robot.leftMotor->SetSpeed(0);
-  robot.rightMotor->SetSpeed(0);
+  robot->leftMotor->SetSpeed(0);
+  robot->rightMotor->SetSpeed(0);
   //robot.rotationMotor->SetSpeed(0);
 }
 void loop()
 {
   if(Serial1.available())
   {
-    parser.parseIncomingByte(Serial1.read());
+    parser->parseIncomingByte(Serial1.read());
   }
-  delay(1);
+  robot->update();
+  delay(300);
 }
