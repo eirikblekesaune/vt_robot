@@ -94,14 +94,22 @@ class RotationMotor
   public:
     RotationMotor(unsigned char rotationPotmeterPin, L293Driver* driver, address_t address);
     const static position_t TARGET_NONE;
-    const static int DIRECTION_RIGHT;
+
     const static int DIRECTION_LEFT;
-    const static int POSITION_MAX_RIGHT;
-    const static int POSITION_MAX_LEFT;
-    const static int SPEED_STOP;    
+    const static int DIRECTION_RIGHT;
+    const static int DIRECTION_DOWN;  
+    const static int DIRECTION_UP;
+    const static int POSITION_MIN;
+    const static int POSITION_MAX;
+    const static int POSITION_LEFT_LIMIT;
+    const static int POSITION_RIGHT_LIMIT;
+    const static int SPEED_STOP;
+    const static int TURNING_LEFT;
+    const static int TURNING_RIGHT;
+    
     void init();
 
-    void Stop() { SetSpeed(SPEED_STOP); };
+    void Stop() { _driver->SetSpeed(SPEED_STOP); };
     
     void SetSpeed(int speed);
     void SetDirection(int direction);
@@ -116,21 +124,30 @@ class RotationMotor
     int GetTargetPosition() { return static_cast<int>(_targetPosition); };
     int GetCurrentPosition() { return static_cast<int>(_currentPosition); };
     int GetBrake() { return static_cast<int>(_driver->GetBrake()); };
-    int GetMaxPosition() { return static_cast<int>(_rightMaxPosition); };
-    int GetMinPosition() { return static_cast<int>(_leftMaxPosition); };
+    int GetMaxPosition() { return static_cast<int>(_maxPosition); };
+    int GetMinPosition() { return static_cast<int>(_minPosition); };
     
     boolean IsBlocked();
     void UpdateState();
     
   private:
+    int _state;
     MotorDriver* _driver;
     address_t _address;
     boolean _blocked;
     position_t _currentPosition;
     position_t _targetPosition;
-    position_t _rightMaxPosition;
-    position_t _leftMaxPosition;
+    position_t _minPosition; //i.e. max left position
+    position_t _maxPosition; //i.e. max right position
     unsigned char _rotationPotmeterPin;
+    
+    void _TurningRight();
+    void _TurningLeft();
+    void _TargetReached();
+    void _MinPositionReached();
+    void _MaxPositionReached();
+
+
     
 };
 

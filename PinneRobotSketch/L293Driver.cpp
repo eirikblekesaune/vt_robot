@@ -18,10 +18,6 @@ void L293Driver::init()
   TCCR3A = 0b10000000;
   TCCR3B = 0b00010001;
   ICR3 = SPEED_MAX;
-  DebugPrint("TCCR1C:");
-  DebugPrint(TCCR1C);
-  DebugPrint("TCCR3C:");
-  DebugPrint(TCCR3C);
   SetDirection(0);
   SetSpeed(0);
 }
@@ -33,8 +29,6 @@ void L293Driver::SetSpeed(speed_t speed)
   if (speed > 400)  // Max PWM dutycycle
     speed = SPEED_MAX;
   _speed = speed;
-  DEBUG_PRINT("L293Speed");
-  DEBUG_PRINT(_speed);
   OCR3A = _speed;
   UpdateDirection();
 }
