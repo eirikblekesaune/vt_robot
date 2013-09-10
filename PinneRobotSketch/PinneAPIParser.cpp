@@ -147,13 +147,13 @@ void PinneAPIParser::_processSetStopCommand()
       break;
     case ADDRESS_ROTATION:
       ////DEBUG_PRINT("Stopping rotation motor\n");DEBUG_NL;
-      //_robot->rotationMotor->Stop();
+      _robot->rotationMotor->Stop();
       break;
     case ADDRESS_GLOBAL:
       ////DEBUG_PRINT("Stopping all motors\n");DEBUG_NL;
       _robot->leftMotor->Stop();
       _robot->rightMotor->Stop();
-      //_robot->rotationMotor->Stop();
+      _robot->rotationMotor->Stop();
     default:
       DEBUG_PRINT("Unknown address\n");
   }
@@ -177,7 +177,7 @@ void PinneAPIParser::_processSetSpeedCommand()
       break;
     case ADDRESS_ROTATION:
       ////DEBUG_PRINT("Setting rotation speed\n"); //DEBUG_PRINT(value);DEBUG_NL;
-      //_robot->rotationMotor->SetSpeed(value);
+      _robot->rotationMotor->SetSpeed(value);
       break;
     default:
       DEBUG_PRINT("Unknown address\n");
@@ -198,10 +198,10 @@ void PinneAPIParser::_processGetSpeedCommand()
       ////DEBUG_PRINT("Right motor speed: ");DEBUG_NL;
       value = _robot->rightMotor->GetSpeed();
       break;
-//    case ADDRESS_ROTATION:
+    case ADDRESS_ROTATION:
 //      //DEBUG_PRINT("Right motor speed: ");
-//      value = _robot->rotationMotor->GetSpeed();
-//      break;
+      value = _robot->rotationMotor->GetSpeed();
+      break;
     default:
       DEBUG_PRINT("Unknown address\n");DEBUG_NL;
   }
@@ -230,7 +230,7 @@ void PinneAPIParser::_processSetDirectionCommand()
       break;
     case ADDRESS_ROTATION:
       ////DEBUG_PRINT("Setting rotation direction"); //DEBUG_PRINT(value);DEBUG_NL;
-      //_robot->rotationMotor->SetDirection(value);
+      _robot->rotationMotor->SetDirection(value);
       break;
     default:
       DEBUG_PRINT("Unknown address");DEBUG_NL;
@@ -251,10 +251,10 @@ void PinneAPIParser::_processGetDirectionCommand()
       //DEBUG_PRINT("Right motor speed: ");DEBUG_NL;
       value = _robot->rightMotor->GetDirection();
       break;
-//    case ADDRESS_ROTATION:
+    case ADDRESS_ROTATION:
 //      //DEBUG_PRINT("Right motor speed: ");
-//      value = _robot->rotationMotor->GetDirection();
-//      break;
+      value = _robot->rotationMotor->GetDirection();
+      break;
     default:
       DEBUG_PRINT("Unknown address\n");DEBUG_NL;
   }
@@ -283,7 +283,7 @@ void PinneAPIParser::_processSetTargetPositionCommand()
       break;
     case ADDRESS_ROTATION:
       //DEBUG_PRINT("Setting rotation target postition"); //DEBUG_PRINT(value);DEBUG_NL;
-      //_robot->rotationMotor->SetTargetPosition(value);
+      _robot->rotationMotor->SetTargetPosition(value);
       break;
     default:
       DEBUG_PRINT("Unknown address");DEBUG_NL;
@@ -304,10 +304,10 @@ void PinneAPIParser::_processGetTargetPositionCommand()
       //DEBUG_PRINT("Right motor target position: ");DEBUG_NL;
       value = _robot->rightMotor->GetTargetPosition();
       break;
-//    case ADDRESS_ROTATION:
+    case ADDRESS_ROTATION:
 //      //DEBUG_PRINT("Right motor target position: ");
-//      value = _robot->rotationMotor->GetTargetPosition();
-//      break;
+      value = _robot->rotationMotor->GetTargetPosition();
+      break;
     default:
       DEBUG_PRINT("Unknown address\n");DEBUG_NL;
   }
@@ -335,7 +335,7 @@ void PinneAPIParser::_processSetCurrentPositionCommand()
       break;
     case ADDRESS_ROTATION:
       //DEBUG_PRINT("Setting rotation current postition"); //DEBUG_PRINT(value);DEBUG_NL;
-      //_robot->rotationMotor->SetCurrentPosition(value);
+      _robot->rotationMotor->SetCurrentPosition(value);
       break;
     default:
       DEBUG_PRINT("Unknown address");DEBUG_NL;
@@ -356,10 +356,10 @@ void PinneAPIParser::_processGetCurrentPositionCommand()
       //DEBUG_PRINT("Right motor current position: ");DEBUG_NL;
       value = _robot->rightMotor->GetCurrentPosition();
       break;
-//    case ADDRESS_ROTATION:
+    case ADDRESS_ROTATION:
 //      //DEBUG_PRINT("Right motor current position: ");
-//      value = _robot->rotationMotor->GetCurrentPosition();
-//      break;
+      value = _robot->rotationMotor->GetCurrentPosition();
+      break;
     default:
       DEBUG_PRINT("Unknown address\n");DEBUG_NL;
   }
@@ -388,7 +388,7 @@ void PinneAPIParser::_processSetBrakeCommand()
       break;
     case ADDRESS_ROTATION:
       //DEBUG_PRINT("Setting rotation brake"); //DEBUG_PRINT(value);DEBUG_NL;
-      //_robot->rotationMotor->SetBrake(value);
+      _robot->rotationMotor->SetBrake(value);
       break;
     default:
       DEBUG_PRINT("Unknown address");DEBUG_NL;
@@ -409,10 +409,10 @@ void PinneAPIParser::_processGetBrakeCommand()
       //DEBUG_PRINT("Right motor brake: ");DEBUG_NL;
       value = _robot->rightMotor->GetBrake();
       break;
-//    case ADDRESS_ROTATION:
+    case ADDRESS_ROTATION:
 //      //DEBUG_PRINT("Right motor brake: ");DEBUG_NL;
-//      value = _robot->rotationMotor->GetBrake();
-//      break;
+      value = _robot->rotationMotor->GetBrake();
+      break;
     default:
       DEBUG_PRINT("Unknown address\n");DEBUG_NL;
   }
@@ -441,7 +441,7 @@ void PinneAPIParser::_processSetMinPositionCommand()
       break;
     case ADDRESS_ROTATION:
       //DEBUG_PRINT("Setting rotation min position"); //DEBUG_PRINT(value);DEBUG_NL;
-      //_robot->rotationMotor->SetMinPosition(value);
+      _robot->rotationMotor->SetMinPosition(value);
       break;
     default:
       DEBUG_PRINT("Unknown address");DEBUG_NL;
@@ -462,10 +462,10 @@ void PinneAPIParser::_processGetMinPositionCommand()
       //DEBUG_PRINT("Right motor min position: ");DEBUG_NL;
       value = _robot->rightMotor->GetMinPosition();
       break;
-//    case ADDRESS_ROTATION:
+    case ADDRESS_ROTATION:
 //      //DEBUG_PRINT("Right motor min position: ");DEBUG_NL;
-//      value = _robot->rotationMotor->GetMinPosition();
-//      break;
+      value = _robot->rotationMotor->GetMinPosition();
+      break;
     default:
       DEBUG_PRINT("Unknown address\n");DEBUG_NL;
   }
@@ -493,7 +493,7 @@ void PinneAPIParser::_processSetMaxPositionCommand()
       break;
     case ADDRESS_ROTATION:
       //DEBUG_PRINT("Setting rotation max position"); //DEBUG_PRINT(value);DEBUG_NL;
-      //_robot->rotationMotor->SetMaxPosition(value);
+      _robot->rotationMotor->SetMaxPosition(value);
       break;
     default:
       DEBUG_PRINT("Unknown address");
@@ -514,10 +514,10 @@ void PinneAPIParser::_processGetMaxPositionCommand()
       //DEBUG_PRINT("Right motor max position: ");DEBUG_NL;
       value = _robot->rightMotor->GetMaxPosition();
       break;
-//    case ADDRESS_ROTATION:
+    case ADDRESS_ROTATION:
 //      //DEBUG_PRINT("Right motor max position: ");DEBUG_NL;
-//      value = _robot->rotationMotor->GetMaxPosition();
-//      break;
+      value = _robot->rotationMotor->GetMaxPosition();
+      break;
     default:
       DEBUG_PRINT("Unknown address\n");DEBUG_NL;
   }

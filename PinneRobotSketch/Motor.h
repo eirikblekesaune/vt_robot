@@ -4,6 +4,10 @@
 #include "MotorDriver.h"
 #include "PinneAPI.h"
 
+
+typedef int position_t;
+
+
 class PinneMotor
 {
   public:
@@ -22,7 +26,6 @@ class PinneMotor
     const static int DIRECTION_UP_INCREMENT;
 //    enum Sensor_POSITION { Sensor_IN, Sensor_OUT };
 //    enum POSITION { POSITION_ALL_UP = 0, POSITION_DEFAULT_MAX = 65535};
-    typedef int position_t;
     const static position_t TARGET_NONE;
     void init();
 
@@ -45,7 +48,6 @@ class PinneMotor
     int GetMinPosition() { return static_cast<int>(_minPosition); };
     
     boolean IsBlocked();
-    
     void UpdateState();
     void ReadTopStopSensor();
     void ReadSlackStopSensor();
@@ -84,6 +86,52 @@ class PinneMotor
     void _SetBlocked(boolean block) {};
     
     int _state;
+};
+
+
+class RotationMotor
+{
+  public:
+    RotationMotor(unsigned char rotationPotmeterPin, L293Driver* driver, address_t address);
+    const static position_t TARGET_NONE;
+    const static int DIRECTION_RIGHT;
+    const static int DIRECTION_LEFT;
+    const static int POSITION_MAX_RIGHT;
+    const static int POSITION_MAX_LEFT;
+    const static int SPEED_STOP;    
+    void init();
+
+    void Stop() { SetSpeed(SPEED_STOP); };
+    
+    void SetSpeed(int speed);
+    void SetDirection(int direction);
+    void SetTargetPosition(int pos);
+    void SetCurrentPosition(int pos) {};
+    void SetBrake(int brake);
+    void SetMaxPosition(int maxPos);
+    void SetMinPosition(int minPos);
+    
+    int GetSpeed() { return static_cast<int>(_driver->GetSpeed()); };
+    int GetDirection() { return static_cast<int>(_driver->GetDirection()); };
+    int GetTargetPosition() { return static_cast<int>(_targetPosition); };
+    int GetCurrentPosition() { return static_cast<int>(_currentPosition); };
+    int GetBrake() { return static_cast<int>(_driver->GetBrake()); };
+    int GetMaxPosition() { return static_cast<int>(_rightMaxPosition); };
+    int GetMinPosition() { return static_cast<int>(_leftMaxPosition); };
+    
+    boolean IsBlocked();
+    void UpdateState();
+    
+  private:
+    MotorDriver* _driver;
+    address_t _address;
+    boolean _blocked;
+    position_t _currentPosition;
+    position_t _targetPosition;
+    position_t _rightMaxPosition;
+    position_t _leftMaxPosition;
+    unsigned char _rotationPotmeterPin;
+    
 };
 
 

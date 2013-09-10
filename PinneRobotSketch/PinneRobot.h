@@ -12,6 +12,7 @@ public:
   void update();
   PinneMotor *leftMotor;
   PinneMotor *rightMotor;
+  RotationMotor *rotationMotor;
 };
 
 

@@ -8,6 +8,7 @@ PinneAPIParser *parser;
 
 void setup()
 { 
+
   Serial1.begin(9600);
   while(!Serial1);
   delay(100);
@@ -16,7 +17,7 @@ void setup()
   robot->init();
   robot->leftMotor->SetSpeed(0);
   robot->rightMotor->SetSpeed(0);
-  //robot.rotationMotor->SetSpeed(0);
+  robot->rotationMotor->SetSpeed(0);
 }
 void loop()
 {
@@ -25,5 +26,5 @@ void loop()
     parser->parseIncomingByte(Serial1.read());
   }
   robot->update();
-  delay(5);
+  delay(300);
 }

@@ -19,27 +19,32 @@ const int rightMotorEncoderInterruptIndex = 0;// digital pin 2 on Leonardo impli
 const int rightMotorTopStopSensor = A1;
 
 const int rotationDriver1A = A3;
-const int rotationDriver2A = A4;
+const int rotationDriver2A = A2;//?
 const int rotationDriverPWM = 5;
+const int rotationPotmeterPin = A4;
 
 PinneRobot::PinneRobot()
 {
   VNH5019Driver *leftDriver = new VNH5019Driver(leftDriverINA, leftDriverINB, leftDriverENDIAG, leftDriverPWM);
   VNH5019Driver *rightDriver = new VNH5019Driver(rightDriverINA, rightDriverINB, rightDriverENDIAG, rightDriverPWM);
+  L293Driver *rotationDriver = new L293Driver(rotationDriver1A, rotationDriver2A, rotationDriverPWM);
   leftMotor = new PinneMotor(leftMotorTopStopSensor, leftMotorSlackStopSensor, leftMotorEncoderInterruptIndex, leftDriver, ADDRESS_LEFT);
   rightMotor = new PinneMotor(rightMotorTopStopSensor, rightMotorSlackStopSensor, rightMotorEncoderInterruptIndex, rightDriver, ADDRESS_RIGHT);
+  rotationMotor = new RotationMotor(rotationPotmeterPin, rotationDriver, ADDRESS_ROTATION);
 }
 
 void PinneRobot::init()
 {
   leftMotor->init();
   rightMotor->init();
+  rotationMotor->init();
 }
 
 void PinneRobot::update()
 {
   leftMotor->UpdateState();
   rightMotor->UpdateState();
+  rotationMotor->UpdateState();
 }
 
 

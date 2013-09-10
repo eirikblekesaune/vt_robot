@@ -172,7 +172,7 @@ Tdef(\listenToSerial, {
 )
 
 
-p.putAll(~buildMessage.value(\left, \set, \speed, 200));
+p.putAll(~buildMessage.value(\left, \set, \speed, 100));
 p.putAll(~buildMessage.value(\left, \get, \speed));
 p.putAll(~buildMessage.value(\left, \set, \stop));
 p.putAll(~buildMessage.value(\left, \set, \minPosition, 100));
@@ -181,6 +181,14 @@ p.putAll(~buildMessage.value(\left, \get, \currentPosition));
 p.putAll(~buildMessage.value(\left, \set, \targetPosition, 100));
 p.putAll(~buildMessage.value(\left, \set, \targetPosition, 0));
 p.putAll(~buildMessage.value(\left, \get, \targetPosition));
+p.putAll(~buildMessage.value(\left, \set, \direction, 1));
+
+p.putAll(~buildMessage.value(\rotation, \set, \speed, 200));
+p.putAll(~buildMessage.value(\rotation, \set, \speed, 0));
+p.putAll(~buildMessage.value(\rotation, \get, \speed));
+p.putAll(~buildMessage.value(\rotation, \set, \direction, 1));
+p.putAll(~buildMessage.value(\rotation, \set, \direction, 0));
+p.putAll(~buildMessage.value(\rotation, \get, \direction));
 
 
 p.putAll(~buildMessage.value(\right, \set, \speed, 220));
