@@ -24,6 +24,9 @@ VTMonsterBoxChannel {
 	var <spec;
 	var <value;
 	var <number;
+	var lastMotorValue;
+	var refreshTask;
+	classvar <refreshRate = 10;
 
 	*new{arg monsterBox, number;
 		^super.new.init(monsterBox, number);
@@ -33,6 +36,24 @@ VTMonsterBoxChannel {
 		monsterBox = monsterBox_;
 		number = number_;
 		spec = ControlSpec(-512, 512, step: 1, default: 0);
+		refreshTask = Task.new({
+			var waitTime = this.class.refreshRate.reciprocal;
+			loop{
+				var message, newMotorValue;
+				//motor driver takes values from 0 to 250
+				newMotorValue = value.linlin(-512, 512, 0, 250).asInteger;
+				if(newMotorValue != lastMotorValue, {
+					message = ("M".ascii ++
+						number.asString.ascii ++
+						newMotorValue.asStringToBase(width: 3).ascii ++
+						$\r.ascii);
+					message.postln;
+					monsterBox.sendMsg(message);
+				});
+				lastMotorValue = newMotorValue;
+				waitTime.wait;
+			}
+		});
 	}
 
 	valueAction_{arg val;
@@ -44,16 +65,21 @@ VTMonsterBoxChannel {
 		value = val;
 	}
 
+	startRefreshing{
+		refreshTask.start;
+		SystemClock.sched(0.5, {
+			this.stopRefreshing;
+		});
+	}
+
+	stopRefreshing{
+		refreshTask.stop;
+	}
+
 	refresh{
-		var message, motorValue;
-		//motor driver takes values from 0 to 250
-		motorValue = value.linlin(-512, 512, 0, 250).asInteger;
-		message = ("M".ascii ++
-			number.asString.ascii ++
-			motorValue.asStringToBase(width: 3).ascii ++
-			$\r.ascii);
-		message.postln;
-		monsterBox.sendMsg(message);
+		if(refreshTask.isPlaying.not, {
+			this.startRefreshing;
+		});
 	}
 
 	stop{
