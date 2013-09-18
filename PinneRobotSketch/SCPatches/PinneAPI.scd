@@ -181,7 +181,7 @@ p.putAll(~buildMessage.value(\left, \get, \currentPosition));
 p.putAll(~buildMessage.value(\left, \set, \targetPosition, 100));
 p.putAll(~buildMessage.value(\left, \set, \targetPosition, 0));
 p.putAll(~buildMessage.value(\left, \get, \targetPosition));
-p.putAll(~buildMessage.value(\left, \set, \direction, 1));
+p.putAll(~buildMessage.value(\left, \set, \direction, 0));
 
 p.putAll(~buildMessage.value(\rotation, \set, \speed, 250));
 p.putAll(~buildMessage.value(\rotation, \set, \speed, 0));
@@ -189,6 +189,9 @@ p.putAll(~buildMessage.value(\rotation, \get, \speed));
 p.putAll(~buildMessage.value(\rotation, \set, \direction, 1));
 p.putAll(~buildMessage.value(\rotation, \set, \direction, 0));
 p.putAll(~buildMessage.value(\rotation, \get, \direction));
+p.putAll(~buildMessage.value(\rotation, \set, \targetPosition, 500));
+p.putAll(~buildMessage.value(\rotation, \get, \targetPosition));
+p.putAll(~buildMessage.value(\rotation, \get, \currentPosition));
 
 
 p.putAll(~buildMessage.value(\right, \set, \speed, 220));

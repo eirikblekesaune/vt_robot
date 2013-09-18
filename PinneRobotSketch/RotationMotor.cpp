@@ -1,16 +1,18 @@
 #include "Motor.h"
 
-
-const int RotationMotor::DIRECTION_UP = 0;//turning left
-const int RotationMotor::DIRECTION_DOWN = 1;//turning right
+//Direction up is semantically mapped to turning left, and direction down is mapped to 
+//turning right. This is because the potmeter is increasing in position value when turning
+//right, thus reflects the same logic as for the pinne motor position increase and decrease schema.
+const int RotationMotor::DIRECTION_UP = 1;//turning left
+const int RotationMotor::DIRECTION_DOWN = 0;//turning right
 const int RotationMotor::DIRECTION_LEFT = RotationMotor::DIRECTION_UP;
 const int RotationMotor::DIRECTION_RIGHT = RotationMotor::DIRECTION_DOWN;
 const int RotationMotor::POSITION_MIN = 200;//max left
 const int RotationMotor::POSITION_MAX = 800;//max right
 const int RotationMotor::POSITION_LEFT_LIMIT = RotationMotor::POSITION_MIN;//max left
 const int RotationMotor::POSITION_RIGHT_LIMIT = RotationMotor::POSITION_MAX;//max right
-const int RotationMotor::TURNING_LEFT = GOING_DOWN;
-const int RotationMotor::TURNING_RIGHT = GOING_UP;
+const int RotationMotor::TURNING_LEFT = GOING_UP;
+const int RotationMotor::TURNING_RIGHT = GOING_DOWN;
 
 const int RotationMotor::SPEED_STOP = 0;
 const int RotationMotor::TARGET_NONE = 0;
@@ -29,9 +31,10 @@ void RotationMotor::init()
 {
   _driver->init();
   Stop();
-  _driver->SetDirection(DIRECTION_LEFT);
+  _driver->SetDirection(DIRECTION_RIGHT);
   pinMode(_rotationPotmeterPin, INPUT);
   _currentPosition = analogRead(_rotationPotmeterPin);
+  SetDirection(DIRECTION_RIGHT);
 }
 
 void RotationMotor::SetSpeed(int speed)
@@ -55,9 +58,9 @@ void RotationMotor::SetDirection(int direction)
     _driver->SetDirection(direction);
     if(GetDirection() == DIRECTION_LEFT)
     {
-      NotifyStateChange((stateChange_t)TURNING_LEFT, _address);
+      _TurningLeft();
     } else {
-      NotifyStateChange((stateChange_t)TURNING_RIGHT, _address);
+      _TurningRight();
     }
   } else {
     _driver->UpdateDirection();
@@ -87,22 +90,28 @@ boolean RotationMotor::IsBlocked()
   switch(_state)
   {
     case BLOCKED_BY_MIN_POSITION:  
-      if(direction == DIRECTION_DOWN)
+      if(direction == DIRECTION_LEFT)
       {
+        DebugPrint("checkminposTrue");
         return true;
       } else {
+        DebugPrint("checkminposFalse");
         return false;
       }
       break;
     case BLOCKED_BY_MAX_POSITION:
-      if(direction == DIRECTION_UP)
+      if(direction == DIRECTION_RIGHT)
       {
+        DebugPrint("checkMAXposTrue");
+        DebugPrint(direction);
         return true;
       } else {
+        DebugPrint("checkMAXposFalse");
+        DebugPrint(direction);
         return false;
       }
     default:
-      //
+      DebugPrint("DefaultFalse");
       return false;
   }
 }
@@ -112,8 +121,8 @@ boolean RotationMotor::IsBlocked()
 void RotationMotor::UpdateState()
 {
   _currentPosition = analogRead(_rotationPotmeterPin);
-  DebugPrint("rotpot");
-  DebugPrint(_currentPosition);
+//  DebugPrint("rotpot");
+//  DebugPrint(_currentPosition);
   int currPosition = _currentPosition;
   int minPosition = GetMinPosition();
   if(currPosition < minPosition)
@@ -123,23 +132,25 @@ void RotationMotor::UpdateState()
   {
     _MaxPositionReached();
   } else {
-//    int direction = GetDirection();
-//    if(direction == DIRECTION_DOWN)
-//    {
-//      if((_targetPosition != TARGET_NONE) && (currPosition > _targetPosition))
-//      {
-//        _TargetReached();
-//      } else {
-//        _TurningLeft();
-//      }
-//    } else {
-//        if((_targetPosition != TARGET_NONE) && (currPosition < _targetPosition))
-//        {
-//          _TargetReached();
-//        } else {
-//          _TurningRight();
-//        }
-//    }
+    int direction = GetDirection();
+    if(direction == DIRECTION_RIGHT)
+    {
+      if((_targetPosition != TARGET_NONE) && (currPosition <= _targetPosition))
+      {
+        DebugPrint("Right target reached");
+        _TargetReached();
+      } else {
+        _TurningRight();
+      }
+    } else {
+        if((_targetPosition != TARGET_NONE) && (currPosition >= _targetPosition))
+        {
+          DebugPrint("Left target reached");
+          _TargetReached();
+        } else {
+          _TurningLeft();
+        }
+    }
   }
 }
 
@@ -201,19 +212,20 @@ void RotationMotor::SetTargetPosition(int targetPosition)
   } else {
     value = constrain(targetPosition, GetMinPosition(), GetMaxPosition());
     _targetPosition = value;
-    int currPosition = GetCurrentPosition();
-    
+
+
     //change the direction if target in the opposite direction
+      int currPosition = GetCurrentPosition();    
     if(GetDirection() == DIRECTION_UP)
     {
       if(currPosition > _targetPosition)
       {
-        SetDirection(DIRECTION_DOWN);
+        SetDirection(DIRECTION_RIGHT);
       }
     } else {
       if(currPosition < _targetPosition)
       {
-        SetDirection(DIRECTION_UP);
+        SetDirection(DIRECTION_LEFT);
       }
     }
   }
