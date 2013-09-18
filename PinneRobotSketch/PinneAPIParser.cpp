@@ -22,10 +22,8 @@ void PinneAPIParser::_parseCommand(byte inByte)
   switch(_currentSetGet)
   {
     case SET_MESSAGE:
-      ////DEBUG_PRINT("SET: ");
       if(_currentCommand == CMD_STOP)
       {
-        ////DEBUG_PRINT("STOP COMMAND");DEBUG_NL;
         _processSetStopCommand();
       } else {
         if(_getDataBytes())
@@ -33,35 +31,35 @@ void PinneAPIParser::_parseCommand(byte inByte)
           switch(_currentCommand)
           {
             case CMD_SPEED:
-              ////DEBUG_PRINT("SET SPEED COMMAND");DEBUG_NL;
               _processSetSpeedCommand();
               break;
             case CMD_DIRECTION:
-              ////DEBUG_PRINT("SET DIRECTION COMMAND");DEBUG_NL;
               _processSetDirectionCommand();
               break;
             case CMD_TARGET_POSITION:
-            ////DEBUG_PRINT("SET TARGET POSITION COMMAND");DEBUG_NL;
               _processSetTargetPositionCommand();
               break;
             case CMD_CURRENT_POSITION:
-              ////DEBUG_PRINT("SET CURRENT POSITION COMMAND");DEBUG_NL;
               _processSetCurrentPositionCommand();
               break;
             case CMD_BRAKE:
-              ////DEBUG_PRINT("SET BRAKE COMMAND");DEBUG_NL;
               _processSetBrakeCommand();
               break;
             case CMD_MIN_POSITION:
-              ////DEBUG_PRINT("SET MIN POSITION COMMAND");DEBUG_NL;
               _processSetMinPositionCommand();
               break;
             case CMD_MAX_POSITION:
-              ////DEBUG_PRINT("SET MAX POSITION COMMAND");DEBUG_NL;
               _processSetMaxPositionCommand();
               break;
+            case CMD_WRITE_SETTINGS:
+              _processWriteDataCommand();
+              break;
+            case CMD_LOAD_SETTINGS:
+              _processLoadSettingsCommand();
+              break;
             default:
-              DEBUG_PRINT("Unknown command"); //DEBUG_PRINT(_currentCommand);DEBUG_NL;
+              DebugPrint("Unknown command");
+              DebugPrint(_currentCommand);
           }
         } else {
           ////DEBUG_PRINT("Error getting data bytes");DEBUG_NL;
@@ -168,15 +166,12 @@ void PinneAPIParser::_processSetSpeedCommand()
   switch(_currentAddress)
   {
     case ADDRESS_LEFT:
-      ////DEBUG_PRINT("Setting left speed\n"); //DEBUG_PRINT(value);DEBUG_NL;
       _robot->leftMotor->SetSpeed(value);
       break;
     case ADDRESS_RIGHT:
-      ////DEBUG_PRINT("Setting right speed\n"); //DEBUG_PRINT(value);DEBUG_NL;
       _robot->rightMotor->SetSpeed(value);
       break;
     case ADDRESS_ROTATION:
-      ////DEBUG_PRINT("Setting rotation speed\n"); //DEBUG_PRINT(value);DEBUG_NL;
       _robot->rotationMotor->SetSpeed(value);
       break;
     default:
@@ -191,15 +186,12 @@ void PinneAPIParser::_processGetSpeedCommand()
   switch(_currentAddress)
   {
     case ADDRESS_LEFT:
-      ////DEBUG_PRINT("Left motor speed: ");DEBUG_NL;
       value = _robot->leftMotor->GetSpeed();
       break;
     case ADDRESS_RIGHT:
-      ////DEBUG_PRINT("Right motor speed: ");DEBUG_NL;
       value = _robot->rightMotor->GetSpeed();
       break;
     case ADDRESS_ROTATION:
-//      //DEBUG_PRINT("Right motor speed: ");
       value = _robot->rotationMotor->GetSpeed();
       break;
     default:
@@ -536,4 +528,24 @@ void PinneAPIParser::_processGetStateCommand()
   //DEBUG_PRINT("State command");DEBUG_NL;
 }
 
+void PinneAPIParser::_processWriteDataCommand()
+{
+  int value = _parseDataValue();
+  if(value != 9999)
+  {
+    DebugPrint("Value needs to be 9999 in order to store");
+  } else {
+    _robot->storeSettingsToEEPROM();
+  }
+}
 
+void PinneAPIParser::_processLoadSettingsCommand()
+{
+  int value = _parseDataValue();
+  if(value != 9999)
+  {
+    DebugPrint("Value needs to be 9999 in order to load");
+  } else {
+    _robot->loadSettingsFromEEPROM();
+  }
+}

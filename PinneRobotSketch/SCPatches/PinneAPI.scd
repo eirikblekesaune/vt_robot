@@ -33,7 +33,9 @@ Tdef(\listenToSerial, {
 	\stateChange -> 2r0110,
 	\info -> 2r0111,
 	\minPosition -> 2r1000,
-	\maxPosition -> 2r1001
+	\maxPosition -> 2r1001,
+	\writeSettings -> 2r1010,
+	\loadSettings -> 2r1011
 ];
 ~setGetMasks = TwoWayIdentityDictionary[
 	\set -> 2r00000000,
@@ -171,17 +173,26 @@ Tdef(\listenToSerial, {
 );
 )
 
+p.putAll(~buildMessage.value(\right, \set, \writeSettings, 9999));
+p.putAll(~buildMessage.value(\right, \set, \loadSettings, 9999));
 
-p.putAll(~buildMessage.value(\left, \set, \speed, 200));
+(1 << 8).bitOr(11);
+
+p.putAll(~buildMessage.value(\left, \set, \speed, 170));
 p.putAll(~buildMessage.value(\left, \get, \speed));
 p.putAll(~buildMessage.value(\left, \set, \stop));
+p.putAll(~buildMessage.value(\left, \get, \direction));
+p.putAll(~buildMessage.value(\left, \set, \direction, 0));
 p.putAll(~buildMessage.value(\left, \set, \minPosition, 100));
-p.putAll(~buildMessage.value(\left, \set, \maxPosition, 400));
+p.putAll(~buildMessage.value(\left, \set, \maxPosition, 500));
 p.putAll(~buildMessage.value(\left, \get, \currentPosition));
+p.putAll(~buildMessage.value(\left, \set, \currentPosition, 444));
 p.putAll(~buildMessage.value(\left, \set, \targetPosition, 100));
+p.putAll(~buildMessage.value(\left, \set, \targetPosition, 300));
+
 p.putAll(~buildMessage.value(\left, \set, \targetPosition, 0));
 p.putAll(~buildMessage.value(\left, \get, \targetPosition));
-p.putAll(~buildMessage.value(\left, \set, \direction, 0));
+p.putAll(~buildMessage.value(\left, \set, \direction, 1));
 
 p.putAll(~buildMessage.value(\rotation, \set, \speed, 250));
 p.putAll(~buildMessage.value(\rotation, \set, \speed, 0));
@@ -189,7 +200,7 @@ p.putAll(~buildMessage.value(\rotation, \get, \speed));
 p.putAll(~buildMessage.value(\rotation, \set, \direction, 1));
 p.putAll(~buildMessage.value(\rotation, \set, \direction, 0));
 p.putAll(~buildMessage.value(\rotation, \get, \direction));
-p.putAll(~buildMessage.value(\rotation, \set, \targetPosition, 500));
+p.putAll(~buildMessage.value(\rotation, \set, \targetPosition, 750));
 p.putAll(~buildMessage.value(\rotation, \get, \targetPosition));
 p.putAll(~buildMessage.value(\rotation, \get, \currentPosition));
 

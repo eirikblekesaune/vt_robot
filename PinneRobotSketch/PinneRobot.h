@@ -4,16 +4,21 @@
 #include "Motor.h"
 #include "PinneAPI.h"
 
+
 class PinneRobot
 {
 public:
+  
   PinneRobot();
   void init();
   void update();
   PinneMotor *leftMotor;
   PinneMotor *rightMotor;
   RotationMotor *rotationMotor;
+  void storeSettingsToEEPROM();
+  void loadSettingsFromEEPROM();
 };
+
 
 
 #endif
