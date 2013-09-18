@@ -92,26 +92,19 @@ boolean RotationMotor::IsBlocked()
     case BLOCKED_BY_MIN_POSITION:  
       if(direction == DIRECTION_LEFT)
       {
-        DebugPrint("checkminposTrue");
         return true;
       } else {
-        DebugPrint("checkminposFalse");
         return false;
       }
       break;
     case BLOCKED_BY_MAX_POSITION:
       if(direction == DIRECTION_RIGHT)
       {
-        DebugPrint("checkMAXposTrue");
-        DebugPrint(direction);
         return true;
       } else {
-        DebugPrint("checkMAXposFalse");
-        DebugPrint(direction);
         return false;
       }
     default:
-      DebugPrint("DefaultFalse");
       return false;
   }
 }
@@ -121,8 +114,6 @@ boolean RotationMotor::IsBlocked()
 void RotationMotor::UpdateState()
 {
   _currentPosition = analogRead(_rotationPotmeterPin);
-//  DebugPrint("rotpot");
-//  DebugPrint(_currentPosition);
   int currPosition = _currentPosition;
   int minPosition = GetMinPosition();
   if(currPosition < minPosition)
@@ -135,17 +126,15 @@ void RotationMotor::UpdateState()
     int direction = GetDirection();
     if(direction == DIRECTION_RIGHT)
     {
-      if((_targetPosition != TARGET_NONE) && (currPosition <= _targetPosition))
+      if((_targetPosition != TARGET_NONE) && (currPosition >= _targetPosition))
       {
-        DebugPrint("Right target reached");
         _TargetReached();
       } else {
         _TurningRight();
       }
     } else {
-        if((_targetPosition != TARGET_NONE) && (currPosition >= _targetPosition))
+        if((_targetPosition != TARGET_NONE) && (currPosition <= _targetPosition))
         {
-          DebugPrint("Left target reached");
           _TargetReached();
         } else {
           _TurningLeft();
@@ -216,16 +205,16 @@ void RotationMotor::SetTargetPosition(int targetPosition)
 
     //change the direction if target in the opposite direction
       int currPosition = GetCurrentPosition();    
-    if(GetDirection() == DIRECTION_UP)
+    if(GetDirection() == DIRECTION_RIGHT)
     {
       if(currPosition > _targetPosition)
       {
-        SetDirection(DIRECTION_RIGHT);
+        SetDirection(DIRECTION_LEFT);
       }
     } else {
       if(currPosition < _targetPosition)
       {
-        SetDirection(DIRECTION_LEFT);
+        SetDirection(DIRECTION_RIGHT);
       }
     }
   }
