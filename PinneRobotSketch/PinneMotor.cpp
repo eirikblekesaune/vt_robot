@@ -374,7 +374,11 @@ void PinneMotor::SetTargetPosition(int targetPosition)
 
 void PinneMotor::SetCurrentPosition(int currentPosition)
 {
-  _currentPosition = currentPosition;
+  DebugUnitPrint(_address, "Setting currentPosition");
+  currentPosition = constrain(currentPosition, GetMinPosition(), GetMaxPosition());
+  noInterrupts();
+  *_encoderCounter = currentPosition;
+  interrupts();
 }
 
 void PinneMotor::SetBrake(int brake)

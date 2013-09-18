@@ -25,5 +25,5 @@ void loop()
     parser->parseIncomingByte(Serial1.read());
   }
   robot->update();
-  delay(700);
+  delay(10);
 }

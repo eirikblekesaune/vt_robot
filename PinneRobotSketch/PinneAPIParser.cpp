@@ -335,7 +335,8 @@ void PinneAPIParser::_processSetCurrentPositionCommand()
       break;
     case ADDRESS_ROTATION:
       //DEBUG_PRINT("Setting rotation current postition"); //DEBUG_PRINT(value);DEBUG_NL;
-      _robot->rotationMotor->SetCurrentPosition(value);
+      //We don't allow setting rotation posistion since it is absolute.
+      //_robot->rotationMotor->SetCurrentPosition(value);
       break;
     default:
       DEBUG_PRINT("Unknown address");DEBUG_NL;
