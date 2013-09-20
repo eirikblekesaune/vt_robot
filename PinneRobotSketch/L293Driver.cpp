@@ -2,7 +2,7 @@
 #include "MotorDriver.h"
 
 const int L293Driver::SPEED_MIN = 0;
-const int L293Driver::SPEED_MAX = 400;
+const int L293Driver::SPEED_MAX = 1023;
 
 L293Driver::L293Driver(unsigned char INA, unsigned char INB, unsigned char PWM) :
   _INA(INA),
@@ -26,7 +26,7 @@ void L293Driver::SetSpeed(speed_t speed)
 {
   if (speed < SPEED_MIN)
     speed = SPEED_MIN;
-  if (speed > 400)  // Max PWM dutycycle
+  if (speed > SPEED_MAX)  // Max PWM dutycycle
     speed = SPEED_MAX;
   _speed = speed;
   OCR3A = _speed;

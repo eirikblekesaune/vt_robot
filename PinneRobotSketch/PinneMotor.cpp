@@ -19,7 +19,7 @@ const int PinneMotor::DIRECTION_DOWN_INCREMENT = 1;
 const int PinneMotor::DIRECTION_UP_INCREMENT = -1;
 
 //variables for Sensor debouncing
-const unsigned long debounceDelay = 50;
+const unsigned long debounceDelay = 150;
 
 void encoderISR1()
 {
@@ -251,6 +251,7 @@ void PinneMotor::_TopStopSensorIn()
 {
   Stop();
   _state = BLOCKED_BY_TOP_SENSOR;
+  SetCurrentPosition(POSITION_ALL_UP);
   NotifyStateChange(BLOCKED_BY_TOP_SENSOR, _address);
 }
 
@@ -266,14 +267,14 @@ void PinneMotor::_TopStopSensorOut()
   }
 }
 
-void PinneMotor::_SlackStopSensorIn()
+void PinneMotor::_SlackStopSensorOut()
 {
   Stop();
   _state = BLOCKED_BY_SLACK_SENSOR;
   NotifyStateChange(BLOCKED_BY_SLACK_SENSOR, _address);
 }
 
-void PinneMotor::_SlackStopSensorOut()
+void PinneMotor::_SlackStopSensorIn()
 {
  int direction;
   direction = GetDirection();

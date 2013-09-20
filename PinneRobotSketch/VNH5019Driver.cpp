@@ -5,7 +5,7 @@
 
 const speed_t VNH5019Driver::SPEED_STOP = 0;
 const speed_t VNH5019Driver::SPEED_MIN = 0;
-const speed_t VNH5019Driver::SPEED_MAX = 400;
+const speed_t VNH5019Driver::SPEED_MAX = 1023;
 const speed_t VNH5019Driver::BRAKE_NONE = 0;
 const speed_t VNH5019Driver::BRAKE_FULL = 400;
 
@@ -31,7 +31,7 @@ void VNH5019Driver::init()
   // 16MHz / 1 (prescaler) / 2 (phase-correct) / 400 (top) = 20kHz
   TCCR1A = 0b10100000;
   TCCR1B = 0b00010001;
-  ICR1 = 400;
+  ICR1 = SPEED_MAX;
   #endif
   //SetSpeed(0);
   //SetDirection(0);
@@ -41,8 +41,8 @@ void VNH5019Driver::SetSpeed(speed_t speed)
 {
   if (speed < 0)
     speed = 0;
-  if (speed > 400)  // Max PWM dutycycle
-    speed = 400;
+  if (speed > SPEED_MAX)  // Max PWM dutycycle
+    speed = SPEED_MAX;
   _speed = speed;
   #if defined(__AVR_ATmega168__)|| defined(__AVR_ATmega328P__) || defined(__AVR_ATmega32U4__)
   //temp hack..
@@ -93,8 +93,8 @@ void VNH5019Driver::SetBrake(speed_t brake)
 {
   if (brake < 0)
     brake = 0;
-  if (brake > 400)  // Max brake
-    brake = 400;
+  if (brake > SPEED_MAX)  // Max brake
+    brake = SPEED_MAX;
   digitalWrite(_INA, LOW);
   digitalWrite(_INB, LOW);
   _brake = brake;
