@@ -22,6 +22,7 @@ MIDIIn.connectAll;
 ~pens = VTPenseBox("/dev/tty.usbserial-FT3EET3MA");
 ~tog = VTMonsterBox("/dev/tty.usbserial-FT3EET3MB");
 ~pinner = VTMonsterBox("/dev/tty.usbserial-FT3EET44A");
+~lanbox = SerialPort.new("/dev/tty.usbmodem24741", 38400, crtscts: true);
 
 //map pens buttons
 8.do{arg i;
@@ -30,6 +31,20 @@ MIDIIn.connectAll;
 	pens = ~pens.penses[i];
 	midiComp.addDependant(pens);
 	pens.addDependant(midiComp);
+};
+
+//~togCtrl.components['rotaryA.1']
+7.do{arg i;
+	var midiComp, dmx;
+	midiComp = ~togCtrl.components.at((("rotaryA.") ++ (i + 1)).asSymbol);
+	midiComp.postln;
+	midiComp.action_({arg comp;
+		var val, commandString;
+		val = comp.value.linlin(0, 127, 0, 255).asInteger.asHexString(2);
+		commandString = ("*C901" ++ (i + 13).asHexString(2) ++ val ++ "#").ascii;
+		~lanbox.putAll(commandString);
+		"dmx % : %\n".postf((i + 1), val);
+	}.inEnvir);
 };
 //map tog to faders
 6.do{arg i;
@@ -152,6 +167,48 @@ MIDIIn.connectAll;
 	}
 );
 
+~togLED3 = (
+	xbee: ~xbee,
+//	address: [0x00, 0x13, 0xA2, 0x00, 0x40, 0x90, 0x29, 0xEA],//TO
+	address: [0x00, 0x13, 0xA2, 0x00, 0x40, 0x90, 0x29, 0x1B],//FEM
+	networkAddress: [0xFF, 0xFE],
+	theTask: Task.new({}),
+	runUpdateTask: {arg ev;
+		ev.use{
+			if(~theTask.isPlaying.not, {
+				~theTask = Task.new({
+					loop {
+						//~setLEDValue.value(~address, ~networkAddress, ~ledValue);
+						if(~ledValue != ~lastTransmittedValue, {
+							~xbee.sendTXFrame(~address, ~networkAddress, ["ms".ascii, ~ledValue, 13, 10].flatten, 1);
+							"sending: %\n".postf([~address, ~networkAddress, ~ledValue]);
+							~lastTransmittedValue = ~ledValue;
+						});
+						0.05.wait;
+					};
+				}.inEnvir).play;
+				SystemClock.sched(0.5, {
+					if(~theTask.isPlaying, {
+						~stopUpdateTask.value(currentEnvironment);
+					});
+				}.inEnvir);
+			});
+		}
+	},
+	stopUpdateTask: {arg ev;
+		ev.use{
+			~theTask.stop;
+		}
+	},
+	ledValue: 0,
+	lastTransmittedValue: 0,
+	setLEDValue: {arg ev, val;
+		ev[\ledValue] = val.clip(0, 250);
+		ev[\runUpdateTask].value(ev);
+	}
+);
+
+
 ~togCtrl.components.at('fader.8').action_({arg comp;
 	var val;
 	val = comp.value.linlin(0, 1023, 0, 250).asInteger;
@@ -161,6 +218,11 @@ MIDIIn.connectAll;
 	var val;
 	val = comp.value.linlin(0, 1023, 0, 250).asInteger;
 	~togLED2.setLEDValue(val);
+});
+~togCtrl.components.at('rotaryA.8').action_({arg comp;
+	var val;
+	val = comp.value.linlin(0, 127, 0, 250).asInteger;
+	~togLED3.setLEDValue(val);
 });
 
 //Fuglen
@@ -177,6 +239,14 @@ MIDIIn.connectAll;
 	~fuglAddr.sendMsg("/robot/fugl/speed", 0);
 	~flyingCtrl.components['rotaryA.8'].valueAction_(64).refresh;
 });
+OSCFunc({arg msg, time, addr, port;
+	var myval, mydir;
+	myval = msg[1].linlin(-512, 512, -5, 5).asInteger;
+	mydir = if(myval.isNegative, {"down"}, {"up"});
+	["fuglOSC", mydir, myval.abs.asInteger].postln;
+	~fuglAddr.sendMsg("/robot/fugl/direction", mydir);
+	~fuglAddr.sendMsg("/robot/fugl/speed", myval.abs);
+}, '/robot/fugl.1/speed');
 
 
 //OSC repsonders for flying
@@ -191,6 +261,19 @@ MIDIIn.connectAll;
 OSCFunc({arg msg, time, addr, resp;
 	~pinner.channels.do(_.stop);
 }.inEnvir, '/robot/flying/stop');
+
+~lysResponders = 256.collect({arg i;
+	var num = i + 1;
+	OSCFunc({arg msg, time, addr, port;
+		var val, commandString;
+
+		val = msg[1].clip(0, 255).asInteger.asHexString(2);
+		commandString = ("*C901" ++ num.asHexString(2) ++ val ++ "#").ascii;
+		~lanbox.putAll(commandString);
+		"dmx % : %\n".postf(num, val);
+	}, ("/light/dmx." ++ (i + 1)).asSymbol);
+});
+
 
 w = Window.new.front;
 w.onClose_({0.exit});
