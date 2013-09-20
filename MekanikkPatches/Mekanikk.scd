@@ -34,7 +34,7 @@ MIDIIn.connectAll;
 };
 
 //~togCtrl.components['rotaryA.1']
-8.do{arg i;
+7.do{arg i;
 	var midiComp, dmx;
 	midiComp = ~togCtrl.components.at((("rotaryA.") ++ (i + 1)).asSymbol);
 	midiComp.postln;
@@ -167,6 +167,48 @@ MIDIIn.connectAll;
 	}
 );
 
+~togLED3 = (
+	xbee: ~xbee,
+//	address: [0x00, 0x13, 0xA2, 0x00, 0x40, 0x90, 0x29, 0xEA],//TO
+	address: [0x00, 0x13, 0xA2, 0x00, 0x40, 0x90, 0x29, 0x1B],//FEM
+	networkAddress: [0xFF, 0xFE],
+	theTask: Task.new({}),
+	runUpdateTask: {arg ev;
+		ev.use{
+			if(~theTask.isPlaying.not, {
+				~theTask = Task.new({
+					loop {
+						//~setLEDValue.value(~address, ~networkAddress, ~ledValue);
+						if(~ledValue != ~lastTransmittedValue, {
+							~xbee.sendTXFrame(~address, ~networkAddress, ["ms".ascii, ~ledValue, 13, 10].flatten, 1);
+							"sending: %\n".postf([~address, ~networkAddress, ~ledValue]);
+							~lastTransmittedValue = ~ledValue;
+						});
+						0.05.wait;
+					};
+				}.inEnvir).play;
+				SystemClock.sched(0.5, {
+					if(~theTask.isPlaying, {
+						~stopUpdateTask.value(currentEnvironment);
+					});
+				}.inEnvir);
+			});
+		}
+	},
+	stopUpdateTask: {arg ev;
+		ev.use{
+			~theTask.stop;
+		}
+	},
+	ledValue: 0,
+	lastTransmittedValue: 0,
+	setLEDValue: {arg ev, val;
+		ev[\ledValue] = val.clip(0, 250);
+		ev[\runUpdateTask].value(ev);
+	}
+);
+
+
 ~togCtrl.components.at('fader.8').action_({arg comp;
 	var val;
 	val = comp.value.linlin(0, 1023, 0, 250).asInteger;
@@ -176,6 +218,11 @@ MIDIIn.connectAll;
 	var val;
 	val = comp.value.linlin(0, 1023, 0, 250).asInteger;
 	~togLED2.setLEDValue(val);
+});
+~togCtrl.components.at('rotaryA.8').action_({arg comp;
+	var val;
+	val = comp.value.linlin(0, 127, 0, 250).asInteger;
+	~togLED3.setLEDValue(val);
 });
 
 //Fuglen
@@ -192,6 +239,14 @@ MIDIIn.connectAll;
 	~fuglAddr.sendMsg("/robot/fugl/speed", 0);
 	~flyingCtrl.components['rotaryA.8'].valueAction_(64).refresh;
 });
+OSCFunc({arg msg, time, addr, port;
+	var myval, mydir;
+	myval = msg[1].linlin(-512, 512, -5, 5).asInteger;
+	mydir = if(myval.isNegative, {"down"}, {"up"});
+	["fuglOSC", mydir, myval.abs.asInteger].postln;
+	~fuglAddr.sendMsg("/robot/fugl/direction", mydir);
+	~fuglAddr.sendMsg("/robot/fugl/speed", myval.abs);
+}, '/robot/fugl.1/speed');
 
 
 //OSC repsonders for flying
