@@ -69,6 +69,13 @@ void PinneRobot::update()
   rotationMotor->UpdateState();
 }
 
+void PinneRobot::GoToParkingPosition()
+{
+  leftMotor->GoToParkingPosition();
+  rightMotor->GoToParkingPosition();
+  rotationMotor->GoToParkingPosition();  
+}
+
 void PinneRobot::storeSettingsToEEPROM()
 {
 //  int i;

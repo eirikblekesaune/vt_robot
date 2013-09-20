@@ -34,8 +34,11 @@ Tdef(\listenToSerial, {
 	\info -> 2r0111,
 	\minPosition -> 2r1000,
 	\maxPosition -> 2r1001,
-	\writeSettings -> 2r1010,
-	\loadSettings -> 2r1011
+	\goToParkingPosition -> 2r1010,
+	\goToTarget -> 2r1011,
+	\pidPValue -> 2r1100,
+	\pidIValue -> 2r1101,
+	\pidDValue -> 2r1110,
 ];
 ~setGetMasks = TwoWayIdentityDictionary[
 	\set -> 2r00000000,
@@ -205,9 +208,11 @@ p.putAll(~buildMessage.value(\left, \set, \direction, 0));
 p.putAll(~buildMessage.value(\right, \set, \direction, 1));
 )
 (
-p.putAll(~buildMessage.value(\left, \set, \targetPosition, 250));
-p.putAll(~buildMessage.value(\right, \set, \targetPosition, 250));
+p.putAll(~buildMessage.value(\left, \set, \targetPosition, 300));
+p.putAll(~buildMessage.value(\right, \set, \targetPosition, 300));
 )
+
+p.putAll(~buildMessage.value(\rotation, \set, \targetPosition, 350));
 p.putAll(~buildMessage.value(\left, \set, \maxPosition, 500));
 p.putAll(~buildMessage.value(\right, \set, \maxPosition, 500));
 
@@ -320,6 +325,7 @@ s.boot
 {SinOsc.ar(440)}.play
 
 
+//sjekk motor range 0 - 1023
 //parkerings funksjon
 //spearate parker for rot and left right
 //check what happens when robot starts with top sensor or slack sensor in/out
@@ -328,19 +334,19 @@ s.boot
 var win, leftView, rightView, rotationView;
 win = Window.new("Pinne Robot Control", 200@600);
 win.addFlowLayout(0@0, 0@0);
-leftView = FlowView.new(win, 100@200, 0@0, 0@0, "Left pinne");
-rightView = FlowView.new(win, 100@200, 0@0, 0@0, "Right pinne");
+leftView = FlowView.new(win, 100@250, 0@0, 0@0, "Left pinne");
+rightView = FlowView.new(win, 100@250, 0@0, 0@0, "Right pinne");
 rotationView = FlowView.new(win, 200@100, 0@0, 0@0, "Rotation");
 ['left', 'right'].do{arg item, i;
 	var view = [leftView, rightView][i];
-	Slider(view, 20@200).action_({arg slid;
+	Slider(view, 100@200).action_({arg slid;
 		var speed, direction, val;
-		val = slid.value.linlin(0.0, 1.0, -400.0, 400.0);
+		val = slid.value.linlin(0.0, 1.0, -512.0, 512.0);
 		speed = val.abs.asInteger;
 		direction = val.isPositive.asInteger;
 		"speed: %, direction: %\n".postf(speed, direction);
-		p.putAll(~buildMessage.value(item, \set, \speed, speed));
 		p.putAll(~buildMessage.value(item, \set, \direction, direction));
+		p.putAll(~buildMessage.value(item, \set, \speed, speed));
 	}).value_(0.5);
 	Button(view,100@50)
 	.action_({arg butt;p.putAll(~buildMessage.value(item, \set, \stop))})
@@ -348,26 +354,25 @@ rotationView = FlowView.new(win, 200@100, 0@0, 0@0, "Rotation");
 };
 Slider(rotationView, 200@20).action_({arg slid;
 	var speed, direction, val;
-	val = slid.value.linlin(0.0, 1.0, -800.0, 800.0);
+	val = slid.value.linlin(0.0, 1.0, -512, 512);
 	speed = val.abs.asInteger;
 	direction = val.isNegative.asInteger;
 	"speed: %, direction: %\n".postf(speed, direction);
-	p.putAll(~buildMessage.value(\rotation, \set, \speed, speed));
 	p.putAll(~buildMessage.value(\rotation, \set, \direction, direction));
+	p.putAll(~buildMessage.value(\rotation, \set, \speed, speed));
+
 }).value_(0.5);
 Button(rotationView,200@50)
 	.action_({arg butt;p.putAll(~buildMessage.value(\rotation, \set, \stop))})
 	.states_([["STOP Rot"]]);
-Button(rotationView, 200@50).action_({arg butt;
-	p.putAll(~buildMessage.value(\global, \set, \stop));
-	p.putAll(~buildMessage.value(\left, \set, \currentPosition, 4096));
-	p.putAll(~buildMessage.value(\right, \set, \currentPosition, 4096));
-	p.putAll(~buildMessage.value(\left, \set, \direction, 1));
-	p.putAll(~buildMessage.value(\right, \set, \direction, 1));
-	p.putAll(~buildMessage.value(\rotation, \set, \targetPosition, 512));
-	p.putAll(~buildMessage.value(\left, \set, \speed, 80));
-	p.putAll(~buildMessage.value(\right, \set, \speed, 80));
-	p.putAll(~buildMessage.value(\rotation, \set, \speed, 650));
+Button(win, 200@50).action_({arg butt;
+	p.putAll(~buildMessage.value(\global, \set, \goToParkingPosition, 0));
 }).states_([["Parkering"]]);
 win.front;
 )
+
+p.putAll(~buildMessage.value(\rotation, \get, \currentPosition));
+p.putAll(~buildMessage.value(\rotation, \set, \targetPosition, 0));
+p.putAll(~buildMessage.value(\rotation, \get, \currentPosition));
+p.putAll(~buildMessage.value(\rotation, \set, \speed, 0));
+p.putAll(~buildMessage.value(\rotation, \set, \speed, 0));

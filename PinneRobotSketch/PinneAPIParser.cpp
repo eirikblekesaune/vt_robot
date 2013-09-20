@@ -51,11 +51,20 @@ void PinneAPIParser::_parseCommand(byte inByte)
             case CMD_MAX_POSITION:
               _processSetMaxPositionCommand();
               break;
-            case CMD_WRITE_SETTINGS:
-              _processWriteDataCommand();
+            case CMD_GOTO_PARKING_POSITION:
+              _robot->GoToParkingPosition();
               break;
-            case CMD_LOAD_SETTINGS:
-              _processLoadSettingsCommand();
+            case CMD_GOTO_TARGET:
+              _processGoToTargetCommand();
+              break;
+            case CMD_PID_P_VALUE:
+              _processPValueCommand();
+              break;
+            case CMD_PID_I_VALUE:
+              _processIValueCommand();
+              break;
+            case CMD_PID_D_VALUE:
+              _processDValueCommand();
               break;
             default:
               DebugPrint("Unknown command");
@@ -528,24 +537,45 @@ void PinneAPIParser::_processGetStateCommand()
   //DEBUG_PRINT("State command");DEBUG_NL;
 }
 
-void PinneAPIParser::_processWriteDataCommand()
+void PinneAPIParser::_processGoToTargetCommand()
 {
-  int value = _parseDataValue();
-  if(value != 9999)
+  int value;
+  value = -1;
+  switch(_currentAddress)
   {
-    DebugPrint("Value needs to be 9999 in order to store");
-  } else {
-    _robot->storeSettingsToEEPROM();
+    case ADDRESS_LEFT:
+//      value = _robot->leftMotor->GoToTarg();
+      break;
+    case ADDRESS_RIGHT:
+//      value = _robot->rightMotor->GetMaxPosition();
+      break;
+    case ADDRESS_ROTATION:
+      value = _robot->rotationMotor->GoToTarget();
+      break;
+    default:
+      DEBUG_PRINT("Unknown address\n");DEBUG_NL;
   }
+  if(value >= 0)
+  {
+    ReturnGetValue(_currentCommand, _currentAddress, value);
+  } else {
+    //DEBUG_PRINT("Something wrong with geting max position");DEBUG_NL;
+  }
+
 }
 
-void PinneAPIParser::_processLoadSettingsCommand()
+void PinneAPIParser::_processPValueCommand()
 {
-  int value = _parseDataValue();
-  if(value != 9999)
-  {
-    DebugPrint("Value needs to be 9999 in order to load");
-  } else {
-    _robot->loadSettingsFromEEPROM();
-  }
+
 }
+
+void PinneAPIParser::_processIValueCommand()
+{
+
+}
+
+void PinneAPIParser::_processDValueCommand()
+{
+
+}
+

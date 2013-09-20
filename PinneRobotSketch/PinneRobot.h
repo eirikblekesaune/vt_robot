@@ -17,6 +17,7 @@ public:
   RotationMotor *rotationMotor;
   void storeSettingsToEEPROM();
   void loadSettingsFromEEPROM();
+  void GoToParkingPosition();
 };
 
 

@@ -5,9 +5,9 @@
 
 const speed_t VNH5019Driver::SPEED_STOP = 0;
 const speed_t VNH5019Driver::SPEED_MIN = 0;
-const speed_t VNH5019Driver::SPEED_MAX = 1023;
+const speed_t VNH5019Driver::SPEED_MAX = 512;
 const speed_t VNH5019Driver::BRAKE_NONE = 0;
-const speed_t VNH5019Driver::BRAKE_FULL = 400;
+const speed_t VNH5019Driver::BRAKE_FULL = 512;
 
 VNH5019Driver::VNH5019Driver(unsigned char INA, unsigned char INB, unsigned char ENDIAG,  unsigned char PWM)
    : _INA(INA), _INB(INB), _ENDIAG(ENDIAG), _PWM(PWM)

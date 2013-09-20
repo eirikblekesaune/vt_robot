@@ -1,5 +1,4 @@
 #include "Motor.h"
-
 //Direction up is semantically mapped to turning left, and direction down is mapped to 
 //turning right. This is because the potmeter is increasing in position value when turning
 //right, thus reflects the same logic as for the pinne motor position increase and decrease schema.
@@ -9,6 +8,7 @@ const int RotationMotor::DIRECTION_LEFT = RotationMotor::DIRECTION_UP;
 const int RotationMotor::DIRECTION_RIGHT = RotationMotor::DIRECTION_DOWN;
 const int RotationMotor::POSITION_MIN = 200;//max left
 const int RotationMotor::POSITION_MAX = 800;//max right
+const int RotationMotor::POSITION_DEFAULT = 512;
 const int RotationMotor::POSITION_LEFT_LIMIT = RotationMotor::POSITION_MIN;//max left
 const int RotationMotor::POSITION_RIGHT_LIMIT = RotationMotor::POSITION_MAX;//max right
 const int RotationMotor::TURNING_LEFT = GOING_UP;
@@ -16,7 +16,7 @@ const int RotationMotor::TURNING_RIGHT = GOING_DOWN;
 
 const int RotationMotor::SPEED_STOP = 0;
 const int RotationMotor::TARGET_NONE = 0;
-
+extern const int LOOP_UPDATE_RATE;
 
 RotationMotor::RotationMotor(unsigned char rotationPotmeterPin, L293Driver* driver, address_t address) :
   _driver(driver),
@@ -35,6 +35,21 @@ void RotationMotor::init()
   pinMode(_rotationPotmeterPin, INPUT);
   _currentPosition = analogRead(_rotationPotmeterPin);
   SetDirection(DIRECTION_RIGHT);
+  
+  //Initialize PID control
+  _pidInput = 0.0;
+  _pidOutput = 0.0;
+  _pidSetpoint = 0.0;
+  _pidKp = 1.0;
+  _pidKi = 0.05;
+  _pidKd = 1.0;
+  _pid = new PID(&_pidInput, &_pidOutput, &_pidSetpoint, _pidKp, _pidKi, _pidKd, DIRECT);
+  _pid->SetOutputLimits(
+    static_cast<double>(L293Driver::SPEED_MIN), 
+    static_cast<double>(L293Driver::SPEED_MAX)
+  );
+  _pid->SetSampleTime(100);
+  _pid->SetMode(AUTOMATIC);
 }
 
 void RotationMotor::SetSpeed(int speed)
@@ -58,9 +73,11 @@ void RotationMotor::SetDirection(int direction)
     _driver->SetDirection(direction);
     if(GetDirection() == DIRECTION_LEFT)
     {
+      _pid->SetControllerDirection(DIRECT);
       _TurningLeft();
     } else {
       _TurningRight();
+      _pid->SetControllerDirection(REVERSE);
     }
   } else {
     _driver->UpdateDirection();
@@ -114,7 +131,19 @@ boolean RotationMotor::IsBlocked()
 void RotationMotor::UpdateState()
 {
   _currentPosition = analogRead(_rotationPotmeterPin);
+  _pidInput = static_cast<double>(_currentPosition);
   int currPosition = _currentPosition;
+  
+  //PID update
+  if(_targetPosition != TARGET_NONE)
+  {
+    if(_pid->Compute())
+    {
+      DebugPrint("PID");
+      DebugPrint(_pidOutput);
+    }
+  }
+  
   int minPosition = GetMinPosition();
   if(currPosition < minPosition)
   {
@@ -201,7 +230,7 @@ void RotationMotor::SetTargetPosition(int targetPosition)
   } else {
     value = constrain(targetPosition, GetMinPosition(), GetMaxPosition());
     _targetPosition = value;
-
+    _pidSetpoint = static_cast<double>(_targetPosition);
 
     //change the direction if target in the opposite direction
       int currPosition = GetCurrentPosition();    
@@ -218,4 +247,11 @@ void RotationMotor::SetTargetPosition(int targetPosition)
       }
     }
   }
+}
+
+
+void RotationMotor::GoToParkingPosition()
+{
+  SetTargetPosition(POSITION_DEFAULT);
+  SetSpeed(int(L293Driver::SPEED_MAX * 0.7));
 }

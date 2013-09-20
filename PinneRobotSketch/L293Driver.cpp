@@ -2,7 +2,7 @@
 #include "MotorDriver.h"
 
 const int L293Driver::SPEED_MIN = 0;
-const int L293Driver::SPEED_MAX = 1023;
+const int L293Driver::SPEED_MAX = 512;
 
 L293Driver::L293Driver(unsigned char INA, unsigned char INB, unsigned char PWM) :
   _INA(INA),

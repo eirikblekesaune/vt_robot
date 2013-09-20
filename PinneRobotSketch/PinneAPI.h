@@ -15,8 +15,11 @@ enum command_t
   CMD_INFO = 0x07,//used for debugging, arbitrary numboer of asci characters
   CMD_MIN_POSITION = 0x08,
   CMD_MAX_POSITION = 0x09,
-  CMD_WRITE_SETTINGS = 0x0A,
-  CMD_LOAD_SETTINGS = 0x0B,
+  CMD_GOTO_PARKING_POSITION = 0x0A,
+  CMD_GOTO_TARGET = 0x0B,
+  CMD_PID_P_VALUE = 0x0C,
+  CMD_PID_I_VALUE = 0x0D,
+  CMD_PID_D_VALUE = 0x0E,
   CMD_UNKNOWN
 };
 

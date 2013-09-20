@@ -40,9 +40,9 @@ class PinneAPIParser
     void _processGetMinPositionCommand();
     void _processGetMaxPositionCommand();
     
-    void _processWriteDataCommand();
-    void _processLoadSettingsCommand();
-
-
+    void _processGoToTargetCommand();
+    void _processPValueCommand();
+    void _processIValueCommand();
+    void _processDValueCommand();
 };
 #endif

@@ -78,10 +78,14 @@ void PinneMotor::init()
   _driver->init();
   _driver->SetDirection(DIRECTION_UP);
   SetDirection(DIRECTION_DOWN);
-  _topStopSensorValue = digitalRead(_topStopSensorPin);
-  _slackStopSensorValue = digitalRead(_slackStopSensorPin);
   Stop();
   _blocked = false;
+  _topStopSensorValue = digitalRead(_topStopSensorPin);
+  if(_topStopSensorValue == TOP_SENSOR_IN)
+    _TopStopSensorIn();
+  _slackStopSensorValue = digitalRead(_slackStopSensorPin);
+  if(_slackStopSensorValue == SLACK_SENSOR_OUT)
+    _SlackStopSensorOut();
 }
 
 void PinneMotor::Stop()
@@ -397,5 +401,17 @@ void PinneMotor::SetMaxPosition(int maxPosition)
   _maxPosition = min(maxPosition, POSITION_DEFAULT_MAX);
 }
 
+void PinneMotor::GoToParkingPosition()
+{
+  //Check if already at top and do parking only if the sensor is out
+  _topStopSensorValue = digitalRead(_topStopSensorPin);
+  if(_topStopSensorValue == TOP_SENSOR_OUT)
+  {
+    //fake the currentPosition to default max
+    SetCurrentPosition(POSITION_DEFAULT_MAX);
+    SetDirection(DIRECTION_UP);
+    SetSpeed(VNH5019Driver::SPEED_MAX / 4);    
+  }
+}
 
 

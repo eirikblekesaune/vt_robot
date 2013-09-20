@@ -5,6 +5,7 @@
 PinneRobot *robot;
 PinneAPIParser *parser;
 
+extern const int LOOP_UPDATE_RATE = 10;
 
 void setup()
 { 
@@ -14,9 +15,6 @@ void setup()
   robot = new PinneRobot();
   parser = new PinneAPIParser(robot);
   robot->init();
-//  robot->leftMotor->SetSpeed(0);//hmm not needed?
-//  robot->rightMotor->SetSpeed(0);
-//  robot->rotationMotor->SetSpeed(0);
 }
 void loop()
 {
@@ -25,5 +23,5 @@ void loop()
     parser->parseIncomingByte(Serial1.read());
   }
   robot->update();
-  delay(10);
+  delay(LOOP_UPDATE_RATE);
 }

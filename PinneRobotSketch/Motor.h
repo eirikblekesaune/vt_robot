@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include "MotorDriver.h"
 #include "PinneAPI.h"
+#include "PID_v1.h"
 
 
 typedef int position_t;
@@ -51,6 +52,7 @@ class PinneMotor
     void UpdateState();
     void ReadTopStopSensor();
     void ReadSlackStopSensor();
+    void GoToParkingPosition();
 
     volatile int* _encoderCounter;
     volatile int* _encoderIncrement;
@@ -101,6 +103,7 @@ class RotationMotor
     const static int DIRECTION_UP;
     const static int POSITION_MIN;
     const static int POSITION_MAX;
+    const static int POSITION_DEFAULT;    
     const static int POSITION_LEFT_LIMIT;
     const static int POSITION_RIGHT_LIMIT;
     const static int SPEED_STOP;
@@ -127,6 +130,7 @@ class RotationMotor
     int GetMaxPosition() { return static_cast<int>(_maxPosition); };
     int GetMinPosition() { return static_cast<int>(_minPosition); };
     
+    void GoToParkingPosition();
     boolean IsBlocked();
     void UpdateState();
     
@@ -140,7 +144,13 @@ class RotationMotor
     position_t _minPosition; //i.e. max left position
     position_t _maxPosition; //i.e. max right position
     unsigned char _rotationPotmeterPin;
-    
+    PID *_pid;
+    double _pidInput;
+    double _pidOutput;
+    double _pidSetpoint;
+    double _pidKp;
+    double _pidKi;
+    double _pidKd;
     void _TurningRight();
     void _TurningLeft();
     void _TargetReached();
