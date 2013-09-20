@@ -43,7 +43,6 @@ void VNH5019Driver::SetSpeed(speed_t speed)
     speed = 0;
   if (speed > 400)  // Max PWM dutycycle
     speed = 400;
-  DEBUG_PRINT("VNH5019Driver::SetSpeed");DEBUG_PRINT(speed);
   _speed = speed;
   #if defined(__AVR_ATmega168__)|| defined(__AVR_ATmega328P__) || defined(__AVR_ATmega32U4__)
   //temp hack..

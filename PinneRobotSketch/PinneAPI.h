@@ -15,6 +15,8 @@ enum command_t
   CMD_INFO = 0x07,//used for debugging, arbitrary numboer of asci characters
   CMD_MIN_POSITION = 0x08,
   CMD_MAX_POSITION = 0x09,
+  CMD_WRITE_SETTINGS = 0x0A,
+  CMD_LOAD_SETTINGS = 0x0B,
   CMD_UNKNOWN
 };
 
@@ -51,13 +53,14 @@ enum parseMask_t {
 enum stateChange_t
 {
   STOPPED,//Stopped manually
-  GOING_UP,//direction set to up
-  GOING_DOWN,//directiom set to down
+  GOING_DOWN,//direction set to up
+  GOING_UP,//directiom set to down
   STOPPED_AT_TARGET,//
   BLOCKED_BY_TOP_SENSOR,//The stop sensor was hit
   BLOCKED_BY_SLACK_SENSOR,
   BLOCKED_BY_MIN_POSITION,//Position counter is below range
   BLOCKED_BY_MAX_POSITION,//Position counter is above range
+  BLOCKED_BY_ABS_MIN_POSITION,//
   DRIVER_FAULT//Something is wrong with the driver itself
 };
 
@@ -82,10 +85,38 @@ static void NotifyStateChange(stateChange_t stateChange, address_t address)
   Serial1.write(stateChange);
 }
 
-//#define DEBUG
+static void DebugUnitPrint(address_t address, const char* msg)
+{
+  Serial1.write(BYTE_COMMAND | SET_MESSAGE | address | CMD_INFO );
+  Serial1.print(msg);
+  Serial1.write(4);
+}
+
+static void DebugUnitPrint(address_t address, int msg)
+{
+  Serial1.write(BYTE_COMMAND | SET_MESSAGE | address | CMD_INFO );
+  Serial1.print(msg);
+  Serial1.write(4);
+}
+
+static void DebugPrint(const char* msg)
+{
+  Serial1.write(BYTE_COMMAND | SET_MESSAGE | ADDRESS_GLOBAL | CMD_INFO );
+  Serial1.print(msg);
+  Serial1.write(4);
+}
+
+static void DebugPrint(int msg)
+{
+  Serial1.write(BYTE_COMMAND | SET_MESSAGE | ADDRESS_GLOBAL | CMD_INFO );
+  Serial1.print(msg);
+  Serial1.write(4);
+}
+
+#define DEBUG
 #ifdef DEBUG 
-#define DEBUG_PRINT(x) Serial1.print(x)
-#define DEBUG_NL Serial1.print("\n")
+#define DEBUG_PRINT(x) DebugPrint(x)
+#define DEBUG_NL
 #else
 #define DEBUG_PRINT(x)
 #define DEBUG_NL

@@ -1,240 +1,172 @@
 #include "PinneRobot.h"
+//#include <avr/eeprom.h>
+//enum _eepromSlots {
+//  EEPROM_LEFT_POSITION_SLOT,
+//  EEPROM_LEFT_MIN_POSITION_SLOT,
+//  EEPROM_LEFT_MAX_POSITION_SLOT,
+//  EEPROM_RIGHT_POSITION_SLOT,
+//  EEPROM_RIGHT_MIN_POSITION_SLOT,
+//  EEPROM_RIGHT_MAX_POSITION_SLOT,
+//  EEPROM_ROTATION_MIN_POSITION_SLOT,
+//  EEPROM_ROTATION_MAX_POSITION_SLOT,
+//  NUM_EEPROM_SLOTS  
+//} eepromSlots;
+
+//void writeByteToEEPROMSlot(int address, uint8_t dataByte)
+//{
+   //eeprom_write_byte((unsigned char *) address, dataByte);
+//}
+
+//uint8_t readByteFromEEPROMSlot(int address)
+//{
+  //return eeprom_read_byte((unsigned char *) address);
+//}
 
 //pin connections
 //left driver aka motor 1, right driver motor 2
 const int leftDriverPWM = 9;
 const int leftDriverINA = 11;//Remapped due to interrupt
 const int leftDriverINB = 4;
-const int leftMotorSlackStopButton = A0; //todo: cut trace, was current sense pin
+const int leftMotorSlackStopSensor = A5; //todo: cut trace, was current sense pin
 const int leftDriverENDIAG = 6;
-const int leftMotorEncoderInterruptIndex = 0;// digital pin 2 implicitly
-const int leftMotorTopStopButton = A5;
+const int leftMotorEncoderInterruptIndex = 1;// digital pin 3 on Leonardo implicitly
+const int leftMotorTopStopSensor = A0;
 
 const int rightDriverPWM = 10;
 const int rightDriverINA = 7;
 const int rightDriverINB = 8;
-const int rightMotorSlackStopButton = A1;//todo cut trace, was current sense pin
+const int rightMotorSlackStopSensor = 13;//todo cut trace, was current sense pin
 const int rightDriverENDIAG = 12;
-const int rightMotorEncoderInterruptIndex = 1;// digital pin 3 implicitly
-const int rightMotorTopStopButton = 13;
+const int rightMotorEncoderInterruptIndex = 0;// digital pin 2 on Leonardo implicitly
+const int rightMotorTopStopSensor = A1;
 
 const int rotationDriver1A = A3;
-const int rotationDriver2A = A4;
+const int rotationDriver2A = A2;
 const int rotationDriverPWM = 5;
+const int rotationPotmeterPin = A4;
 
 PinneRobot::PinneRobot()
 {
   VNH5019Driver *leftDriver = new VNH5019Driver(leftDriverINA, leftDriverINB, leftDriverENDIAG, leftDriverPWM);
   VNH5019Driver *rightDriver = new VNH5019Driver(rightDriverINA, rightDriverINB, rightDriverENDIAG, rightDriverPWM);
-  leftMotor = new PinneMotor(leftMotorTopStopButton, leftMotorSlackStopButton, leftMotorEncoderInterruptIndex, leftDriver, ADDRESS_LEFT);
-  rightMotor = new PinneMotor(rightMotorTopStopButton, rightMotorSlackStopButton, rightMotorEncoderInterruptIndex, rightDriver, ADDRESS_RIGHT);
+  L293Driver *rotationDriver = new L293Driver(rotationDriver1A, rotationDriver2A, rotationDriverPWM);
+  leftMotor = new PinneMotor(leftMotorTopStopSensor, leftMotorSlackStopSensor, leftMotorEncoderInterruptIndex, leftDriver, ADDRESS_LEFT);
+  rightMotor = new PinneMotor(rightMotorTopStopSensor, rightMotorSlackStopSensor, rightMotorEncoderInterruptIndex, rightDriver, ADDRESS_RIGHT);
+  rotationMotor = new RotationMotor(rotationPotmeterPin, rotationDriver, ADDRESS_ROTATION);
 }
 
 void PinneRobot::init()
 {
   leftMotor->init();
   rightMotor->init();
+  rotationMotor->init();
+}
+
+void PinneRobot::update()
+{
+  leftMotor->UpdateState();
+  rightMotor->UpdateState();
+  rotationMotor->UpdateState();
+}
+
+void PinneRobot::storeSettingsToEEPROM()
+{
+//  int i;
+//  int value;
+//  int slotSize = sizeof(int);
+//  int currentSlotNum, currentDataByte;
+  //verbose code but semantically clear.
+//  noInterrupts();
+//  
+//  //Storing left motor data
+//  value = leftMotor->GetCurrentPosition();
+//  for(i = 0; i < slotSize; i++)
+//  {
+//    currentSlotNum = (EEPROM_LEFT_POSITION_SLOT * slotSize) + i;
+//    currentDataByte = (value >> (i * 8)) & 0xFF;
+//    writeByteToEEPROMSlot(currentSlotNum, currentDataByte);
+//    DebugPrint("currentSlotNum");
+//    DebugPrint(currentSlotNum);
+//    DebugPrint("currentDataByte");
+//    DebugPrint(currentDataByte);
+//  }
+//  
+//  value = leftMotor->GetMinPosition();
+//  for(i = 0; i < slotSize; i++)
+//  {
+//    DebugPrint((EEPROM_LEFT_MIN_POSITION_SLOT * slotSize) + i);
+//    DebugPrint((value >> (i * 8)) & 0xFF);
+//  }
+//  
+//  value = leftMotor->GetMaxPosition();
+//  for(i = 0; i < slotSize; i++)
+//  {
+//    DebugPrint((EEPROM_LEFT_MAX_POSITION_SLOT * slotSize) + i);
+//    DebugPrint((value >> (i * 8)) & 0xFF);
+//  }
+//  
+//  
+//  //Storing right motor data
+//  value = rightMotor->GetCurrentPosition();
+//  for(i = 0; i < slotSize; i++)
+//  {
+//    DebugPrint((EEPROM_RIGHT_POSITION_SLOT * slotSize) + i);
+//    DebugPrint((value >> (i * 8)) & 0xFF);
+//  }
+//  
+//  value = rightMotor->GetMinPosition();
+//  for(i = 0; i < slotSize; i++)
+//  {
+//    DebugPrint((EEPROM_RIGHT_MIN_POSITION_SLOT * slotSize) + i);
+//    DebugPrint((value >> (i * 8)) & 0xFF);
+//  }
+//  
+//  value = rightMotor->GetMaxPosition();
+//  for(i = 0; i < slotSize; i++)
+//  {
+//    DebugPrint((EEPROM_RIGHT_MAX_POSITION_SLOT * slotSize) + i);
+//    DebugPrint((value >> (i * 8)) & 0xFF);
+//  }
+//  
+//  //Storing rotation motor data  
+//  value = rotationMotor->GetMinPosition();
+//  for(i = 0; i < slotSize; i++)
+//  {
+//    DebugPrint((EEPROM_ROTATION_MIN_POSITION_SLOT * slotSize) + i);
+//    DebugPrint((value >> (i * 8)) & 0xFF);
+//  }
+//  
+//  value = rotationMotor->GetMaxPosition();
+//  for(i = 0; i < slotSize; i++)
+//  {
+//    DebugPrint((EEPROM_ROTATION_MAX_POSITION_SLOT * slotSize) + i);
+//    DebugPrint((value >> (i * 8)) & 0xFF);
+//  }
+//  interrupts();
+//  DebugPrint("Settings written");
+    DebugPrint("EEPROM writing not implemented");
+}
+
+void PinneRobot::loadSettingsFromEEPROM()
+{
+//  int i;
+//  int currentSlotNum;
+//  int currentValue;
+//  int slotSize = sizeof(int);
+//  DebugPrint("Loading seetings");
+//  //noInterrupts();
+//  for(i = 0; i < slotSize; i++)
+//  {
+//    currentSlotNum = (EEPROM_LEFT_POSITION_SLOT * slotSize) + i;
+//    currentValue = (int)readByteFromEEPROMSlot(currentSlotNum) << (i * 8);
+//    DebugPrint("Slotnum:");
+//    DebugPrint(currentSlotNum);
+//    DebugPrint("val:");
+//  }
+  //interrupts();
+  DebugPrint("EEPROM reading not implemented");
 }
 
 
-//
-//void PinneRobot::_initLeftMotor()
-//{
-//  _leftMotor.speed = SPEED_STOP;
-//  _leftMotor.direction = DIRECTION_DOWN;
-//  _leftMotor.target = TARGET_NONE;
-//  _leftMotor.minPosition = POSITION_ALL_UP;
-//  _leftMotor.maxPosition = POSITION_DEFAULT_MAX;
-//  _leftMotor.brake = BRAKE_NONE;
-//  _leftMotor.stopButtonValue = digitalRead(M1_STOP);
-//}
-//
-//void PinneRobot::checkSensors()
-//{
-//  int i, val;
-//  val = digitalRead(M1_STOP);
-//  if( val != _leftMotor.stopButtonValue)
-//  {
-//    if(val == BUTTON_IN)
-//    {
-//      _leftMotorStopSensorHit();
-//    } else {
-//      setLeftMotorBrake(BRAKE_NONE);
-//    }
-//  }
-//}
-//
-//void PinneRobot::updatePositions()
-//{
-//  position_t currentPosition;
-//  if(_leftMotor.target != TARGET_NONE)
-//  {
-//    if(getLeftMotorDirection() == DIRECTION_UP)
-//    {
-//      if(posM1 <= _leftMotor.target)
-//      {
-//        _leftMotorTargetReached();
-//      }
-//    } else {//otherwise the direction is DIRECTION_DOWN
-//      if(posM1 >= _leftMotor.target)
-//      {
-//        _leftMotorTargetReached();
-//      }
-//    }
-//  }
-//  currentPosition = getLeftMotorCurrentPosition();
-//  if(!_leftMotor.blocked)
-//    {
-//    if(currentPosition <= POSITION_ALL_UP)
-//    {
-//      _leftMotorSetBlocked(true);
-//      _notifyStateChange(LEFT_MOTOR_BLOCKED_BY_MIN_POSITION);
-//    }
-//    if(currentPosition >= getLeftMotorMaxPosition())
-//    {
-//      _leftMotorSetBlocked(true);
-//      _notifyStateChange(LEFT_MOTOR_BLOCKED_BY_MAX_POSITION);
-//    }
-//  }
-//}
-//
-//void PinneRobot::setLeftMotorSpeed(speed_t speed)
-//{
-//  _leftMotor.speed = constrain(speed, SPEED_MIN, SPEED_MAX);
-//  if(_leftMotor.speed == 0)
-//  {
-//    leftMotorStop();
-//  } else {
-//    _leftMotorCalculateAndSetSpeed();
-//  }
-//}
-//
-//speed_t PinneRobot::getLeftMotorSpeed()
-//{
-//  return _leftMotor.speed;
-//}
-//
-//void PinneRobot::leftMotorStop()
-//{
-//  _leftMotor.speed = SPEED_STOP;
-//  _leftMotorCalculateAndSetSpeed();
-//  _notifyStateChange(LEFT_MOTOR_STOPPED);
-//}
-//
-//void PinneRobot::setLeftMotorDirection(direction_t direction)
-//{
-//  if(direction != _leftMotor.direction)
-//  {
-//    if(direction == DIRECTION_DOWN)
-//    {
-//      if(direction != _leftMotor.direction)
-//      {
-//        _notifyStateChange(LEFT_MOTOR_GOING_DOWN);
-//      }
-//      _leftMotor.direction = direction;
-//      encoder1TickValue = 1;
-//    } else if(direction == DIRECTION_UP) {
-//          if(direction != _leftMotor.direction)
-//      {
-//        _notifyStateChange(LEFT_MOTOR_GOING_DOWN);
-//      }
-//      _leftMotor.direction = direction;
-//      encoder1TickValue = -1;
-//      _notifyStateChange(LEFT_MOTOR_GOING_UP);
-//    }
-//  }
-//  _leftMotorCalculateAndSetSpeed();
-//}
-//
-//direction_t PinneRobot::getLeftMotorDirection()
-//{
-//  return _leftMotor.direction;
-//}
-//
-//void PinneRobot::setLeftMotorTargetPosition(position_t position)
-//{
-//  _leftMotor.target = constrain(position, max(_leftMotor.minPosition, POSITION_ALL_UP), _leftMotor.maxPosition);
-//}
-//
-//position_t PinneRobot::getLeftMotorTargetPosition()
-//{
-//  return _leftMotor.target;
-//}
-//
-//void PinneRobot::setLeftMotorMaxPosition(position_t maxPos)
-//{
-//  _leftMotor.maxPosition = maxPos;
-//}
-//
-//position_t PinneRobot::getLeftMotorMaxPosition()
-//{
-//  return _leftMotor.maxPosition;
-//}
-//
-//void PinneRobot::setLeftMotorMinPosition(position_t minPos)
-//{
-//  _leftMotor.minPosition = minPos;
-//}
-//
-//position_t PinneRobot::getLeftMotorMinPosition()
-//{
-//  return _leftMotor.minPosition;
-//}
-//
-//void PinneRobot::setLeftMotorCurrentPosition(position_t pos)
-//{
-//  posM1 = pos;
-//}
-//
-//position_t PinneRobot::getLeftMotorCurrentPosition()
-//{
-//  return posM1;
-//}
-//
-//void PinneRobot::setLeftMotorBrake(speed_t brake)
-//{
-//  _leftMotor.brake = constrain(brake, BRAKE_NONE, BRAKE_FULL);
-//  md.setM1Brake(_leftMotor.brake);
-//}
-//
-//speed_t PinneRobot::getLeftMotorBrake()
-//{
-//  _leftMotor.brake;
-//}
-//
-//void PinneRobot::_leftMotorCalculateAndSetSpeed()
-//{
-//  if(!_leftMotor.blocked)
-//  {
-//    md.setM1Speed(_leftMotor.speed * getLeftMotorDirection());
-//  }
-//}
-//
-//void PinneRobot::_leftMotorSetBlocked(boolean block)
-//{
-//  if(_leftMotor.blocked != block)
-//  {
-//    _leftMotor.blocked = block;
-//    _leftMotorCalculateAndSetSpeed();
-//  }
-//}
-//
-//void PinneRobot::_leftMotorStopSensorHit()
-//{
-//  setLeftMotorBrake(BRAKE_FULL);
-//  setLeftMotorCurrentPosition(POSITION_ALL_UP);
-//  _notifyStateChange(LEFT_MOTOR_BLOCKED_BY_SENSOR);
-//}
-//
-//
-//void PinneRobot::_leftMotorTargetReached()
-//{
-//  setLeftMotorBrake(BRAKE_FULL);
-//  _leftMotor.target = TARGET_NONE;
-//  _notifyStateChange(LEFT_MOTOR_REACHED_TARGET);
-//}
-//
-//void PinneRobot::_notifyStateChange(stateChange_t stateChange)
-//{
-//  DEBUG_PRINT("State change:"); DEBUG_PRINT(stateChange);
-//}
+
+
