@@ -40,10 +40,8 @@ void RotationMotor::init()
   _pidInput = 0.0;
   _pidOutput = 0.0;
   _pidSetpoint = 0.0;
-  _pidKp = 1.0;
-  _pidKi = 0.05;
-  _pidKd = 1.0;
-  _pid = new PID(&_pidInput, &_pidOutput, &_pidSetpoint, _pidKp, _pidKi, _pidKd, DIRECT);
+  double pidKp = 1.0, pidKi = 0.05, pidKd = 1.0;
+  _pid = new PID(&_pidInput, &_pidOutput, &_pidSetpoint, pidKp, pidKi, pidKd, DIRECT);
   _pid->SetOutputLimits(
     static_cast<double>(L293Driver::SPEED_MIN), 
     static_cast<double>(L293Driver::SPEED_MAX)
@@ -255,3 +253,40 @@ void RotationMotor::GoToParkingPosition()
   SetTargetPosition(POSITION_DEFAULT);
   SetSpeed(int(L293Driver::SPEED_MAX * 0.7));
 }
+
+void RotationMotor::GoToTargetPosition()
+{
+  DebugUnitPrint(_address, "Going to Target");
+}
+
+
+void RotationMotor::SetPidPValue(int value)
+{
+  double pVal, iVal, dVal;
+  pVal = (float)value / 1000.0;
+  iVal = _pid->GetKi();
+  dVal = _pid->GetKd();
+  _pid->SetTunings(pVal, iVal, dVal);  
+  DebugUnitPrint(_address, "Setting PID P value"); 
+}
+
+void RotationMotor::SetPidIValue(int value)
+{
+  double pVal, iVal, dVal;
+  pVal = _pid->GetKp();
+  iVal = (float)value / 1000.0;
+  dVal = _pid->GetKd();
+  _pid->SetTunings(pVal, iVal, dVal);
+  DebugUnitPrint(_address, "Setting PID I value");
+}
+
+void RotationMotor::SetPidDValue(int value)
+{
+  double pVal, iVal, dVal;
+  pVal = _pid->GetKp();
+  iVal = _pid->GetKi();
+  dVal = (float)value / 1000.0;
+  _pid->SetTunings(pVal, iVal, dVal);
+  DebugUnitPrint(_address, "Setting PID D value");
+}
+

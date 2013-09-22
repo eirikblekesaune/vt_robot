@@ -7,7 +7,7 @@
 
 
 typedef int position_t;
-
+//todo: implement private inheritance of PID in motor classes 
 
 class PinneMotor
 {
@@ -48,6 +48,15 @@ class PinneMotor
     int GetMaxPosition() { return static_cast<int>(_maxPosition); };
     int GetMinPosition() { return static_cast<int>(_minPosition); };
     
+    void GoToTargetPosition();
+    void SetPidPValue(int pVal);
+    void SetPidIValue(int iVal);
+    void SetPidDValue(int dVal);
+    
+    int GetPidPValue() {return _pid->GetKp(); };
+    int GetPidIValue() {return _pid->GetKi(); };
+    int GetPidDValue() {return _pid->GetKd(); };
+    
     boolean IsBlocked();
     void UpdateState();
     void ReadTopStopSensor();
@@ -86,8 +95,12 @@ class PinneMotor
     void _MaxPositionReached();
     void _CalculateAndSetSpeed();
     void _SetBlocked(boolean block) {};
-    
     int _state;
+    //PID memebers
+    PID *_pid;
+    double _pidInput;
+    double _pidOutput;
+    double _pidSetpoint;
 };
 
 
@@ -121,6 +134,10 @@ class RotationMotor
     void SetBrake(int brake);
     void SetMaxPosition(int maxPos);
     void SetMinPosition(int minPos);
+    void GoToTargetPosition();
+    void SetPidPValue(int pVal);
+    void SetPidIValue(int iVal);
+    void SetPidDValue(int dVal);
     
     int GetSpeed() { return static_cast<int>(_driver->GetSpeed()); };
     int GetDirection() { return static_cast<int>(_driver->GetDirection()); };
@@ -129,6 +146,9 @@ class RotationMotor
     int GetBrake() { return static_cast<int>(_driver->GetBrake()); };
     int GetMaxPosition() { return static_cast<int>(_maxPosition); };
     int GetMinPosition() { return static_cast<int>(_minPosition); };
+    int GetPidPValue() {return _pid->GetKp(); };
+    int GetPidIValue() {return _pid->GetKp(); };
+    int GetPidDValue() {return _pid->GetKp(); };
     
     void GoToParkingPosition();
     boolean IsBlocked();
@@ -148,9 +168,6 @@ class RotationMotor
     double _pidInput;
     double _pidOutput;
     double _pidSetpoint;
-    double _pidKp;
-    double _pidKi;
-    double _pidKd;
     void _TurningRight();
     void _TurningLeft();
     void _TargetReached();

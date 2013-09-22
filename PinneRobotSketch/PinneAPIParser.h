@@ -30,8 +30,12 @@ class PinneAPIParser
     void _processSetBrakeCommand();
     void _processSetMinPositionCommand();
     void _processSetMaxPositionCommand();
+    void _processSetGoToTargetCommand();
+    void _processSetPidPValueCommand();
+    void _processSetPidIValueCommand();
+    void _processSetPidDValueCommand();
+
     void _processGetStateCommand();
-    
     void _processGetSpeedCommand();    
     void _processGetDirectionCommand();
     void _processGetTargetPositionCommand();
@@ -39,10 +43,8 @@ class PinneAPIParser
     void _processGetBrakeCommand();
     void _processGetMinPositionCommand();
     void _processGetMaxPositionCommand();
-    
-    void _processGoToTargetCommand();
-    void _processPValueCommand();
-    void _processIValueCommand();
-    void _processDValueCommand();
+    void _processGetPidPValueCommand();
+    void _processGetPidIValueCommand();
+    void _processGetPidDValueCommand();    
 };
 #endif

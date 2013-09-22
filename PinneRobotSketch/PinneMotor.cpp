@@ -414,4 +414,38 @@ void PinneMotor::GoToParkingPosition()
   }
 }
 
+void PinneMotor::GoToTargetPosition()
+{
+  DebugUnitPrint(_address, "Going to Target");
+}
+
+void PinneMotor::SetPidPValue(int value)
+{
+  double pVal, iVal, dVal;
+  pVal = (float)value / 1000.0;
+  iVal = _pid->GetKi();
+  dVal = _pid->GetKd();
+  _pid->SetTunings(pVal, iVal, dVal);  
+  DebugUnitPrint(_address, "Setting PID P value"); 
+}
+
+void PinneMotor::SetPidIValue(int value)
+{
+  double pVal, iVal, dVal;
+  pVal = _pid->GetKp();
+  iVal = (float)value / 1000.0;
+  dVal = _pid->GetKd();
+  _pid->SetTunings(pVal, iVal, dVal);
+  DebugUnitPrint(_address, "Setting PID I value");
+}
+
+void PinneMotor::SetPidDValue(int value)
+{
+  double pVal, iVal, dVal;
+  pVal = _pid->GetKp();
+  iVal = _pid->GetKi();
+  dVal = (float)value / 1000.0;
+  _pid->SetTunings(pVal, iVal, dVal);
+  DebugUnitPrint(_address, "Setting PID D value");
+}
 
