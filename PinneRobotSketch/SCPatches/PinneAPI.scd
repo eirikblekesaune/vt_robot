@@ -1,7 +1,7 @@
 SerialPort.devices.do(_.postln)
 (
 p = SerialPort("/dev/tty.usbserial-FT5QT6JNA", 9600, crtscts:true,xonxoff:true);
-//p = SerialPort("/dev/tty.usbmodem411", 9600, crtscts:true,xonxoff:true);
+//p = SerialPort("/dev/tty.usbmodem621", 9600, crtscts:true,xonxoff:true);
 Tdef(\listenToSerial, {
 	loop{
 		var byte;
@@ -35,10 +35,10 @@ Tdef(\listenToSerial, {
 	\minPosition -> 2r1000,
 	\maxPosition -> 2r1001,
 	\goToParkingPosition -> 2r1010,
-	\goToTarget -> 2r1011,
-	\pidPValue -> 2r1100,
-	\pidIValue -> 2r1101,
-	\pidDValue -> 2r1110,
+	\goToTargetPosition -> 2r1011,
+	\goToSpeedRampUp -> 2r1100,//argument is ramp up percent of halfway point
+	\goToSpeedRampDown -> 2r1101,//ramp down time will take effect after halfway point
+	\goToSpeedScaling -> 2r1110
 ];
 ~setGetMasks = TwoWayIdentityDictionary[
 	\set -> 2r00000000,
@@ -49,13 +49,13 @@ Tdef(\listenToSerial, {
 	\goingDown ->   2r00000001,
 	\goingUp -> 2r00000010,
 	\stoppedAtTarget -> 2r00000011,
-	\blockedByTopSensor -> 2r00000100,
-	\blockedBySlackSensor -> 2r00000101,
-	\blockedByMinPosition -> 2r00000110,
-	\blockedByMaxPosition -> 2r00000111,
-	\blockedByAbsMinPosition -> 2r00001000,
-	\motorDriverFault -> 2r00001001
-
+	\goingToTarget -> 2r00000100,
+	\blockedByTopSensor -> 2r00000101,
+	\blockedBySlackSensor -> 2r00000110,
+	\blockedByMinPosition -> 2r00000111,
+	\blockedByMaxPosition -> 2r00001000,
+	\blockedByAbsMinPosition -> 2r00001001,
+	\motorDriverFault -> 2r00001010
 ];
 ~buildMessage = {arg address, setGet, command, value;
 	var msg;
@@ -176,10 +176,66 @@ Tdef(\listenToSerial, {
 );
 )
 
-p.putAll(~buildMessage.value(\right, \set, \writeSettings, 9999));
-p.putAll(~buildMessage.value(\right, \set, \loadSettings, 9999));
 
-(1 << 8).bitOr(11);
+p.putAll(~buildMessage.value(\left, \set, \goToTargetPosition, 0));
+p.putAll(~buildMessage.value(\left, \set, \targetPosition, 500));
+
+p.putAll(~buildMessage.value(\left, \set, \goToSpeedRampUp, 10));
+p.putAll(~buildMessage.value(\left, \get, \goToSpeedRampUp));
+p.putAll(~buildMessage.value(\left, \set, \goToSpeedRampDown, 10));
+p.putAll(~buildMessage.value(\left, \get, \goToSpeedRampDown));
+p.putAll(~buildMessage.value(\left, \set, \goToSpeedScaling, 99));
+p.putAll(~buildMessage.value(\left, \get, \goToSpeedScaling));
+
+p.putAll(~buildMessage.value(\right, \set, \goToSpeedRampUp, 10));
+p.putAll(~buildMessage.value(\right, \get, \goToSpeedRampUp));
+p.putAll(~buildMessage.value(\right, \set, \goToSpeedRampDown, 10));
+p.putAll(~buildMessage.value(\right, \get, \goToSpeedRampDown));
+p.putAll(~buildMessage.value(\right, \set, \goToSpeedScaling, 99));
+p.putAll(~buildMessage.value(\right, \get, \goToSpeedScaling));
+
+p.putAll(~buildMessage.value(\rotation, \set, \goToSpeedRampUp, 10));
+p.putAll(~buildMessage.value(\rotation, \get, \goToSpeedRampUp));
+p.putAll(~buildMessage.value(\rotation, \set, \goToSpeedRampDown, 10));
+p.putAll(~buildMessage.value(\rotation, \get, \goToSpeedRampDown));
+p.putAll(~buildMessage.value(\rotation, \set, \goToSpeedScaling, 99));
+p.putAll(~buildMessage.value(\rotation, \get, \goToSpeedScaling));
+
+
+p.putAll(~buildMessage.value(\right, \set, \goToSpeedRampDown, 20));
+p.putAll(~buildMessage.value(\right, \get, \goToSpeedRampDown));
+
+p.putAll(~buildMessage.value(\rotation, \set, \goToSpeedRampDown, 30));
+p.putAll(~buildMessage.value(\rotation, \get, \goToSpeedRampDown));
+
+
+p.putAll(~buildMessage.value(\left, \get, \pidPValue));
+p.putAll(~buildMessage.value(\left, \get, \pidIValue));
+p.putAll(~buildMessage.value(\left, \get, \pidDValue));
+
+
+
+p.putAll(~buildMessage.value(\rotation, \set, \goToTargetPosition, 0));
+p.putAll(~buildMessage.value(\rotation, \set, \pidPValue, 11));
+p.putAll(~buildMessage.value(\rotation, \set, \pidIValue, 22));
+p.putAll(~buildMessage.value(\rotation, \set, \pidDValue, 33));
+p.putAll(~buildMessage.value(\rotation, \get, \pidPValue));
+p.putAll(~buildMessage.value(\rotation, \get, \pidIValue));
+p.putAll(~buildMessage.value(\rotation, \get, \pidDValue));
+
+(
+p.putAll(~buildMessage.value(\right, \set, \targetPosition, 200));
+p.putAll(~buildMessage.value(\right, \set, \goToTargetPosition, 0));
+)
+(
+p.putAll(~buildMessage.value(\right, \set, \pidPValue, 3000));
+p.putAll(~buildMessage.value(\right, \set, \pidIValue, 1));
+p.putAll(~buildMessage.value(\right, \set, \pidDValue, 1000));
+)
+p.putAll(~buildMessage.value(\right, \get, \pidPValue));
+p.putAll(~buildMessage.value(\right, \get, \pidIValue));
+p.putAll(~buildMessage.value(\right, \get, \pidDValue));
+
 (
 p.putAll(~buildMessage.value(\left, \set, \speed, 100));
 p.putAll(~buildMessage.value(\right, \set, \speed, 100));
@@ -374,5 +430,5 @@ win.front;
 p.putAll(~buildMessage.value(\rotation, \get, \currentPosition));
 p.putAll(~buildMessage.value(\rotation, \set, \targetPosition, 0));
 p.putAll(~buildMessage.value(\rotation, \get, \currentPosition));
-p.putAll(~buildMessage.value(\rotation, \set, \speed, 0));
+p.putAll(~buildMessage.value(\left, \get, \speed));
 p.putAll(~buildMessage.value(\rotation, \set, \speed, 0));

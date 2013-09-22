@@ -35,19 +35,6 @@ void RotationMotor::init()
   pinMode(_rotationPotmeterPin, INPUT);
   _currentPosition = analogRead(_rotationPotmeterPin);
   SetDirection(DIRECTION_RIGHT);
-  
-  //Initialize PID control
-  _pidInput = 0.0;
-  _pidOutput = 0.0;
-  _pidSetpoint = 0.0;
-  double pidKp = 1.0, pidKi = 0.05, pidKd = 1.0;
-  _pid = new PID(&_pidInput, &_pidOutput, &_pidSetpoint, pidKp, pidKi, pidKd, DIRECT);
-  _pid->SetOutputLimits(
-    static_cast<double>(L293Driver::SPEED_MIN), 
-    static_cast<double>(L293Driver::SPEED_MAX)
-  );
-  _pid->SetSampleTime(100);
-  _pid->SetMode(AUTOMATIC);
 }
 
 void RotationMotor::SetSpeed(int speed)
@@ -71,11 +58,9 @@ void RotationMotor::SetDirection(int direction)
     _driver->SetDirection(direction);
     if(GetDirection() == DIRECTION_LEFT)
     {
-      _pid->SetControllerDirection(DIRECT);
       _TurningLeft();
     } else {
       _TurningRight();
-      _pid->SetControllerDirection(REVERSE);
     }
   } else {
     _driver->UpdateDirection();
@@ -129,19 +114,7 @@ boolean RotationMotor::IsBlocked()
 void RotationMotor::UpdateState()
 {
   _currentPosition = analogRead(_rotationPotmeterPin);
-  _pidInput = static_cast<double>(_currentPosition);
   int currPosition = _currentPosition;
-  
-  //PID update
-  if(_targetPosition != TARGET_NONE)
-  {
-    if(_pid->Compute())
-    {
-      DebugPrint("PID");
-      DebugPrint(_pidOutput);
-    }
-  }
-  
   int minPosition = GetMinPosition();
   if(currPosition < minPosition)
   {
@@ -228,8 +201,6 @@ void RotationMotor::SetTargetPosition(int targetPosition)
   } else {
     value = constrain(targetPosition, GetMinPosition(), GetMaxPosition());
     _targetPosition = value;
-    _pidSetpoint = static_cast<double>(_targetPosition);
-
     //change the direction if target in the opposite direction
       int currPosition = GetCurrentPosition();    
     if(GetDirection() == DIRECTION_RIGHT)
@@ -259,34 +230,17 @@ void RotationMotor::GoToTargetPosition()
   DebugUnitPrint(_address, "Going to Target");
 }
 
-
-void RotationMotor::SetPidPValue(int value)
+void RotationMotor::SetGoToSpeedRampUp(int value)
 {
-  double pVal, iVal, dVal;
-  pVal = (float)value / 1000.0;
-  iVal = _pid->GetKi();
-  dVal = _pid->GetKd();
-  _pid->SetTunings(pVal, iVal, dVal);  
-  DebugUnitPrint(_address, "Setting PID P value"); 
+  _speedRamper->SetRampUp(static_cast<double>(value));
 }
 
-void RotationMotor::SetPidIValue(int value)
+void RotationMotor::SetGoToSpeedRampDown(int value)
 {
-  double pVal, iVal, dVal;
-  pVal = _pid->GetKp();
-  iVal = (float)value / 1000.0;
-  dVal = _pid->GetKd();
-  _pid->SetTunings(pVal, iVal, dVal);
-  DebugUnitPrint(_address, "Setting PID I value");
+  _speedRamper->SetRampDown(static_cast<double>(value));
 }
 
-void RotationMotor::SetPidDValue(int value)
+void RotationMotor::SetGoToSpeedScaling(int value)
 {
-  double pVal, iVal, dVal;
-  pVal = _pid->GetKp();
-  iVal = _pid->GetKi();
-  dVal = (float)value / 1000.0;
-  _pid->SetTunings(pVal, iVal, dVal);
-  DebugUnitPrint(_address, "Setting PID D value");
+  _speedRamper->SetSpeedScaling(static_cast<double>(value));
 }
-

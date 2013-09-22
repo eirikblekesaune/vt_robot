@@ -189,15 +189,21 @@ void PinneMotor::UpdateState()
         {
           _TargetReached();
         } else {
-          _GoingDown();
+          if(_state != GOING_TO_TARGET)
+          {
+            _GoingDown();
+          }
         }
       } else {
           if((_targetPosition != TARGET_NONE) && (currPosition < _targetPosition))
           {
             _TargetReached();
           } else {
-            _GoingUp();
-          }
+            if(_state != GOING_TO_TARGET)
+            {
+              _GoingUp();
+            }
+         }
       }
     }
   } 
@@ -350,6 +356,15 @@ void PinneMotor::_TargetReached()
   }
 }
 
+void PinneMotor::_GoingToTarget()
+{
+  if(_state != GOING_TO_TARGET)
+  {
+    _state = GOING_TO_TARGET;
+    NotifyStateChange(GOING_TO_TARGET, _address);
+  }
+}
+
 void PinneMotor::SetTargetPosition(int targetPosition)
 {
   int value;
@@ -416,36 +431,21 @@ void PinneMotor::GoToParkingPosition()
 
 void PinneMotor::GoToTargetPosition()
 {
-  DebugUnitPrint(_address, "Going to Target");
+  //DebugUnitPrint(_address, "Going to Target");
+  _GoingToTarget();
 }
 
-void PinneMotor::SetPidPValue(int value)
+void PinneMotor::SetGoToSpeedRampUp(int value)
 {
-  double pVal, iVal, dVal;
-  pVal = (float)value / 1000.0;
-  iVal = _pid->GetKi();
-  dVal = _pid->GetKd();
-  _pid->SetTunings(pVal, iVal, dVal);  
-  DebugUnitPrint(_address, "Setting PID P value"); 
+  _speedRamper->SetRampUp(static_cast<double>(value));
 }
 
-void PinneMotor::SetPidIValue(int value)
+void PinneMotor::SetGoToSpeedRampDown(int value)
 {
-  double pVal, iVal, dVal;
-  pVal = _pid->GetKp();
-  iVal = (float)value / 1000.0;
-  dVal = _pid->GetKd();
-  _pid->SetTunings(pVal, iVal, dVal);
-  DebugUnitPrint(_address, "Setting PID I value");
+  _speedRamper->SetRampDown(static_cast<double>(value));
 }
 
-void PinneMotor::SetPidDValue(int value)
+void PinneMotor::SetGoToSpeedScaling(int value)
 {
-  double pVal, iVal, dVal;
-  pVal = _pid->GetKp();
-  iVal = _pid->GetKi();
-  dVal = (float)value / 1000.0;
-  _pid->SetTunings(pVal, iVal, dVal);
-  DebugUnitPrint(_address, "Setting PID D value");
+  _speedRamper->SetSpeedScaling(static_cast<double>(value));
 }
-

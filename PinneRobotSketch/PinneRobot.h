@@ -15,8 +15,6 @@ public:
   PinneMotor *leftMotor;
   PinneMotor *rightMotor;
   RotationMotor *rotationMotor;
-  void storeSettingsToEEPROM();
-  void loadSettingsFromEEPROM();
   void GoToParkingPosition();
 };
 

@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include "MotorDriver.h"
 #include "PinneAPI.h"
-#include "PID_v1.h"
+#include "SpeedRamping.h"
 
 
 typedef int position_t;
@@ -39,6 +39,10 @@ class PinneMotor
     void SetBrake(int brake);
     void SetMaxPosition(int maxPos);
     void SetMinPosition(int minPos);
+    void SetGoToSpeedScaling(int value);
+    void SetGoToSpeedRampUp(int value);
+    void SetGoToSpeedRampDown(int value);
+
     
     int GetSpeed() { return static_cast<int>(_driver->GetSpeed()); };
     int GetDirection() { return static_cast<int>(_driver->GetDirection()); };
@@ -47,16 +51,13 @@ class PinneMotor
     int GetBrake() { return static_cast<int>(_driver->GetBrake()); };
     int GetMaxPosition() { return static_cast<int>(_maxPosition); };
     int GetMinPosition() { return static_cast<int>(_minPosition); };
+
+    int GetGoToSpeedScaling() {static_cast<int>(_speedRamper->GetSpeedScaling() * 1000); };
+    int GetGoToSpeedRampUp() {static_cast<int>(_speedRamper->GetRampUp()); };
+    int GetGoToSpeedRampDown() {static_cast<int>(_speedRamper->GetRampDown()); };
     
     void GoToTargetPosition();
-    void SetPidPValue(int pVal);
-    void SetPidIValue(int iVal);
-    void SetPidDValue(int dVal);
-    
-    int GetPidPValue() {return _pid->GetKp(); };
-    int GetPidIValue() {return _pid->GetKi(); };
-    int GetPidDValue() {return _pid->GetKd(); };
-    
+
     boolean IsBlocked();
     void UpdateState();
     void ReadTopStopSensor();
@@ -93,14 +94,14 @@ class PinneMotor
     void _AbsMinPositionReached();
     void _MinPositionReached();
     void _MaxPositionReached();
+    void _GoingToTarget();
+    
     void _CalculateAndSetSpeed();
     void _SetBlocked(boolean block) {};
     int _state;
-    //PID memebers
-    PID *_pid;
-    double _pidInput;
-    double _pidOutput;
-    double _pidSetpoint;
+    
+    //SpeedRamp
+    SpeedRamping* _speedRamper;
 };
 
 
@@ -132,12 +133,16 @@ class RotationMotor
     void SetTargetPosition(int pos);
     void SetCurrentPosition(int pos) {};
     void SetBrake(int brake);
-    void SetMaxPosition(int maxPos);
     void SetMinPosition(int minPos);
+    void SetMaxPosition(int maxPos);
+    void SetGoToSpeedScaling(int value);
+    void SetGoToSpeedRampUp(int value);
+    void SetGoToSpeedRampDown(int value);
+    
+    
+    
+    
     void GoToTargetPosition();
-    void SetPidPValue(int pVal);
-    void SetPidIValue(int iVal);
-    void SetPidDValue(int dVal);
     
     int GetSpeed() { return static_cast<int>(_driver->GetSpeed()); };
     int GetDirection() { return static_cast<int>(_driver->GetDirection()); };
@@ -146,9 +151,11 @@ class RotationMotor
     int GetBrake() { return static_cast<int>(_driver->GetBrake()); };
     int GetMaxPosition() { return static_cast<int>(_maxPosition); };
     int GetMinPosition() { return static_cast<int>(_minPosition); };
-    int GetPidPValue() {return _pid->GetKp(); };
-    int GetPidIValue() {return _pid->GetKp(); };
-    int GetPidDValue() {return _pid->GetKp(); };
+
+    int GetGoToSpeedScaling() {static_cast<int>(_speedRamper->GetSpeedScaling() * 1000); };
+    int GetGoToSpeedRampUp() {static_cast<int>(_speedRamper->GetRampUp()); };
+    int GetGoToSpeedRampDown() {static_cast<int>(_speedRamper->GetRampDown()); };
+    
     
     void GoToParkingPosition();
     boolean IsBlocked();
@@ -164,18 +171,14 @@ class RotationMotor
     position_t _minPosition; //i.e. max left position
     position_t _maxPosition; //i.e. max right position
     unsigned char _rotationPotmeterPin;
-    PID *_pid;
-    double _pidInput;
-    double _pidOutput;
-    double _pidSetpoint;
+
     void _TurningRight();
     void _TurningLeft();
     void _TargetReached();
     void _MinPositionReached();
     void _MaxPositionReached();
-
-
     
+    SpeedRamping* _speedRamper;
 };
 
 

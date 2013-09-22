@@ -17,9 +17,9 @@ enum command_t
   CMD_MAX_POSITION = 0x09,
   CMD_GOTO_PARKING_POSITION = 0x0A,
   CMD_GOTO_TARGET = 0x0B,
-  CMD_PID_P_VALUE = 0x0C,
-  CMD_PID_I_VALUE = 0x0D,
-  CMD_PID_D_VALUE = 0x0E,
+  CMD_GOTO_SPEED_RAMP_UP = 0x0C,
+  CMD_GOTO_SPEED_RAMP_DOWN = 0x0D,
+  CMD_GOTO_SPEED_SCALING = 0x0E,
   CMD_UNKNOWN
 };
 
@@ -59,6 +59,7 @@ enum stateChange_t
   GOING_DOWN,//direction set to up
   GOING_UP,//directiom set to down
   STOPPED_AT_TARGET,//
+  GOING_TO_TARGET,
   BLOCKED_BY_TOP_SENSOR,//The stop sensor was hit
   BLOCKED_BY_SLACK_SENSOR,
   BLOCKED_BY_MIN_POSITION,//Position counter is below range

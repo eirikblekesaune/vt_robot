@@ -57,14 +57,14 @@ void PinneAPIParser::_parseCommand(byte inByte)
             case CMD_GOTO_TARGET:
               _processSetGoToTargetCommand();
               break;
-            case CMD_PID_P_VALUE:
-              _processSetPidPValueCommand();
+            case CMD_GOTO_SPEED_RAMP_UP:
+              _processSetGoToSpeedRampUpCommand();
               break;
-            case CMD_PID_I_VALUE:
-              _processSetPidIValueCommand();
+            case CMD_GOTO_SPEED_RAMP_DOWN:
+              _processSetGoToSpeedRampDownCommand();
               break;
-            case CMD_PID_D_VALUE:
-              _processSetPidDValueCommand();
+            case CMD_GOTO_SPEED_SCALING:
+              _processSetGoToSpeedScalingCommand();
               break;
             default:
               DebugPrint("Unknown command");
@@ -110,15 +110,15 @@ void PinneAPIParser::_parseCommand(byte inByte)
           ////DEBUG_PRINT("GET MAX POSITION COMMAND");DEBUG_NL;
           _processGetMaxPositionCommand();
           break;
-        case CMD_PID_P_VALUE:
-          _processGetPidPValueCommand();
+        case CMD_GOTO_SPEED_RAMP_UP:
+          _processGetGoToSpeedRampUpCommand();
           break;
-        case CMD_PID_I_VALUE:
-          _processGetPidIValueCommand();
+        case CMD_GOTO_SPEED_RAMP_DOWN:
+          _processGetGoToSpeedRampDownCommand();
           break;
-        case CMD_PID_D_VALUE:
-          _processGetPidDValueCommand();
-          break;
+        case CMD_GOTO_SPEED_SCALING:
+          _processGetGoToSpeedScalingCommand();
+          break;        
         default:
           DEBUG_PRINT("Unknown command"); //DEBUG_PRINT(_currentCommand);DEBUG_NL;
       }
@@ -564,80 +564,77 @@ void PinneAPIParser::_processSetGoToTargetCommand()
   }
 }
 
-void PinneAPIParser::_processSetPidPValueCommand()
+void PinneAPIParser::_processSetGoToSpeedRampUpCommand()
 {
   int value = _parseDataValue();
   switch(_currentAddress)
   {
     case ADDRESS_LEFT:
-      _robot->leftMotor->SetPidPValue(value);
+      _robot->leftMotor->SetGoToSpeedRampUp(value);
       break;
     case ADDRESS_RIGHT:
-      _robot->rightMotor->SetPidPValue(value);
+      _robot->rightMotor->SetGoToSpeedRampUp(value);
       break;
     case ADDRESS_ROTATION:
-      _robot->rotationMotor->SetPidPValue(value);
+      _robot->rotationMotor->SetGoToSpeedRampUp(value);
       break;
     default:
       DEBUG_PRINT("Unknown address\n");DEBUG_NL;
   }
 }
 
-void PinneAPIParser::_processSetPidIValueCommand()
+void PinneAPIParser::_processSetGoToSpeedRampDownCommand()
 {
   int value = _parseDataValue();
   switch(_currentAddress)
   {
     case ADDRESS_LEFT:
-      _robot->leftMotor->SetPidIValue(value);
+      _robot->leftMotor->SetGoToSpeedRampDown(value);
       break;
     case ADDRESS_RIGHT:
-      _robot->rightMotor->SetPidIValue(value);
+      _robot->rightMotor->SetGoToSpeedRampDown(value);
       break;
     case ADDRESS_ROTATION:
-      _robot->rotationMotor->SetPidIValue(value);
+      _robot->rotationMotor->SetGoToSpeedRampDown(value);
       break;
     default:
       DEBUG_PRINT("Unknown address\n");DEBUG_NL;
   }
 }
 
-void PinneAPIParser::_processSetPidDValueCommand()
+void PinneAPIParser::_processSetGoToSpeedScalingCommand()
 {
   int value = _parseDataValue();
   switch(_currentAddress)
   {
     case ADDRESS_LEFT:
-      _robot->leftMotor->SetPidDValue(value);
+      _robot->leftMotor->SetGoToSpeedScaling(value);
       break;
     case ADDRESS_RIGHT:
-      _robot->rightMotor->SetPidDValue(value);
+      _robot->rightMotor->SetGoToSpeedScaling(value);
       break;
     case ADDRESS_ROTATION:
-      _robot->rotationMotor->SetPidDValue(value);
+      _robot->rotationMotor->SetGoToSpeedScaling(value);
       break;
     default:
       DEBUG_PRINT("Unknown address\n");DEBUG_NL;
   }
 }
 
-void PinneAPIParser::_processGetPidPValueCommand()
+void PinneAPIParser::_processGetGoToSpeedRampUpCommand()
 {
   int value;
   value = -1;
   switch(_currentAddress)
   {
     case ADDRESS_LEFT:
-      //DEBUG_PRINT("Left motor max position: ");DEBUG_NL;
-      value = _robot->leftMotor->GetPidPValue();
+      value = _robot->leftMotor->GetGoToSpeedRampUp();
       break;
     case ADDRESS_RIGHT:
-      //DEBUG_PRINT("Right motor max position: ");DEBUG_NL;
-      value = _robot->rightMotor->GetPidPValue();
+      value = _robot->rightMotor->GetGoToSpeedRampUp();
       break;
     case ADDRESS_ROTATION:
-//      //DEBUG_PRINT("Right motor max position: ");DEBUG_NL;
-      value = _robot->rotationMotor->GetPidPValue();
+      value = _robot->rotationMotor->GetGoToSpeedRampUp();
       break;
     default:
       DEBUG_PRINT("Unknown address\n");DEBUG_NL;
@@ -650,23 +647,20 @@ void PinneAPIParser::_processGetPidPValueCommand()
   }
 }
 
-void PinneAPIParser::_processGetPidIValueCommand()
+void PinneAPIParser::_processGetGoToSpeedRampDownCommand()
 {
   int value;
   value = -1;
   switch(_currentAddress)
   {
     case ADDRESS_LEFT:
-      //DEBUG_PRINT("Left motor max position: ");DEBUG_NL;
-      value = _robot->leftMotor->GetPidIValue();
+      value = _robot->leftMotor->GetGoToSpeedRampDown();
       break;
     case ADDRESS_RIGHT:
-      //DEBUG_PRINT("Right motor max position: ");DEBUG_NL;
-      value = _robot->rightMotor->GetPidIValue();
+      value = _robot->rightMotor->GetGoToSpeedRampDown();
       break;
     case ADDRESS_ROTATION:
-//      //DEBUG_PRINT("Right motor max position: ");DEBUG_NL;
-      value = _robot->rotationMotor->GetPidIValue();
+      value = _robot->rotationMotor->GetGoToSpeedRampDown();
       break;
     default:
       DEBUG_PRINT("Unknown address\n");DEBUG_NL;
@@ -679,20 +673,20 @@ void PinneAPIParser::_processGetPidIValueCommand()
   }
 }
 
-void PinneAPIParser::_processGetPidDValueCommand()
+void PinneAPIParser::_processGetGoToSpeedScalingCommand()
 {
   int value;
   value = -1;
   switch(_currentAddress)
   {
     case ADDRESS_LEFT:
-      value = _robot->leftMotor->GetPidDValue();
+      value = _robot->leftMotor->GetGoToSpeedScaling();
       break;
     case ADDRESS_RIGHT:
-      value = _robot->rightMotor->GetPidDValue();
+      value = _robot->rightMotor->GetGoToSpeedScaling();
       break;
     case ADDRESS_ROTATION:
-      value = _robot->rotationMotor->GetPidDValue();
+      value = _robot->rotationMotor->GetGoToSpeedScaling();
       break;
     default:
       DEBUG_PRINT("Unknown address\n");DEBUG_NL;
