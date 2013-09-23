@@ -20,13 +20,14 @@ SpeedRamping::SpeedRamping(int minSpeed, int maxSpeed) :
 }
 
 
-void SpeedRamping::Start(int startPosition, int endPosition)
+void SpeedRamping::Start(int startPosition, int endPosition, int peakDuration)
 {
   //calculate halfway point
   _startPosition = startPosition;
   _endPosition = endPosition;
   _halfwayPosition = ((_endPosition - _startPosition) / 2) + _startPosition;
   _speedRange = abs(_maxSpeed - _minSpeed);
+  _peakDuration = peakDuration;
   if(_startPosition <= _endPosition)
   {
     _direction = RISING_RAMP;
@@ -62,7 +63,13 @@ boolean SpeedRamping::Calculate(int currPosition)
       }
       _currentFloatIndex = min(2.0, _currentFloatIndex + _riseDelta);
     } else {
-      _currentFloatIndex = max(1.0, _currentFloatIndex - _fallDelta);
+      _peakDuration = _peakDuration - _calcInterval;
+      if(_peakDuration < 0.0)
+      {
+        _currentFloatIndex = max(1.0, _currentFloatIndex - _fallDelta);
+      } else {
+        _currentFloatIndex = 2.0;
+      }
     }
     
     _lastCalcTime = nowTime;

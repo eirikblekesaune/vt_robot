@@ -218,7 +218,6 @@ void RotationMotor::_TargetReached()
 
 void RotationMotor::_GoingToTarget()
 {
-  _speedRamper->Start(GetCurrentPosition(), GetTargetPosition());
   _state = GOING_TO_TARGET;
   NotifyStateChange(GOING_TO_TARGET, _address);
 }
@@ -262,6 +261,7 @@ void RotationMotor::GoToTargetPosition(int value)
   {
     if(GetTargetPosition() != TARGET_NONE)
     {
+      _speedRamper->Start(GetCurrentPosition(), GetTargetPosition(), value);
       _GoingToTarget();
     }
   } else {

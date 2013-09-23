@@ -12,7 +12,7 @@ class SpeedRamping {
     RISING_RAMP,
     FALLING_RAMP
   };  
-  void Start(int startValue, int endValue);
+  void Start(int startValue, int endValue, int duration);
   void Stop();
   boolean Calculate(int currPosition);
   
@@ -49,6 +49,7 @@ class SpeedRamping {
   float _currentFloatIndex;
   int _direction;
   int _speedRange;
+  int _peakDuration;
 };
 
 
