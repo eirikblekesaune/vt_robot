@@ -52,9 +52,9 @@ class PinneMotor
     int GetMaxPosition() { return static_cast<int>(_maxPosition); };
     int GetMinPosition() { return static_cast<int>(_minPosition); };
 
-    int GetGoToSpeedScaling() {static_cast<int>(_speedRamper->GetSpeedScaling() * 1000); };
-    int GetGoToSpeedRampUp() {static_cast<int>(_speedRamper->GetRampUp()); };
-    int GetGoToSpeedRampDown() {static_cast<int>(_speedRamper->GetRampDown()); };
+    int GetGoToSpeedScaling() {return static_cast<int>(_speedRamper->GetSpeedScaling() * 1000); };
+    int GetGoToSpeedRampUp() {return static_cast<int>(_speedRamper->GetRampUp()); };
+    int GetGoToSpeedRampDown() {return static_cast<int>(_speedRamper->GetRampDown()); };
     
     void GoToTargetPosition();
 
@@ -96,6 +96,7 @@ class PinneMotor
     void _MaxPositionReached();
     void _GoingToTarget();
     
+    void _UpdateSpeedRamp();
     void _CalculateAndSetSpeed();
     void _SetBlocked(boolean block) {};
     int _state;
@@ -152,9 +153,9 @@ class RotationMotor
     int GetMaxPosition() { return static_cast<int>(_maxPosition); };
     int GetMinPosition() { return static_cast<int>(_minPosition); };
 
-    int GetGoToSpeedScaling() {static_cast<int>(_speedRamper->GetSpeedScaling() * 1000); };
-    int GetGoToSpeedRampUp() {static_cast<int>(_speedRamper->GetRampUp()); };
-    int GetGoToSpeedRampDown() {static_cast<int>(_speedRamper->GetRampDown()); };
+    int GetGoToSpeedScaling() {return static_cast<int>(_speedRamper->GetSpeedScaling() * 1000); };
+    int GetGoToSpeedRampUp() {return static_cast<int>(_speedRamper->GetRampUp()); };
+    int GetGoToSpeedRampDown() {return static_cast<int>(_speedRamper->GetRampDown()); };
     
     
     void GoToParkingPosition();
@@ -177,6 +178,7 @@ class RotationMotor
     void _TargetReached();
     void _MinPositionReached();
     void _MaxPositionReached();
+    void _GoingToTarget();
     
     SpeedRamping* _speedRamper;
 };

@@ -86,6 +86,13 @@ void PinneMotor::init()
   _slackStopSensorValue = digitalRead(_slackStopSensorPin);
   if(_slackStopSensorValue == SLACK_SENSOR_OUT)
     _SlackStopSensorOut();
+  
+  _speedRamper = new SpeedRamping(
+    VNH5019Driver::SPEED_MAX * 0.115,
+    VNH5019Driver::SPEED_MIN * 0.5
+  );
+  _speedRamper->SetRampUp(0);
+  _speedRamper->SetRampDown(0);
 }
 
 void PinneMotor::Stop()
@@ -189,8 +196,10 @@ void PinneMotor::UpdateState()
         {
           _TargetReached();
         } else {
-          if(_state != GOING_TO_TARGET)
+          if(_state == GOING_TO_TARGET)
           {
+            _UpdateSpeedRamp();
+          } else {
             _GoingDown();
           }
         }
@@ -199,14 +208,26 @@ void PinneMotor::UpdateState()
           {
             _TargetReached();
           } else {
-            if(_state != GOING_TO_TARGET)
+            if(_state == GOING_TO_TARGET)
             {
+              _UpdateSpeedRamp();
+            } else {
               _GoingUp();
             }
          }
       }
     }
   } 
+}
+
+void PinneMotor::_UpdateSpeedRamp()
+{
+  if(_speedRamper->Calculate( GetCurrentPosition() ))
+  {
+    int newSpeed;
+    newSpeed = _speedRamper->GetCurrentValue();
+    SetSpeed(newSpeed);
+  }
 }
 
 void PinneMotor::ReadTopStopSensor()
@@ -360,6 +381,7 @@ void PinneMotor::_GoingToTarget()
 {
   if(_state != GOING_TO_TARGET)
   {
+    _speedRamper->Start(GetCurrentPosition(), GetTargetPosition(), 1000);
     _state = GOING_TO_TARGET;
     NotifyStateChange(GOING_TO_TARGET, _address);
   }
@@ -431,21 +453,24 @@ void PinneMotor::GoToParkingPosition()
 
 void PinneMotor::GoToTargetPosition()
 {
-  //DebugUnitPrint(_address, "Going to Target");
+  DebugUnitPrint(_address, "Going to Target");
   _GoingToTarget();
 }
 
 void PinneMotor::SetGoToSpeedRampUp(int value)
 {
-  _speedRamper->SetRampUp(static_cast<double>(value));
+  DebugUnitPrint(_address, "Setting Ramp up");
+  _speedRamper->SetRampUp(static_cast<float>(value));
 }
 
 void PinneMotor::SetGoToSpeedRampDown(int value)
 {
-  _speedRamper->SetRampDown(static_cast<double>(value));
+  DebugUnitPrint(_address, "Setting Ramp down");
+  _speedRamper->SetRampDown(static_cast<float>(value));
 }
 
 void PinneMotor::SetGoToSpeedScaling(int value)
 {
-  _speedRamper->SetSpeedScaling(static_cast<double>(value));
+  DebugUnitPrint(_address, "Setting Ramp speed scaling");
+  _speedRamper->SetSpeedScaling(static_cast<float>(value) / 1000.0);
 }

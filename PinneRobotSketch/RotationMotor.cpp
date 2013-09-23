@@ -35,6 +35,10 @@ void RotationMotor::init()
   pinMode(_rotationPotmeterPin, INPUT);
   _currentPosition = analogRead(_rotationPotmeterPin);
   SetDirection(DIRECTION_RIGHT);
+  _speedRamper = new SpeedRamping(
+    L293Driver::SPEED_MAX * 0.4,
+    L293Driver::SPEED_MIN
+  );
 }
 
 void RotationMotor::SetSpeed(int speed)
@@ -192,6 +196,14 @@ void RotationMotor::_TargetReached()
   }
 }
 
+void RotationMotor::_GoingToTarget()
+{
+  if(_state != GOING_TO_TARGET)
+  {
+    DebugUnitPrint(_address, "AIMING STATE");
+  }
+}
+
 void RotationMotor::SetTargetPosition(int targetPosition)
 {
   int value;
@@ -228,19 +240,23 @@ void RotationMotor::GoToParkingPosition()
 void RotationMotor::GoToTargetPosition()
 {
   DebugUnitPrint(_address, "Going to Target");
+  _GoingToTarget();
 }
 
 void RotationMotor::SetGoToSpeedRampUp(int value)
 {
-  _speedRamper->SetRampUp(static_cast<double>(value));
+  DebugUnitPrint(_address, "Setting ramp up");
+  _speedRamper->SetRampUp(static_cast<float>(value));
 }
 
 void RotationMotor::SetGoToSpeedRampDown(int value)
 {
-  _speedRamper->SetRampDown(static_cast<double>(value));
+  DebugUnitPrint(_address, "Setting ramp down");
+  _speedRamper->SetRampDown(static_cast<float>(value));
 }
 
 void RotationMotor::SetGoToSpeedScaling(int value)
 {
-  _speedRamper->SetSpeedScaling(static_cast<double>(value));
+  DebugUnitPrint(_address, "Setting speed scaling");
+  _speedRamper->SetSpeedScaling(static_cast<float>(value / 1000.0));
 }

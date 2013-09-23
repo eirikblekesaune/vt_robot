@@ -189,7 +189,7 @@ p.putAll(~buildMessage.value(\left, \get, \goToSpeedScaling));
 
 p.putAll(~buildMessage.value(\right, \set, \goToSpeedRampUp, 10));
 p.putAll(~buildMessage.value(\right, \get, \goToSpeedRampUp));
-p.putAll(~buildMessage.value(\right, \set, \goToSpeedRampDown, 10));
+p.putAll(~buildMessage.value(\right, \set, \goToSpeedRampDown, 20));
 p.putAll(~buildMessage.value(\right, \get, \goToSpeedRampDown));
 p.putAll(~buildMessage.value(\right, \set, \goToSpeedScaling, 99));
 p.putAll(~buildMessage.value(\right, \get, \goToSpeedScaling));
