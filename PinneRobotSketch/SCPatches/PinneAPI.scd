@@ -177,8 +177,8 @@ Tdef(\listenToSerial, {
 )
 
 
-p.putAll(~buildMessage.value(\left, \set, \goToTargetPosition, 0));
-p.putAll(~buildMessage.value(\left, \set, \targetPosition, 10));
+p.putAll(~buildMessage.value(\left, \set, \goToTargetPosition, 10));
+p.putAll(~buildMessage.value(\left, \set, \targetPosition, 150));
 (
 p.putAll(~buildMessage.value(\left, \set, \goToSpeedRampUp, 1000));
 p.putAll(~buildMessage.value(\left, \get, \goToSpeedRampUp));
@@ -199,14 +199,14 @@ p.putAll(~buildMessage.value(\right, \set, \targetPosition, 10));
 p.putAll(~buildMessage.value(\right, \set, \goToTargetPosition, 0));
 )
 
-p.putAll(~buildMessage.value(\rotation, \set, \goToTargetPosition, 1));
-p.putAll(~buildMessage.value(\rotation, \set, \targetPosition, 400));
+p.putAll(~buildMessage.value(\rotation, \set, \goToTargetPosition, 3000));
+p.putAll(~buildMessage.value(\rotation, \set, \targetPosition, 650));
 (
-p.putAll(~buildMessage.value(\rotation, \set, \goToSpeedRampUp, 2000));
+p.putAll(~buildMessage.value(\rotation, \set, \goToSpeedRampUp, 3000));
 p.putAll(~buildMessage.value(\rotation, \get, \goToSpeedRampUp));
-p.putAll(~buildMessage.value(\rotation, \set, \goToSpeedRampDown, 1000));
+p.putAll(~buildMessage.value(\rotation, \set, \goToSpeedRampDown, 10));
 p.putAll(~buildMessage.value(\rotation, \get, \goToSpeedRampDown));
-p.putAll(~buildMessage.value(\rotation, \set, \goToSpeedScaling, 800));
+p.putAll(~buildMessage.value(\rotation, \set, \goToSpeedScaling, 1000));
 p.putAll(~buildMessage.value(\rotation, \get, \goToSpeedScaling));
 p.putAll(~buildMessage.value(\rotation, \get, \speed));
 )
@@ -217,10 +217,6 @@ p.putAll(~buildMessage.value(\right, \get, \goToSpeedRampDown));
 p.putAll(~buildMessage.value(\rotation, \set, \goToSpeedRampDown, 30));
 p.putAll(~buildMessage.value(\rotation, \get, \goToSpeedRampDown));
 
-
-p.putAll(~buildMessage.value(\left, \get, \pidPValue));
-p.putAll(~buildMessage.value(\left, \get, \pidIValue));
-p.putAll(~buildMessage.value(\left, \get, \pidDValue));
 
 
 
