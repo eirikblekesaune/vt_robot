@@ -548,16 +548,18 @@ void PinneAPIParser::_processGetStateCommand()
 
 void PinneAPIParser::_processSetGoToTargetCommand()
 {
+  int value;
+  value = _parseDataValue();
   switch(_currentAddress)
   {
     case ADDRESS_LEFT:
-      _robot->leftMotor->GoToTargetPosition();
+      _robot->leftMotor->GoToTargetPosition(value);
       break;
     case ADDRESS_RIGHT:
-      _robot->rightMotor->GoToTargetPosition();
+      _robot->rightMotor->GoToTargetPosition(value);
       break;
     case ADDRESS_ROTATION:
-      _robot->rotationMotor->GoToTargetPosition();
+      _robot->rotationMotor->GoToTargetPosition(value);
       break;
     default:
       DEBUG_PRINT("Unknown address\n");DEBUG_NL;

@@ -178,29 +178,38 @@ Tdef(\listenToSerial, {
 
 
 p.putAll(~buildMessage.value(\left, \set, \goToTargetPosition, 0));
-p.putAll(~buildMessage.value(\left, \set, \targetPosition, 500));
-
-p.putAll(~buildMessage.value(\left, \set, \goToSpeedRampUp, 10));
+p.putAll(~buildMessage.value(\left, \set, \targetPosition, 10));
+(
+p.putAll(~buildMessage.value(\left, \set, \goToSpeedRampUp, 1000));
 p.putAll(~buildMessage.value(\left, \get, \goToSpeedRampUp));
-p.putAll(~buildMessage.value(\left, \set, \goToSpeedRampDown, 10));
+p.putAll(~buildMessage.value(\left, \set, \goToSpeedRampDown, 2000));
 p.putAll(~buildMessage.value(\left, \get, \goToSpeedRampDown));
-p.putAll(~buildMessage.value(\left, \set, \goToSpeedScaling, 99));
+p.putAll(~buildMessage.value(\left, \set, \goToSpeedScaling, 500));
 p.putAll(~buildMessage.value(\left, \get, \goToSpeedScaling));
-
+)
+(
 p.putAll(~buildMessage.value(\right, \set, \goToSpeedRampUp, 10));
 p.putAll(~buildMessage.value(\right, \get, \goToSpeedRampUp));
-p.putAll(~buildMessage.value(\right, \set, \goToSpeedRampDown, 20));
+p.putAll(~buildMessage.value(\right, \set, \goToSpeedRampDown, 2000));
 p.putAll(~buildMessage.value(\right, \get, \goToSpeedRampDown));
 p.putAll(~buildMessage.value(\right, \set, \goToSpeedScaling, 99));
 p.putAll(~buildMessage.value(\right, \get, \goToSpeedScaling));
 
-p.putAll(~buildMessage.value(\rotation, \set, \goToSpeedRampUp, 10));
-p.putAll(~buildMessage.value(\rotation, \get, \goToSpeedRampUp));
-p.putAll(~buildMessage.value(\rotation, \set, \goToSpeedRampDown, 10));
-p.putAll(~buildMessage.value(\rotation, \get, \goToSpeedRampDown));
-p.putAll(~buildMessage.value(\rotation, \set, \goToSpeedScaling, 99));
-p.putAll(~buildMessage.value(\rotation, \get, \goToSpeedScaling));
+p.putAll(~buildMessage.value(\right, \set, \targetPosition, 10));
+p.putAll(~buildMessage.value(\right, \set, \goToTargetPosition, 0));
+)
 
+p.putAll(~buildMessage.value(\rotation, \set, \goToTargetPosition, 1));
+p.putAll(~buildMessage.value(\rotation, \set, \targetPosition, 400));
+(
+p.putAll(~buildMessage.value(\rotation, \set, \goToSpeedRampUp, 2000));
+p.putAll(~buildMessage.value(\rotation, \get, \goToSpeedRampUp));
+p.putAll(~buildMessage.value(\rotation, \set, \goToSpeedRampDown, 1000));
+p.putAll(~buildMessage.value(\rotation, \get, \goToSpeedRampDown));
+p.putAll(~buildMessage.value(\rotation, \set, \goToSpeedScaling, 800));
+p.putAll(~buildMessage.value(\rotation, \get, \goToSpeedScaling));
+p.putAll(~buildMessage.value(\rotation, \get, \speed));
+)
 
 p.putAll(~buildMessage.value(\right, \set, \goToSpeedRampDown, 20));
 p.putAll(~buildMessage.value(\right, \get, \goToSpeedRampDown));

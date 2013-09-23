@@ -89,10 +89,8 @@ void PinneMotor::init()
   
   _speedRamper = new SpeedRamping(
     VNH5019Driver::SPEED_MAX * 0.115,
-    VNH5019Driver::SPEED_MIN * 0.5
+    VNH5019Driver::SPEED_MAX
   );
-  _speedRamper->SetRampUp(0);
-  _speedRamper->SetRampDown(0);
 }
 
 void PinneMotor::Stop()
@@ -379,12 +377,9 @@ void PinneMotor::_TargetReached()
 
 void PinneMotor::_GoingToTarget()
 {
-  if(_state != GOING_TO_TARGET)
-  {
-    _speedRamper->Start(GetCurrentPosition(), GetTargetPosition(), 1000);
-    _state = GOING_TO_TARGET;
-    NotifyStateChange(GOING_TO_TARGET, _address);
-  }
+  _speedRamper->Start(GetCurrentPosition(), GetTargetPosition());
+  _state = GOING_TO_TARGET;
+  NotifyStateChange(GOING_TO_TARGET, _address);
 }
 
 void PinneMotor::SetTargetPosition(int targetPosition)
@@ -416,7 +411,6 @@ void PinneMotor::SetTargetPosition(int targetPosition)
 
 void PinneMotor::SetCurrentPosition(int currentPosition)
 {
-  DebugUnitPrint(_address, "Setting currentPosition");
   currentPosition = constrain(currentPosition, GetMinPosition(), GetMaxPosition());
   noInterrupts();
   *_encoderCounter = currentPosition;
@@ -451,26 +445,35 @@ void PinneMotor::GoToParkingPosition()
   }
 }
 
-void PinneMotor::GoToTargetPosition()
+void PinneMotor::GoToTargetPosition(int value)
 {
-  DebugUnitPrint(_address, "Going to Target");
-  _GoingToTarget();
+  if(value > 0)
+  {
+    if(GetTargetPosition() != TARGET_NONE)
+    {
+      _GoingToTarget();
+    }
+  } else {
+    if(GetDirection() == DIRECTION_DOWN)//cancel goto target when speed is set
+    {
+      _GoingDown();
+    } else {
+      _GoingUp();
+    }
+  }
 }
 
 void PinneMotor::SetGoToSpeedRampUp(int value)
 {
-  DebugUnitPrint(_address, "Setting Ramp up");
   _speedRamper->SetRampUp(static_cast<float>(value));
 }
 
 void PinneMotor::SetGoToSpeedRampDown(int value)
 {
-  DebugUnitPrint(_address, "Setting Ramp down");
   _speedRamper->SetRampDown(static_cast<float>(value));
 }
 
 void PinneMotor::SetGoToSpeedScaling(int value)
 {
-  DebugUnitPrint(_address, "Setting Ramp speed scaling");
   _speedRamper->SetSpeedScaling(static_cast<float>(value) / 1000.0);
 }

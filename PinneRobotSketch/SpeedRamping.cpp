@@ -1,5 +1,8 @@
+
 #include "SpeedRamping.h"
 #include "kRISE_TABLE.h"
+#define DEFAULT_RAMP_TIME 500
+
 const unsigned long SpeedRamping::DEFAULT_CALC_INTERVAL = 50;
 
 SpeedRamping::SpeedRamping(int minSpeed, int maxSpeed) :
@@ -9,11 +12,15 @@ SpeedRamping::SpeedRamping(int minSpeed, int maxSpeed) :
   _halfwayReached(false),
   _startPosition(0),
   _endPosition(0),
-  _direction(RISING_RAMP)
+  _direction(RISING_RAMP),
+  _rampUp(DEFAULT_RAMP_TIME),
+  _rampDown(DEFAULT_RAMP_TIME),
+  _speedScaling(1.0)
 {
 }
 
-void SpeedRamping::Start(int startPosition, int endPosition, int duration)
+
+void SpeedRamping::Start(int startPosition, int endPosition)
 {
   //calculate halfway point
   _startPosition = startPosition;
@@ -26,9 +33,9 @@ void SpeedRamping::Start(int startPosition, int endPosition, int duration)
   } else {
     _direction = FALLING_RAMP;
   }
-  _riseFactor = 1.01;
-  _fallFactor = 0.99;
-  _currentFloatIndex = 0.0;
+  _riseDelta = (1000.0 / _calcInterval) / _rampUp;
+  _fallDelta = (1000.0 / _calcInterval) / _rampDown;
+  _currentFloatIndex = 1.0; //this becomes subtracted by 1 upon look-up
   _halfwayReached = false;
 }
 
@@ -37,24 +44,27 @@ boolean SpeedRamping::Calculate(int currPosition)
   unsigned long nowTime = millis();
   if((nowTime - _lastCalcTime) >= _calcInterval)
   {
-    if(_direction == RISING_RAMP)
-    {
-      if(currPosition >= _halfwayPosition)
-      {
-        _halfwayReached = true;
-      }
-    } else {
-      if(currPosition <= _halfwayPosition)
-      {
-        _halfwayReached = true;
-      }
-    }
     if(!_halfwayReached)
     {
-      _currentFloatIndex = min(1.0, _currentFloatIndex * _riseFactor);
+      if(_direction == RISING_RAMP)
+      {
+        if(currPosition >= _halfwayPosition)
+        {
+          if(!_halfwayReached)
+          _halfwayReached = true;
+        }
+      } else {
+        if(currPosition <= _halfwayPosition)
+        {
+          if(!_halfwayReached)
+          _halfwayReached = true;
+        }
+      }
+      _currentFloatIndex = min(2.0, _currentFloatIndex + _riseDelta);
     } else {
-      _currentFloatIndex = max(0.0, _currentFloatIndex * _fallFactor);
+      _currentFloatIndex = max(1.0, _currentFloatIndex - _fallDelta);
     }
+    
     _lastCalcTime = nowTime;
     return true;
   } else {
@@ -71,7 +81,7 @@ int SpeedRamping::GetCurrentValue()
 {
   int index;
   float result;
-  index = static_cast<int>(floor(_currentFloatIndex * TABLE_SIZE));
+  index = max(0, static_cast<int>(floor((_currentFloatIndex - 1.0) * TABLE_SIZE)) - 1);
   result = (kRampTable[index] * _speedRange * _speedScaling) + _minSpeed;
   return static_cast<int>(result);
 }
@@ -93,11 +103,11 @@ void SpeedRamping::SetSpeedScaling(float speedScaling)
 
 void SpeedRamping::SetRampUp(float value)
 {
-  _rampUp = value;
+  _rampUp = max(value, 0.1);
 }
 
 void SpeedRamping::SetRampDown(float value)
 {
-  _rampDown = value;
+  _rampDown = max(value, 0.1);
 }
 

@@ -36,8 +36,8 @@ void RotationMotor::init()
   _currentPosition = analogRead(_rotationPotmeterPin);
   SetDirection(DIRECTION_RIGHT);
   _speedRamper = new SpeedRamping(
-    L293Driver::SPEED_MAX * 0.4,
-    L293Driver::SPEED_MIN
+    L293Driver::SPEED_MAX * 0.55,
+    L293Driver::SPEED_MAX
   );
 }
 
@@ -134,16 +134,36 @@ void RotationMotor::UpdateState()
       {
         _TargetReached();
       } else {
-        _TurningRight();
+      if(_state == GOING_TO_TARGET)
+        {
+          _UpdateSpeedRamp();
+        } else {
+          _TurningRight();
+        }
       }
     } else {
         if((_targetPosition != TARGET_NONE) && (currPosition <= _targetPosition))
         {
           _TargetReached();
         } else {
-          _TurningLeft();
+          if(_state == GOING_TO_TARGET)
+          {
+            _UpdateSpeedRamp();
+          } else {
+            _TurningLeft();
+          }
         }
     }
+  }
+}
+
+void RotationMotor::_UpdateSpeedRamp()
+{
+  if(_speedRamper->Calculate( GetCurrentPosition() ))
+  {
+    int newSpeed;
+    newSpeed = _speedRamper->GetCurrentValue();
+    SetSpeed(newSpeed);
   }
 }
 
@@ -198,10 +218,9 @@ void RotationMotor::_TargetReached()
 
 void RotationMotor::_GoingToTarget()
 {
-  if(_state != GOING_TO_TARGET)
-  {
-    DebugUnitPrint(_address, "AIMING STATE");
-  }
+  _speedRamper->Start(GetCurrentPosition(), GetTargetPosition());
+  _state = GOING_TO_TARGET;
+  NotifyStateChange(GOING_TO_TARGET, _address);
 }
 
 void RotationMotor::SetTargetPosition(int targetPosition)
@@ -237,26 +256,35 @@ void RotationMotor::GoToParkingPosition()
   SetSpeed(int(L293Driver::SPEED_MAX * 0.7));
 }
 
-void RotationMotor::GoToTargetPosition()
+void RotationMotor::GoToTargetPosition(int value)
 {
-  DebugUnitPrint(_address, "Going to Target");
-  _GoingToTarget();
+  if(value > 0)
+  {
+    if(GetTargetPosition() != TARGET_NONE)
+    {
+      _GoingToTarget();
+    }
+  } else {
+    if(GetDirection() == DIRECTION_LEFT)//cancel goto target when speed is set
+    {
+      _TurningLeft();
+    } else {
+      _TurningRight();
+    }
+  }
 }
 
 void RotationMotor::SetGoToSpeedRampUp(int value)
 {
-  DebugUnitPrint(_address, "Setting ramp up");
   _speedRamper->SetRampUp(static_cast<float>(value));
 }
 
 void RotationMotor::SetGoToSpeedRampDown(int value)
 {
-  DebugUnitPrint(_address, "Setting ramp down");
   _speedRamper->SetRampDown(static_cast<float>(value));
 }
 
 void RotationMotor::SetGoToSpeedScaling(int value)
 {
-  DebugUnitPrint(_address, "Setting speed scaling");
   _speedRamper->SetSpeedScaling(static_cast<float>(value / 1000.0));
 }

@@ -56,7 +56,7 @@ class PinneMotor
     int GetGoToSpeedRampUp() {return static_cast<int>(_speedRamper->GetRampUp()); };
     int GetGoToSpeedRampDown() {return static_cast<int>(_speedRamper->GetRampDown()); };
     
-    void GoToTargetPosition();
+    void GoToTargetPosition(int value);
 
     boolean IsBlocked();
     void UpdateState();
@@ -140,10 +140,7 @@ class RotationMotor
     void SetGoToSpeedRampUp(int value);
     void SetGoToSpeedRampDown(int value);
     
-    
-    
-    
-    void GoToTargetPosition();
+    void GoToTargetPosition(int value);
     
     int GetSpeed() { return static_cast<int>(_driver->GetSpeed()); };
     int GetDirection() { return static_cast<int>(_driver->GetDirection()); };
@@ -180,6 +177,7 @@ class RotationMotor
     void _MaxPositionReached();
     void _GoingToTarget();
     
+    void _UpdateSpeedRamp();
     SpeedRamping* _speedRamper;
 };
 

@@ -2,7 +2,7 @@
 #define SpeedRamping_h
 
 #include <Arduino.h>
-
+#include "PinneAPI.h"
 class SpeedRamping {
   public:
   SpeedRamping(int minSpeed, int maxSpeed);
@@ -12,7 +12,7 @@ class SpeedRamping {
     RISING_RAMP,
     FALLING_RAMP
   };  
-  void Start(int startValue, int endValue, int duration);
+  void Start(int startValue, int endValue);
   void Stop();
   boolean Calculate(int currPosition);
   
@@ -40,8 +40,8 @@ class SpeedRamping {
   int _halfwayPosition;
   int _startPosition;
   int _endPosition;
-  float _riseFactor;
-  float _fallFactor;
+  float _riseDelta;
+  float _fallDelta;
   
   boolean _halfwayReached;
   unsigned long _calcInterval;
