@@ -242,11 +242,7 @@ VTPinneRobotParser{
 			address = this.class.addressMasks.getID(byte.bitAnd(2r00110000));//get address symbol
 			setGet = this.class.setGetMasks.getID(byte.bitAnd(2r01000000));//get set or get command
 			switch(command,
-				\stop, {
-					//"Received stop command".postln;
-					nextParserState = \waitingForCommandByte;
-					this.doCommand;
-				},
+				\stop, {"Received stop command".postln},
 				\stateChange, {
 					//"Receive state change command".postln;
 					nextParserState = \waitingForStateByte;
@@ -312,7 +308,7 @@ VTPinneRobotParser{
 			this.class.setGetMasks[setGet],
 			this.class.commandMasks[command],
 		].reduce(\bitOr).asArray;
-		if(setGet == \set and: {command != \stop}, {
+		if(setGet == \set, {
 			msg = msg ++ this.class.makeDataBytes.value(value);
 		});
 		^msg;

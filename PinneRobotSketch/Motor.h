@@ -31,7 +31,8 @@ class PinneMotor
     void init();
 
     void Stop();
-    
+
+    void SetStop(int value);    
     void SetSpeed(int speed);
     void SetDirection(int direction);
     void SetTargetPosition(int pos);
@@ -55,6 +56,8 @@ class PinneMotor
     int GetGoToSpeedScaling() {return static_cast<int>(_speedRamper->GetSpeedScaling() * 1000); };
     int GetGoToSpeedRampUp() {return static_cast<int>(_speedRamper->GetRampUp()); };
     int GetGoToSpeedRampDown() {return static_cast<int>(_speedRamper->GetRampDown()); };
+    int GetStop() {return _stoppingSpeed; };
+    
     
     void GoToTargetPosition(int value);
 
@@ -83,6 +86,7 @@ class PinneMotor
     boolean _blocked;
     MotorDriver* _driver;
     address_t _address;
+    int _stoppingSpeed;
     int _encoderInterruptIndex;
     void _GoingUp();
     void _GoingDown();
@@ -128,6 +132,7 @@ class RotationMotor
     void init();
 
     void Stop() { _driver->SetSpeed(SPEED_STOP); };
+    void SetStop(int value);
     
     void SetSpeed(int speed);
     void SetDirection(int direction);
@@ -149,6 +154,8 @@ class RotationMotor
     int GetBrake() { return static_cast<int>(_driver->GetBrake()); };
     int GetMaxPosition() { return static_cast<int>(_maxPosition); };
     int GetMinPosition() { return static_cast<int>(_minPosition); };
+    int GetStop() {return _stoppingSpeed; };
+    
 
     int GetGoToSpeedScaling() {return static_cast<int>(_speedRamper->GetSpeedScaling() * 1000); };
     int GetGoToSpeedRampUp() {return static_cast<int>(_speedRamper->GetRampUp()); };
@@ -169,6 +176,7 @@ class RotationMotor
     position_t _minPosition; //i.e. max left position
     position_t _maxPosition; //i.e. max right position
     unsigned char _rotationPotmeterPin;
+    int _stoppingSpeed;
 
     void _TurningRight();
     void _TurningLeft();

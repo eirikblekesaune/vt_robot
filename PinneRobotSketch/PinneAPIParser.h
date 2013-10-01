@@ -46,5 +46,6 @@ class PinneAPIParser
     void _processGetGoToSpeedRampUpCommand();
     void _processGetGoToSpeedRampDownCommand();
     void _processGetGoToSpeedScalingCommand();
+    void _processGetStopCommand();
 };
 #endif

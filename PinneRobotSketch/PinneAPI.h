@@ -5,7 +5,7 @@
 
 enum command_t
 {
-  CMD_STOP = 0x00,
+  CMD_STOP = 0x00,//speed fade out time as argument
   CMD_SPEED = 0x01,
   CMD_DIRECTION = 0x02,
   CMD_TARGET_POSITION = 0x03,
@@ -16,7 +16,7 @@ enum command_t
   CMD_MIN_POSITION = 0x08,
   CMD_MAX_POSITION = 0x09,
   CMD_GOTO_PARKING_POSITION = 0x0A,
-  CMD_GOTO_TARGET = 0x0B,
+  CMD_GOTO_TARGET = 0x0B, //duration after halfway point as argument
   CMD_GOTO_SPEED_RAMP_UP = 0x0C,
   CMD_GOTO_SPEED_RAMP_DOWN = 0x0D,
   CMD_GOTO_SPEED_SCALING = 0x0E,

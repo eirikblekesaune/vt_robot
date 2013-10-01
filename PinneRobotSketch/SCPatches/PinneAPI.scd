@@ -1,7 +1,7 @@
 SerialPort.devices.do(_.postln)
 (
-p = SerialPort("/dev/tty.usbserial-FT5QT6JNA", 9600, crtscts:true,xonxoff:true);
-//p = SerialPort("/dev/tty.usbmodem621", 9600, crtscts:true,xonxoff:true);
+//p = SerialPort("/dev/tty.usbserial-FT5QT6JNA", 9600, crtscts:true,xonxoff:true);
+p = SerialPort("/dev/tty.usbserial-FT5QT6TQA", 9600, crtscts:true,xonxoff:true);//EN
 Tdef(\listenToSerial, {
 	loop{
 		var byte;
@@ -65,7 +65,7 @@ Tdef(\listenToSerial, {
 		~setGetMasks[setGet],
 		~commandMasks[command],
 	].reduce(\bitOr).asArray;
-	if(setGet == \set and: {command != \stop}, {
+	if(setGet == \set, {
 		msg = msg ++ ~makeDataBytes.value(value);
 	});
 	msg;
@@ -93,11 +93,7 @@ Tdef(\listenToSerial, {
 			address = ~addressMasks.getID(byte.bitAnd(2r00110000));//get address symbol
 			setGet = ~setGetMasks.getID(byte.bitAnd(2r01000000));//get set or get command
 			switch(command,
-				\stop, {
-					//"Received stop command".postln;
-					nextParserState = \waitingForCommandByte;
-					ev[\doCommand].value
-				},
+				\stop, {"Received stop command".postln},
 				\stateChange, {
 					//"Receive state change command".postln;
 					nextParserState = \waitingForStateByte;
@@ -177,6 +173,8 @@ Tdef(\listenToSerial, {
 )
 
 
+
+
 p.putAll(~buildMessage.value(\left, \set, \goToTargetPosition, 10));
 p.putAll(~buildMessage.value(\left, \set, \targetPosition, 150));
 (
@@ -244,8 +242,10 @@ p.putAll(~buildMessage.value(\right, \get, \pidDValue));
 (
 p.putAll(~buildMessage.value(\left, \set, \speed, 100));
 p.putAll(~buildMessage.value(\right, \set, \speed, 100));
+p.putAll(~buildMessage.value(\left, \set, \speed, 0));
 )
-p.putAll(~buildMessage.value(\global, \set, \stop));
+p.putAll(~buildMessage.value(\left, \set, \stop, 100));
+p.putAll(~buildMessage.value(\left, \get, \stop));
 (
 var dir = 0;
 p.putAll(~buildMessage.value(\left, \set, \direction, dir));
@@ -410,7 +410,7 @@ rotationView = FlowView.new(win, 200@100, 0@0, 0@0, "Rotation");
 		p.putAll(~buildMessage.value(item, \set, \speed, speed));
 	}).value_(0.5);
 	Button(view,100@50)
-	.action_({arg butt;p.putAll(~buildMessage.value(item, \set, \stop))})
+	.action_({arg butt;p.putAll(~buildMessage.value(item, \set, \stop, 0))})
 	.states_([["STOP:" ++ item.asString]]);
 };
 Slider(rotationView, 200@20).action_({arg slid;
@@ -424,7 +424,7 @@ Slider(rotationView, 200@20).action_({arg slid;
 
 }).value_(0.5);
 Button(rotationView,200@50)
-	.action_({arg butt;p.putAll(~buildMessage.value(\rotation, \set, \stop))})
+	.action_({arg butt;p.putAll(~buildMessage.value(\rotation, \set, \stop, 0))})
 	.states_([["STOP Rot"]]);
 Button(win, 200@50).action_({arg butt;
 	p.putAll(~buildMessage.value(\global, \set, \goToParkingPosition, 0));

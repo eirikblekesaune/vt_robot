@@ -22,15 +22,15 @@ void PinneAPIParser::_parseCommand(byte inByte)
   switch(_currentSetGet)
   {
     case SET_MESSAGE:
-      if(_currentCommand == CMD_STOP)
-      {
-        _processSetStopCommand();
-      } else {
-        if(_getDataBytes())
-        {
+      _getDataBytes();
           switch(_currentCommand)
           {
+            case CMD_STOP:
+              DebugUnitPrint(_currentAddress, "SetStopCommand");
+              _processSetStopCommand();
+              break;
             case CMD_SPEED:
+              DebugUnitPrint(_currentAddress, "SetSpeedCommand");
               _processSetSpeedCommand();
               break;
             case CMD_DIRECTION:
@@ -70,14 +70,13 @@ void PinneAPIParser::_parseCommand(byte inByte)
               DebugPrint("Unknown command");
               DebugPrint(_currentCommand);
           }
-        } else {
-          ////DEBUG_PRINT("Error getting data bytes");DEBUG_NL;
-        }
-      }
-      break;
+          break;
     case GET_MESSAGE:
       switch(_currentCommand)
       {
+        case CMD_STOP:
+          _processGetStopCommand();
+          break;
         case CMD_SPEED:
           ////DEBUG_PRINT("GET SPEED COMMAND");DEBUG_NL;
           _processGetSpeedCommand();
@@ -151,27 +150,52 @@ int PinneAPIParser::_parseDataValue()
 //STOP COMMAND
 void PinneAPIParser::_processSetStopCommand()
 {
+  int value;
+  value = _parseDataValue();
   switch(_currentAddress)
   {
     case ADDRESS_LEFT:
-      ////DEBUG_PRINT("Stopping left motor\n");DEBUG_NL;
-      _robot->leftMotor->Stop();
+      _robot->leftMotor->SetStop(value);
       break;
     case ADDRESS_RIGHT:
-      ////DEBUG_PRINT("Stopping right motor\n");DEBUG_NL;
-      _robot->rightMotor->Stop();
+      _robot->rightMotor->SetStop(value);
       break;
     case ADDRESS_ROTATION:
-      ////DEBUG_PRINT("Stopping rotation motor\n");DEBUG_NL;
-      _robot->rotationMotor->Stop();
+      _robot->rotationMotor->SetStop(value);
       break;
     case ADDRESS_GLOBAL:
-      ////DEBUG_PRINT("Stopping all motors\n");DEBUG_NL;
-      _robot->leftMotor->Stop();
-      _robot->rightMotor->Stop();
-      _robot->rotationMotor->Stop();
+      _robot->leftMotor->SetStop(value);
+      _robot->rightMotor->SetStop(value);
+      _robot->rotationMotor->SetStop(value);
+      break;
     default:
       DEBUG_PRINT("Unknown address\n");
+  }
+}
+
+void PinneAPIParser::_processGetStopCommand()
+{
+  int value;
+  value = -1;
+  switch(_currentAddress)
+  {
+    case ADDRESS_LEFT:
+      value = _robot->leftMotor->GetStop();
+      break;
+    case ADDRESS_RIGHT:
+      value = _robot->rightMotor->GetStop();
+      break;
+    case ADDRESS_ROTATION:
+      value = _robot->rotationMotor->GetStop();
+      break;
+    default:
+      DEBUG_PRINT("Unknown address\n");DEBUG_NL;
+  }
+  if(value >= 0)
+  {
+    ReturnGetValue(_currentCommand, _currentAddress, value);
+  } else {
+    ////DEBUG_PRINT("Something wrong with geting speed");DEBUG_NL;
   }
 }
 

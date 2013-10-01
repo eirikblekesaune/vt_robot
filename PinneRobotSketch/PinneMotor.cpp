@@ -98,6 +98,12 @@ void PinneMotor::Stop()
   _driver->SetSpeed(VNH5019Driver::SPEED_STOP);
 }
 
+void PinneMotor::SetStop(int value)
+{
+  _stoppingSpeed = constrain(value, 0, 5000);
+  _driver->SetSpeed(VNH5019Driver::SPEED_STOP);
+}
+
 void PinneMotor::SetSpeed(int speed)
 {
   if(speed <= 0)
