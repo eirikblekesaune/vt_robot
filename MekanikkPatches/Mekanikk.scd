@@ -22,7 +22,7 @@ MIDIIn.connectAll;
 ~pens = VTPenseBox("/dev/tty.usbserial-FT3EET3MA");
 ~tog = VTMonsterBox("/dev/tty.usbserial-FT3EET3MB");
 ~pinner = VTMonsterBox("/dev/tty.usbserial-FT3EET44A");
-~lanbox = SerialPort.new("/dev/tty.usbmodem24741", 38400, crtscts: true);
+~lanbox = SerialPort.new("/dev/tty.usbmodem641", 38400, crtscts: true);
 
 //map pens buttons
 8.do{arg i;
@@ -34,7 +34,7 @@ MIDIIn.connectAll;
 };
 
 //~togCtrl.components['rotaryA.1']
-7.do{arg i;
+6.do{arg i;
 	var midiComp, dmx;
 	midiComp = ~togCtrl.components.at((("rotaryA.") ++ (i + 1)).asSymbol);
 	midiComp.postln;
@@ -43,11 +43,11 @@ MIDIIn.connectAll;
 		val = comp.value.linlin(0, 127, 0, 255).asInteger.asHexString(2);
 		commandString = ("*C901" ++ (i + 13).asHexString(2) ++ val ++ "#").ascii;
 		~lanbox.putAll(commandString);
-		"dmx % : %\n".postf((i + 1), val);
+		"dmx % : %\n".postf((i + 13), val);
 	}.inEnvir);
 };
 //map tog to faders
-6.do{arg i;
+7.do{arg i;
 	var fader, tog, button;
 	fader = ~togCtrl.components.at(("fader." ++ (i + 1)).asSymbol);
 	tog = ~tog.channels[i];
@@ -61,6 +61,9 @@ MIDIIn.connectAll;
 			tog.changed(butt, \value);
 		});
 	};
+	tog.stop;
+	fader.valueAction_(512);
+	fader.refresh;
 };
 //map faders to pinner
 8.do{arg i;
@@ -78,6 +81,13 @@ MIDIIn.connectAll;
 		});
 	};
 };
+~flyingCtrl.components['button.20'].action_({arg comp;
+	8.do{arg i;
+		~pinner.channels[i].stop;
+		~pinner.channels[i].changed(comp, \value);
+	};
+	"global koppstopp".postln;
+});
 //Wireless LED fader
 ~xbee = XBeeAPI(SerialPort('/dev/tty.usbserial-A600ezu2', 9600));
 ~xbee.rxAction = {|serialAddr, networkAddr, receiveOptions, data|
@@ -169,7 +179,7 @@ MIDIIn.connectAll;
 
 ~togLED3 = (
 	xbee: ~xbee,
-//	address: [0x00, 0x13, 0xA2, 0x00, 0x40, 0x90, 0x29, 0xEA],//TO
+	//	address: [0x00, 0x13, 0xA2, 0x00, 0x40, 0x90, 0x29, 0xEA],//TO
 	address: [0x00, 0x13, 0xA2, 0x00, 0x40, 0x90, 0x29, 0x1B],//FEM
 	networkAddress: [0xFF, 0xFE],
 	theTask: Task.new({}),
@@ -214,7 +224,7 @@ MIDIIn.connectAll;
 	val = comp.value.linlin(0, 1023, 0, 250).asInteger;
 	~togLED1.setLEDValue(val);
 });
-~togCtrl.components.at('fader.7').action_({arg comp;
+~togCtrl.components.at('rotaryA.7').action_({arg comp;
 	var val;
 	val = comp.value.linlin(0, 1023, 0, 250).asInteger;
 	~togLED2.setLEDValue(val);
@@ -275,5 +285,5 @@ OSCFunc({arg msg, time, addr, resp;
 });
 
 
-w = Window.new.front;
-w.onClose_({0.exit});
+//w = Window.new.front;
+//w.onClose_({0.exit});
