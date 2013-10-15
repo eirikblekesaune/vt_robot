@@ -1,7 +1,7 @@
 SerialPort.devices.do(_.postln)
 (
-//p = SerialPort("/dev/tty.usbserial-FT5QT6JNA", 9600, crtscts:true,xonxoff:true);
-p = SerialPort("/dev/tty.usbserial-FT5QT6TQA", 9600, crtscts:true,xonxoff:true);//EN
+p = SerialPort("/dev/tty.usbserial-FT5QT6JNA", 9600, crtscts:true,xonxoff:true);
+//p = SerialPort("/dev/tty.usbserial-FT5QT6TQA", 9600, crtscts:true,xonxoff:true);//EN
 Tdef(\listenToSerial, {
 	loop{
 		var byte;
@@ -437,3 +437,14 @@ p.putAll(~buildMessage.value(\rotation, \set, \targetPosition, 0));
 p.putAll(~buildMessage.value(\rotation, \get, \currentPosition));
 p.putAll(~buildMessage.value(\left, \get, \speed));
 p.putAll(~buildMessage.value(\rotation, \set, \speed, 0));
+
+(
+f = fork{
+loop {
+		p.putAll(~buildMessage.value(\rotation, \get, \currentPosition)); 1.0.wait;
+	};
+}
+)
+f.play;
+f.stop;
+		p.putAll(~buildMessage.value(\rotation, \get, \currentPosition))
