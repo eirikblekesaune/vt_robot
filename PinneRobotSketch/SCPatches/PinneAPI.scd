@@ -1,4 +1,16 @@
 SerialPort.devices.do(_.postln)
+~pinne1 = SerialPort('/dev/tty.usbserial-FT3EET44B', 2400, crtscts: true);
+~pinne1.put(33)
+
+~pinne2 = SerialPort('/dev/tty.usbserial-FT3EET4IA', 2400, crtscts: true);
+~pinne2.put(33)
+
+~pinne3 = SerialPort('/dev/tty.usbserial-FT3EET4IB', 2400, crtscts: true);
+~pinne3.put(22)
+
+~pinne4 = SerialPort('/dev/tty.usbserial-FT3EET52A', 2400, crtscts: true);
+~pinne4.put(22)
+
 (
 p = SerialPort("/dev/tty.usbserial-FT5QT6JNA", 9600, crtscts:true,xonxoff:true);
 //p = SerialPort("/dev/tty.usbserial-FT5QT6TQA", 9600, crtscts:true,xonxoff:true);//EN
