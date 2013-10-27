@@ -10,10 +10,13 @@ SerialPort.devices.do(_.postln)
 
 ~pinne4 = SerialPort('/dev/tty.usbserial-FT3EET52A', 2400, crtscts: true);
 ~pinne4.put(22)
-
+SerialPort.devices
 (
-p = SerialPort("/dev/tty.usbserial-FT5QT6JNA", 9600, crtscts:true,xonxoff:true);
-//p = SerialPort("/dev/tty.usbserial-FT5QT6TQA", 9600, crtscts:true,xonxoff:true);//EN
+//p = SerialPort("/dev/tty.usbserial-FT5QT6JNA", 9600, crtscts:true,xonxoff:true);
+p = SerialPort("/dev/tty.usbserial-FT3EET44B", 9600, crtscts:true,xonxoff:true);// pinne en
+//p = SerialPort("/dev/tty.usbserial-FT3EET4IA", 9600, crtscts:true,xonxoff:true);// pinne to
+//p = SerialPort("/dev/tty.usbserial-FT3EET4IB", 9600, crtscts:true,xonxoff:true);// pinne tre
+//p = SerialPort("/dev/tty.usbserial-FT3EET52A", 9600, crtscts:true,xonxoff:true);// pinne fire
 Tdef(\listenToSerial, {
 	loop{
 		var byte;

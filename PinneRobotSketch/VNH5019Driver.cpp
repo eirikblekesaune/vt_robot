@@ -1,4 +1,4 @@
-///Much of this code is based on Pololu's DualVNH5019Motorshield.h code from:
+///This code is based on Pololu's DualVNH5019Motorshield.h code from:
 //https://github.com/pololu/Dual-VNH5019-Motor-Shield
 
 #include "MotorDriver.h"
@@ -28,7 +28,7 @@ void VNH5019Driver::init()
   // top of 400
   //
   // PWM frequency calculation
-  // 16MHz / 1 (prescaler) / 2 (phase-correct) / 400 (top) = 20kHz
+  // 16MHz / 1 (prescaler) / 2 (phase-correct) / SPPED_MAX (512) = 15.625Hz
   TCCR1A = 0b10100000;
   TCCR1B = 0b00010001;
   ICR1 = SPEED_MAX;

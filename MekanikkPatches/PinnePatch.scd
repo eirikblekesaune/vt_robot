@@ -1,16 +1,14 @@
-a = VTPinneRobot.new("/dev/tty.usbserial-FT5QT6JNA");
+SerialPort.devices;
+a = VTPinneRobot.new("/dev/tty.Bluetooth-Serial-1");
 a.connected;
 a.refresh;
-a.leftMotor.directionEnum;
+
+
+a.leftMotor.speed_(100);
 a.rightMotor.directionEnum;
-a.rotationMotor.directionEnum.at(\left);
+a.rotationMotor.directionEnum
 
 
-[0.0, 20.0].asSpec.constrain(23)
-
-b = (hei: 223, hallo: 112)
-a = IdentitySet.newFrom(b.keys);
-a.do(_.postln)
-
-a.add(\homo)
-a.pop
+b = IdentitySet[\thukk, \tjusg];
+b.pop
+b.do(_.postln)

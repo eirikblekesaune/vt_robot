@@ -6,6 +6,7 @@
 
 typedef int speed_t;
 
+//Rename to DCMotorDriver?
 class MotorDriver
 {
   public:  
