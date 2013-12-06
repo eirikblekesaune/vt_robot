@@ -1,8 +1,8 @@
 //#!/Applications/SuperCollider/SuperCollider.app/Contents/Resources/sclang
 MIDIClient.init;
 MIDIIn.connectAll;
-~flyingCtrl = MIDIController.new("BCF2000", "BCF2000", "BCF2000", "BCF2000");
-~togCtrl = MIDIController.new("BCF2000", "Port 1", "BCF2000", "Port 1");
+~flyingCtrl = MIDIController.new("BCF2000B", "Port 1", "BCF2000B", "Port 1");
+~togCtrl = MIDIController.new("BCF2000A", "BCF2000", "BCF2000A", "BCF2000");
 [~flyingCtrl, ~togCtrl].do({arg ctrl;
 	ctrl.setMappings(
 		(
@@ -22,7 +22,7 @@ MIDIIn.connectAll;
 ~pens = VTPenseBox("/dev/tty.usbserial-FT3EET3MA");
 ~tog = VTMonsterBox("/dev/tty.usbserial-FT3EET3MB");
 ~pinner = VTMonsterBox("/dev/tty.usbserial-FT3EET44A");
-~lanbox = SerialPort.new("/dev/tty.usbmodem641", 38400, crtscts: true);
+~lanbox = SerialPort.new("/dev/tty.usbmodem471", 38400, crtscts: true);
 
 //map pens buttons
 8.do{arg i;
@@ -284,10 +284,14 @@ OSCFunc({arg msg, time, addr, resp;
 	}, ("/light/dmx." ++ (i + 1)).asSymbol);
 });
 ~pinnerne = [
-	SerialPort("/dev/tty.usbserial-FT3EET44B", 9600, crtscts:true,xonxoff:true),// pinne en
-	SerialPort("/dev/tty.usbserial-FT3EET4IA", 9600, crtscts:true,xonxoff:true),// pinne to
-	SerialPort("/dev/tty.usbserial-FT3EET4IB", 9600, crtscts:true,xonxoff:true),// pinne tre
-	SerialPort("/dev/tty.usbserial-FT3EET52A", 9600, crtscts:true,xonxoff:true)// pinne fire
+	SerialPort("/dev/tty.usbserial-FT5QT6TQA", 9600, crtscts:true),// pinne en
+	SerialPort("/dev/tty.usbserial-FT5QT6TQB", 9600, crtscts:true),// pinne to
+	SerialPort("/dev/tty.usbserial-FT5QT6TZA", 9600, crtscts:true),// pinne tre
+	SerialPort("/dev/tty.usbserial-FT5QT6TZB", 9600, crtscts:true),// pinne fire
+	SerialPort("/dev/tty.usbserial-FT5QT6UDA", 9600, crtscts:true),// pinne fem
+	SerialPort("/dev/tty.usbserial-FT5QT6UDB", 9600, crtscts:true),// pinne seks
+	SerialPort("/dev/tty.usbserial-FT5QT6ULA", 9600, crtscts:true),// pinne syv
+	SerialPort("/dev/tty.usbserial-FT5QT6ULB", 9600, crtscts:true)// pinne aatte
 ];
 
 ~makeDataBytes = {|val|
