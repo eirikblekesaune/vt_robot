@@ -10,7 +10,7 @@ SerialPort.devices.do(_.postln)
 
 ~pinne4 = SerialPort('/dev/tty.usbserial-FT3EET52A', 2400, crtscts: true);
 ~pinne4.put(22)
-
+SerialPort.devices
 (
 //p = SerialPort("/dev/tty.usbserial-FT5QT6JNA", 9600, crtscts:true,xonxoff:true);
 //p = SerialPort("/dev/tty.usbserial-FT5QT6TQA", 9600, crtscts:true,xonxoff:true);//EN

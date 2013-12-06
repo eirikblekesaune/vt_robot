@@ -42,7 +42,7 @@ x0000100: blocked by top sensor
 x0000101: blocked by slack sensor
 x0000110: blocked by min position
 x0000111: blocked by max position
-x0000111: motor driver fault 
+x0001000: motor driver fault 
 ```
 
 Telleverk/Target position/speed data bytes:

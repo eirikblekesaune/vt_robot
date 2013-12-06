@@ -1,17 +1,31 @@
 VTPinneRobot {
 	var parser, <online = false;
 	var <leftMotor, <rightMotor, <rotationMotor;
+	var refreshTask, <>refreshInterval = 0.0001;//refresh is when cached values are sent to the robot
+	var updateTask, <>updateInterval = 1.0;//update is when values are requested from the robot
 
 	*new{arg path;
 		^super.new.init(path);
 	}
 
 	init{arg path_;
+		leftMotor = VTPinneRobotMotor.new(this, \left);
+		rightMotor = VTPinneRobotMotor.new(this, \right);
+		rotationMotor = VTPinneRotationMotor.new(this, \rotation);
 		this.connect(path_);
 		if(this.connected.not, {"PinneRobot is offline".warn});
-		leftMotor = VTPinneRobotMotor.new(this);
-		rightMotor = VTPinneRobotMotor.new(this);
-		rotationMotor = VTPinneRotationMotor.new(this);
+		refreshTask = Task({
+			loop{
+				this.refresh;
+				refreshInterval.wait;
+			}
+		}).play;
+		updateTask = Task({
+			loop{
+				this.requestValuesFromRobot([\speed, \direction, \currentPosition]);
+				updateInterval.wait;
+			}
+		}).play;
 	}
 
 	connect{arg path;
@@ -26,12 +40,26 @@ VTPinneRobot {
 		parser.disconnect;
 	}
 
+	startRefreshTask{
+		refreshTask.play;
+		updateTask.play;
+	}
+
+	stopRefreshTask{
+		refreshTask.stop;
+		updateTask.stop;
+	}
+
 	sendMsg{arg address, setGet, command, val;
 		parser.sendMsg(address, setGet, command, val);
 	}
 
 	refresh{
 		[leftMotor, rightMotor, rotationMotor].do(_.refresh);
+	}
+
+	requestValuesFromRobot{arg which;//a list of keys to be updated
+		[leftMotor, rightMotor, rotationMotor].do(_.requestValuesFromRobot(which));
 	}
 
 	update{arg theChanged, theChanger;
@@ -42,7 +70,7 @@ VTPinneRobot {
 VTPinneRobotMotor{
 	var robot;
 	var <speed;
-	var <direction;
+	var <direction; //symbol up or down
 	var <targetPosition;
 	var <currentPosition;
 	var <state;
@@ -50,7 +78,9 @@ VTPinneRobotMotor{
 	var <speedRampUp, <speedRampDown, <speedScaling, <stopTime;
 	var <directionEnum;
 	var <address;
-	var needsRefresh;//parameters that need update
+	var needsRefresh;//parameters that need to be sent to the robot
+	var outputCache;//parameter values to be sent to the robot
+	var needsUpdate;//parameter values to be update from the robot
 
 	*new{arg robot, address;
 		^super.new.init(robot, address);
@@ -70,71 +100,89 @@ VTPinneRobotMotor{
 			speedScaling: ControlSpec(0.0, 1.0, step: 0.001, default: 0),
 			stop: ControlSpec(0, 5000, step:1, default:0)
 		);
-		needsRefresh = IdentitySet.newFrom(specs.keys);
+		needsRefresh = IdentitySet.new;
+		needsUpdate = IdentitySet.newFrom(specs.keys);
+		outputCache = IdentityDictionary.new;
+	}
+
+	prInvalidateParameter{arg key, val;
+		needsRefresh.add(key);
+		outputCache.put(key, val);
 	}
 
 	speed_{arg val;
 		speed = specs.at(\speed).constrain(val);
-		robot.sendMsg(address, \set, \speed, speed);
-		needsRefresh.add(\speed);
+		this.prInvalidateParameter(\speed, speed);
+	}
+
+	direction_{arg val;
+		var newDir = directionEnum.at(val);
+		if(newDir.notNil, {
+			direction = newDir;
+			this.prInvalidateParameter(\direction, direction);
+		});
+	}
+
+	targetPosition_{arg val;
+		targetPosition = specs.at(\targetPosition).constrain(targetPosition);
+		this.prInvalidateParameter(\targetPosition, targetPosition);
+	}
+
+	currentPosition_{arg val;
+		targetPosition = specs.at(\currentPosition).constrain(targetPosition);
+		this.prInvalidateParameter(\currentPosition, currentPosition);
 	}
 
 	stop{arg val;
 		stopTime = stopTime ? specs.at(\stop).constrain(val);
-		robot.sendMsg(address, \set, \stop, speed);
-		needsRefresh.add(\stop);
-		needsRefresh.add(\speed);
+		this.prInvalidateParameter(\stop, stopTime);
 	}
 
 	goToParkingPosition{
-		robot.sendMsg(address, \set, \goToParkingPostition, 0);
-		needsRefresh.add(\speed);
-		needsRefresh.add(\direction);
+		this.prInvalidateParameter(\direction, direction);
+		this.prInvalidateParameter(\speed, speed);
 	}
 
 	goToTargetPosition{arg duration;
-		robot.sendMsg(
-			address,
-			\set,
-			\goToTargetPostition,
-			speedScaling.clip(0, 5000).asInteger
-		);
 		needsRefresh.add(\speed);
 		needsRefresh.add(\direction);
 	}
 
 	speedRampUp_{arg val;
 		speedRampUp = specs.at(\speedRampUp).constrain(val);
-		robot.sendMsg(address, \set, \speedRampUp, speedRampUp);
 		needsRefresh.add(\speedRampUp);
 	}
 
 	speedRampDown_{arg val;
 		speedRampUp = specs.at(\speedRampDown).constrain(val);
-		robot.sendMsg(address, \set, \speedRampDown, speedRampUp);
 		needsRefresh.add(\speedRampDown);
 	}
 
 	speedScaling_{arg val;
 		speedScaling = specs.at(\speedScaling).constrain(val);
-		robot.sendMsg(address, \set, \speedScaling, speedScaling);
 		needsRefresh.add(\goToTargetPosition);
 	}
 
-	refresh{arg forceRefresh;
-		if(needsRefresh.notEmpty, {
-			if(forceRefresh,
-				{
-					specs.keys.do({arg item;
-						robot.sendMsg(address, \get, item.asSymbol);
-					})
-				},
-				{
-					needsRefresh.do({arg item;
-						robot.sendMsg(address, \get, item.asSymbol);
-					});
-				}
-			);
+	refresh{arg forceRefresh = false;
+		var cachedValue, cachedKey;
+		cachedKey = needsRefresh.pop;
+		while({cachedKey.notNil}, {
+			robot.sendMsg(address, \set, cachedKey, outputCache.removeAt(cachedKey));
+			cachedKey = needsRefresh.pop;
+		});
+	}
+
+	requestValuesFromRobot{arg which;
+		if(which.isNil, {
+			//"reqeusting all".postln;
+			specs.keys.do({arg item;
+				//robot.sendMsg(address, \get, item);
+			});
+			}, {
+				//"Requesting: %\n".postf(which);
+				which.do({arg item;
+					//robot.sendMsg(address, \get, item);
+				})
 		});
 	}
 
@@ -149,8 +197,11 @@ VTPinneRotationMotor : VTPinneRobotMotor {
 	}
 
 	init{
+		super.init;
 		directionEnum = TwoWayIdentityDictionary[\right -> 0, \left -> 1];
 	}
+
+	currentPosition_{arg val; }
 }
 
 
