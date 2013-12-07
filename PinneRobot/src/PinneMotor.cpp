@@ -19,7 +19,8 @@ const int PinneMotor::DIRECTION_DOWN_INCREMENT = 1;
 const int PinneMotor::DIRECTION_UP_INCREMENT = -1;
 
 //variables for Sensor debouncing
-const unsigned long debounceDelay = 150;
+const unsigned long topSensorDebounceDelay = 150;
+const unsigned long slackSensorDebounceDelay = 350;
 
 void encoderISR1()
 {
@@ -242,7 +243,7 @@ void PinneMotor::ReadTopStopSensor()
   {
     _lastTopSensorReadTime = millis();
   }
-  if((millis() - _lastTopSensorReadTime) > debounceDelay)
+  if((millis() - _lastTopSensorReadTime) > topSensorDebounceDelay)
   {
     if(newReading != _topStopSensorValue)
     {
@@ -266,7 +267,7 @@ void PinneMotor::ReadSlackStopSensor()
   {
     _lastSlackSensorReadTime = millis();
   }
-  if((millis() - _lastSlackSensorReadTime) > debounceDelay)
+  if((millis() - _lastSlackSensorReadTime) > slackSensorDebounceDelay)
   {
     if(newReading != _slackStopSensorValue)
     {
