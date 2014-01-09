@@ -1,7 +1,7 @@
 ///This code is based on Pololu's DualVNH5019Motorshield.h code from:
 //https://github.com/pololu/Dual-VNH5019-Motor-Shield
 
-#include "MotorDriver.h"
+#include "VNH5019Driver.h"
 
 const speed_t VNH5019Driver::SPEED_STOP = 0;
 const speed_t VNH5019Driver::SPEED_MIN = 0;

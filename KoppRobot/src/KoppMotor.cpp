@@ -66,15 +66,17 @@ void KoppMotor::init()
     attachInterrupt(0, encoderISR1, CHANGE);
     _encoderCounter = &encoderCounter1;
     _encoderIncrement = &encoderIncrement1;
+		pinMode(2, INPUT_PULLUP);
     break;
   case 1:
     attachInterrupt(1, encoderISR2, CHANGE);
     _encoderCounter = &encoderCounter2;
     _encoderIncrement = &encoderIncrement2;
+		pinMode(3, INPUT_PULLUP);
     break;
   }
-  pinMode(_topStopSensorPin, INPUT);
-  pinMode(_slackStopSensorPin, INPUT);
+  pinMode(_topStopSensorPin, INPUT_PULLUP);
+  pinMode(_slackStopSensorPin, INPUT_PULLUP);
   _driver->init();
   _driver->SetDirection(DIRECTION_UP);
   SetDirection(DIRECTION_DOWN);
