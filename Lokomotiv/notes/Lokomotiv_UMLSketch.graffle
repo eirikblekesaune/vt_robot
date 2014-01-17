@@ -14,7 +14,7 @@
 	<key>BackgroundGraphic</key>
 	<dict>
 		<key>Bounds</key>
-		<string>{{0, 0}, {1118.5799560546875, 782.8900146484375}}</string>
+		<string>{{0, 0}, {1118.5600299835205, 782.8900146484375}}</string>
 		<key>Class</key>
 		<string>SolidGraphic</string>
 		<key>ID</key>
@@ -57,14 +57,140 @@
 			<key>Head</key>
 			<dict>
 				<key>ID</key>
+				<integer>83</integer>
+			</dict>
+			<key>ID</key>
+			<integer>84</integer>
+			<key>Points</key>
+			<array>
+				<string>{386.78051965661012, 156.71080211638343}</string>
+				<string>{515.71948034338982, 65.289197883616566}</string>
+			</array>
+			<key>Style</key>
+			<dict>
+				<key>stroke</key>
+				<dict>
+					<key>HeadArrow</key>
+					<string>FilledDiamond</string>
+					<key>HeadScale</key>
+					<real>2.0000002384185791</real>
+					<key>Legacy</key>
+					<true/>
+					<key>LineType</key>
+					<integer>1</integer>
+					<key>TailArrow</key>
+					<string>0</string>
+				</dict>
+			</dict>
+			<key>Tail</key>
+			<dict>
+				<key>ID</key>
+				<integer>47</integer>
+			</dict>
+		</dict>
+		<dict>
+			<key>Class</key>
+			<string>TableGroup</string>
+			<key>Graphics</key>
+			<array>
+				<dict>
+					<key>Bounds</key>
+					<string>{{462, 37}, {128, 14}}</string>
+					<key>Class</key>
+					<string>ShapedGraphic</string>
+					<key>FitText</key>
+					<string>Vertical</string>
+					<key>Flow</key>
+					<string>Resize</string>
+					<key>ID</key>
+					<integer>81</integer>
+					<key>Shape</key>
+					<string>Rectangle</string>
+					<key>Style</key>
+					<dict>
+						<key>fill</key>
+						<dict>
+							<key>GradientCenter</key>
+							<string>{-0.29411799999999999, -0.264706}</string>
+						</dict>
+					</dict>
+					<key>Text</key>
+					<dict>
+						<key>Text</key>
+						<string>{\rtf1\ansi\ansicpg1252\cocoartf1265
+\cocoascreenfonts1{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc
+
+\f0\b\fs24 \cf0 VNH5019Driver}</string>
+						<key>VerticalPad</key>
+						<integer>0</integer>
+					</dict>
+					<key>TextPlacement</key>
+					<integer>0</integer>
+				</dict>
+				<dict>
+					<key>Bounds</key>
+					<string>{{462, 51}, {128, 14}}</string>
+					<key>Class</key>
+					<string>ShapedGraphic</string>
+					<key>FitText</key>
+					<string>Vertical</string>
+					<key>Flow</key>
+					<string>Resize</string>
+					<key>ID</key>
+					<integer>83</integer>
+					<key>Shape</key>
+					<string>Rectangle</string>
+					<key>Style</key>
+					<dict>
+						<key>fill</key>
+						<dict>
+							<key>GradientCenter</key>
+							<string>{-0.29411799999999999, -0.264706}</string>
+						</dict>
+					</dict>
+					<key>Text</key>
+					<dict>
+						<key>Align</key>
+						<integer>0</integer>
+						<key>Text</key>
+						<string>{\rtf1\ansi\ansicpg1252\cocoartf1265
+\cocoascreenfonts1{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720
+
+\f0\fs24 \cf0 -}</string>
+						<key>VerticalPad</key>
+						<integer>0</integer>
+					</dict>
+					<key>TextPlacement</key>
+					<integer>0</integer>
+				</dict>
+			</array>
+			<key>GridH</key>
+			<array>
+				<integer>81</integer>
+				<integer>83</integer>
+				<array/>
+			</array>
+			<key>ID</key>
+			<integer>80</integer>
+		</dict>
+		<dict>
+			<key>Class</key>
+			<string>LineGraphic</string>
+			<key>Head</key>
+			<dict>
+				<key>ID</key>
 				<integer>76</integer>
 			</dict>
 			<key>ID</key>
 			<integer>79</integer>
 			<key>Points</key>
 			<array>
-				<string>{443.49908424559732, 189.06055047387315}</string>
-				<string>{474.50091575440268, 190.93944931318507}</string>
+				<string>{443.49908424559732, 189.06055051992604}</string>
+				<string>{474.50091575440268, 190.93944938054756}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -390,7 +516,7 @@ Operation}</string>
 			<array>
 				<dict>
 					<key>Bounds</key>
-					<string>{{305, 540}, {133, 14}}</string>
+					<string>{{307.5, 530}, {133, 14}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -426,7 +552,7 @@ Operation}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{305, 554}, {133, 28}}</string>
+					<string>{{307.5, 544}, {133, 28}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -465,7 +591,7 @@ Attribute}</string>
 				</dict>
 				<dict>
 					<key>Bounds</key>
-					<string>{{305, 582}, {133, 28}}</string>
+					<string>{{307.5, 572}, {133, 28}}</string>
 					<key>Class</key>
 					<string>ShapedGraphic</string>
 					<key>FitText</key>
@@ -525,8 +651,8 @@ Operation}</string>
 			<integer>65</integer>
 			<key>Points</key>
 			<array>
-				<string>{376.26003751029725, 156.50025573920934}</string>
-				<string>{374.24426720138223, 93.499735015818615}</string>
+				<string>{376.2596282936571, 156.5002566144743}</string>
+				<string>{374.24042042075484, 93.49974328785062}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -857,8 +983,8 @@ Operation}</string>
 			<integer>55</integer>
 			<key>Points</key>
 			<array>
-				<string>{189.49057296492671, 281.19595298769718}</string>
-				<string>{309.50938057991829, 304.83752631408288}</string>
+				<string>{189.49058366042763, 281.18825614809583}</string>
+				<string>{309.50941039031648, 304.81603998009001}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -1023,8 +1149,8 @@ Operation}</string>
 			<integer>50</integer>
 			<key>Points</key>
 			<array>
-				<string>{189.49999621844569, 219.26022977083275}</string>
-				<string>{309.5000041658281, 219.72631299964763}</string>
+				<string>{189.49999615406972, 219.26332382913779}</string>
+				<string>{309.50000390977578, 219.73494865529645}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -1357,7 +1483,7 @@ Operation}</string>
 	<key>MasterSheets</key>
 	<array/>
 	<key>ModificationDate</key>
-	<string>2013-12-26 13:18:49 +0000</string>
+	<string>2014-01-09 16:37:38 +0000</string>
 	<key>Modifier</key>
 	<string>Eirik Arthur Blekesaune</string>
 	<key>NotesVisible</key>
@@ -1388,7 +1514,7 @@ Operation}</string>
 		<key>NSPaperSize</key>
 		<array>
 			<string>size</string>
-			<string>{595.28997802734375, 841.8900146484375}</string>
+			<string>{595.28001499176025, 841.8900146484375}</string>
 		</array>
 		<key>NSPrintReverseOrientation</key>
 		<array>
@@ -1452,7 +1578,7 @@ Operation}</string>
 		<key>SidebarWidth</key>
 		<integer>120</integer>
 		<key>VisibleRegion</key>
-		<string>{{21, 0}, {607, 735}}</string>
+		<string>{{20, 0}, {607, 735}}</string>
 		<key>Zoom</key>
 		<real>1</real>
 		<key>ZoomValues</key>

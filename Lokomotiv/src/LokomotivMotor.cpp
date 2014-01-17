@@ -18,9 +18,14 @@ void LokomotivMotor::Update()
 	input_ = encoder_->CalculateSpeed();
 	if(pid_->Compute())
 	{
-		if(driver->GetSpeed() != kSpeedStop)
+		if(driver_->GetSpeed() != kSpeedStop)
 		{
 			driver_->SetSpeed(output_);
 		}
 	}
+}
+
+void LokomotivMotor::ResetPositionCounter()
+{
+
 }

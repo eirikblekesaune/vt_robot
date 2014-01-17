@@ -8,11 +8,18 @@ class Lokomotiv{
 public:
 	Lokomotiv();
 	~Lokomotiv();
-	long GetLastIRBeaconID() {};
+	unsigned char GetLastIRBeaconID() {};
 	long GetDistanceFromLastIRBeaconDetection() {};
+	void Init();
 	void Update();
+	void GotAddr(unsigned char);
+	volatile long distanceFromLastBeacon_;
 private:
 	LokomotivMotor *motor_;
+	IRReader *irReader_;
+	unsigned char lastBeaconAddress_;
+	long lastBeaconAddressUpdate_;
+	static const long beaconAddressUpdateInterval_;
 };
 
 #endif

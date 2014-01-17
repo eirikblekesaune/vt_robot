@@ -30,10 +30,16 @@ enum byteType_t
   BYTE_UNKNOWN
 };
 
+enum setGet_t
+{
+  SET_MESSAGE = 0x00,
+  GET_MESSAGE = 0x40,
+  SETGET_UNKNOWN
+};
+
 enum parseMask_t {
   PARSE_MASK_MESSAGE_TYPE = 0x80,//command byte of data byte
   PARSE_MASK_SETGET = 0x40,//setter or getter
-  PARSE_MASK_ADDRESS = 0x30,//which motor is address
   PARSE_MASK_COMMAND = 0x0F,
   PARSE_MASK_UNKNOWN
 };
@@ -50,51 +56,51 @@ enum stateChange_t
 
 static void Reply(const char* str)
 {
-  Serial1.println(str);
+  Serial.println(str);
 }
 
-static void ReturnGetValue(command_t command, address_t address, int value)
+static void ReturnGetValue(command_t command, int value)
 {
   unsigned char data[2];
   data[0] = (value >> 7) & 0x7F;
   data[1] = lowByte(value) & 0x7F;
-  Serial1.write(BYTE_COMMAND | SET_MESSAGE | address | command);
-  Serial1.write(data[0]);
-  Serial1.write(data[1]);
+  Serial.write(BYTE_COMMAND | SET_MESSAGE | command);
+  Serial.write(data[0]);
+  Serial.write(data[1]);
 }
 
-static void NotifyStateChange(stateChange_t stateChange, address_t address)
+static void NotifyStateChange(stateChange_t stateChange)
 {
-  Serial1.write(BYTE_COMMAND | SET_MESSAGE | address | CMD_STATE_CHANGE);
-  Serial1.write(stateChange);
+  Serial.write(BYTE_COMMAND | SET_MESSAGE | CMD_STATE_CHANGE);
+  Serial.write(stateChange);
 }
 
-static void DebugUnitPrint(address_t address, const char* msg)
+static void DebugUnitPrint(const char* msg)
 {
-  Serial1.write(BYTE_COMMAND | SET_MESSAGE | address | CMD_INFO );
-  Serial1.print(msg);
-  Serial1.write(4);
+  Serial.write(BYTE_COMMAND | SET_MESSAGE | CMD_INFO );
+  Serial.print(msg);
+  Serial.write(4);
 }
 
-static void DebugUnitPrint(address_t address, int msg)
+static void DebugUnitPrint(int msg)
 {
-  Serial1.write(BYTE_COMMAND | SET_MESSAGE | address | CMD_INFO );
-  Serial1.print(msg);
-  Serial1.write(4);
+  Serial.write(BYTE_COMMAND | SET_MESSAGE | CMD_INFO );
+  Serial.print(msg);
+  Serial.write(4);
 }
 
 static void DebugPrint(const char* msg)
 {
-  Serial1.write(BYTE_COMMAND | SET_MESSAGE | ADDRESS_GLOBAL | CMD_INFO );
-  Serial1.print(msg);
-  Serial1.write(4);
+  Serial.write(BYTE_COMMAND | SET_MESSAGE | CMD_INFO );
+  Serial.print(msg);
+  Serial.write(4);
 }
 
 static void DebugPrint(int msg)
 {
-  Serial1.write(BYTE_COMMAND | SET_MESSAGE | ADDRESS_GLOBAL | CMD_INFO );
-  Serial1.print(msg);
-  Serial1.write(4);
+  Serial.write(BYTE_COMMAND | SET_MESSAGE | CMD_INFO );
+  Serial.print(msg);
+  Serial.write(4);
 }
 
 #define DEBUG
