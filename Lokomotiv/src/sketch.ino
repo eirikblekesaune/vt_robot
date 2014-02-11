@@ -1,9 +1,9 @@
 #include "Lokomotiv.h"
-#include "LokomotivParser.h"
 #include "LokomotivAPI.h"
+#include "LokomotivAPIParser.h"
 
 Lokomotiv *lok;
-LokomotivParser *parser;
+LokomotivAPIParser *parser;
 unsigned long interval = 1000;
 unsigned long lastTime;
 
@@ -15,20 +15,19 @@ void setup()
 		;
 	}
 	lastTime = millis();
-	parser = new LokomotivParser(lok);
+	parser = new LokomotivAPIParser(lok);
 	lok->Init();
 }
 
 void loop()
 {
-	if(Serial.available() > 0)
+	while(Serial.available() > 0)
 	{
-		parser->ParseByte(Serial.read());
+		parser->parseIncomingByte(Serial.read());
 	}
 	lok->Update();
 	if(millis() >= (interval + lastTime))
 	{
-		Serial.println(lastTime);
 		lastTime = millis();
 	}
 }
