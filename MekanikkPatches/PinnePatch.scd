@@ -1,5 +1,8 @@
 SerialPort.devices;
-a = VTPinneRobot.new("/dev/tty.Bluetooth-Serial-1");
+p = SerialPort("/dev/tty.usbserial-FT5QT6JNA", 9600, crtscts:true);
+p.put($r)
+p.close;
+a = VTPinneRobot.new("/dev/tty.usbserial-FT5QT6JNA");
 a.connected;
 a.refresh;
 

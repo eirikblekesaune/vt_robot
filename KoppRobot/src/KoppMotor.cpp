@@ -6,17 +6,17 @@ volatile int encoderIncrement1 = 1;
 volatile int encoderIncrement2 = 1;
 
 //init static variables
-const int PinneMotor::DIRECTION_DOWN = 0;
-const int PinneMotor::DIRECTION_UP = 1;
-const int PinneMotor::TOP_SENSOR_IN = 0;
-const int PinneMotor::TOP_SENSOR_OUT = 1;
-const int PinneMotor::SLACK_SENSOR_IN = 0;
-const int PinneMotor::SLACK_SENSOR_OUT = 1;
-const int PinneMotor::POSITION_ALL_UP = 1;
-const int PinneMotor::POSITION_DEFAULT_MAX = 4096;
-const int PinneMotor::TARGET_NONE = 0;
-const int PinneMotor::DIRECTION_DOWN_INCREMENT = 1;
-const int PinneMotor::DIRECTION_UP_INCREMENT = -1;
+const int KoppMotor::DIRECTION_DOWN = 0;
+const int KoppMotor::DIRECTION_UP = 1;
+const int KoppMotor::TOP_SENSOR_IN = 0;
+const int KoppMotor::TOP_SENSOR_OUT = 1;
+const int KoppMotor::SLACK_SENSOR_IN = 0;
+const int KoppMotor::SLACK_SENSOR_OUT = 1;
+const int KoppMotor::POSITION_ALL_UP = 1;
+const int KoppMotor::POSITION_DEFAULT_MAX = 4096;
+const int KoppMotor::TARGET_NONE = 0;
+const int KoppMotor::DIRECTION_DOWN_INCREMENT = 1;
+const int KoppMotor::DIRECTION_UP_INCREMENT = -1;
 
 //variables for Sensor debouncing
 const unsigned long topSensorDebounceDelay = 150;
@@ -32,7 +32,7 @@ void encoderISR2()
   encoderCounter2 = max(encoderCounter2 + encoderIncrement2, 0);
 }
 
-int PinneMotor::GetCurrentPosition()
+int KoppMotor::GetCurrentPosition()
 { 
   int value;
   uint8_t data[sizeof(int)];
@@ -45,7 +45,7 @@ int PinneMotor::GetCurrentPosition()
 };
 
 
-PinneMotor::PinneMotor(int topStopSensorPin, int slackStopSensorPin, int encoderInterruptIndex, VNH5019Driver* driver, address_t address) :
+KoppMotor::KoppMotor(int topStopSensorPin, int slackStopSensorPin, int encoderInterruptIndex, VNH5019Driver* driver) :
 _currentPosition(POSITION_ALL_UP), 
 _targetPosition(TARGET_NONE), 
 _minPosition(POSITION_ALL_UP), 
@@ -53,13 +53,12 @@ _maxPosition(POSITION_DEFAULT_MAX),
 _topStopSensorPin(topStopSensorPin),
 _slackStopSensorPin(slackStopSensorPin),
 _driver(driver),
-_address(address),
 _encoderInterruptIndex(encoderInterruptIndex)
 {
 
 }
 
-void PinneMotor::init()
+void KoppMotor::init()
 {
   switch(_encoderInterruptIndex)
   {
@@ -67,15 +66,17 @@ void PinneMotor::init()
     attachInterrupt(0, encoderISR1, CHANGE);
     _encoderCounter = &encoderCounter1;
     _encoderIncrement = &encoderIncrement1;
+		pinMode(2, INPUT_PULLUP);
     break;
   case 1:
     attachInterrupt(1, encoderISR2, CHANGE);
     _encoderCounter = &encoderCounter2;
     _encoderIncrement = &encoderIncrement2;
+		pinMode(3, INPUT_PULLUP);
     break;
   }
-  pinMode(_topStopSensorPin, INPUT);
-  pinMode(_slackStopSensorPin, INPUT);
+  pinMode(_topStopSensorPin, INPUT_PULLUP);
+  pinMode(_slackStopSensorPin, INPUT_PULLUP);
   _driver->init();
   _driver->SetDirection(DIRECTION_UP);
   SetDirection(DIRECTION_DOWN);
@@ -94,18 +95,18 @@ void PinneMotor::init()
   );
 }
 
-void PinneMotor::Stop()
+void KoppMotor::Stop()
 {
   _driver->SetSpeed(VNH5019Driver::SPEED_STOP);
 }
 
-void PinneMotor::SetStop(int value)
+void KoppMotor::SetStop(int value)
 {
   _stoppingSpeed = constrain(value, 0, 5000);
   _driver->SetSpeed(VNH5019Driver::SPEED_STOP);
 }
 
-void PinneMotor::SetSpeed(int speed)
+void KoppMotor::SetSpeed(int speed)
 {
   if(speed <= 0)
   {
@@ -119,7 +120,7 @@ void PinneMotor::SetSpeed(int speed)
   }
 }
 
-void PinneMotor::SetDirection(int direction)
+void KoppMotor::SetDirection(int direction)
 {
   if(GetDirection() != direction)
   {
@@ -141,7 +142,7 @@ void PinneMotor::SetDirection(int direction)
   }
 }
 
-boolean PinneMotor::IsBlocked()
+boolean KoppMotor::IsBlocked()
 {
   if(_state >= BLOCKED_BY_TOP_SENSOR)
   {
@@ -177,7 +178,7 @@ boolean PinneMotor::IsBlocked()
 
 //Read all sensor values and check positions
 //Stop motor if needed
-void PinneMotor::UpdateState()
+void KoppMotor::UpdateState()
 {
   ReadTopStopSensor();
   ReadSlackStopSensor();
@@ -225,7 +226,7 @@ void PinneMotor::UpdateState()
   } 
 }
 
-void PinneMotor::_UpdateSpeedRamp()
+void KoppMotor::_UpdateSpeedRamp()
 {
   if(_speedRamper->Calculate( GetCurrentPosition() ))
   {
@@ -235,7 +236,7 @@ void PinneMotor::_UpdateSpeedRamp()
   }
 }
 
-void PinneMotor::ReadTopStopSensor()
+void KoppMotor::ReadTopStopSensor()
 {
   int newReading;
   newReading = digitalRead(_topStopSensorPin);
@@ -259,7 +260,7 @@ void PinneMotor::ReadTopStopSensor()
   _lastTopSensorReading = newReading;
 }
 
-void PinneMotor::ReadSlackStopSensor()
+void KoppMotor::ReadSlackStopSensor()
 {
   int newReading;
   newReading = digitalRead(_slackStopSensorPin);
@@ -283,15 +284,15 @@ void PinneMotor::ReadSlackStopSensor()
   _lastSlackSensorReading = newReading;
 }
 
-void PinneMotor::_TopStopSensorIn()
+void KoppMotor::_TopStopSensorIn()
 {
   Stop();
   _state = BLOCKED_BY_TOP_SENSOR;
   SetCurrentPosition(POSITION_ALL_UP);
-  NotifyStateChange(BLOCKED_BY_TOP_SENSOR, _address);
+  NotifyStateChange(BLOCKED_BY_TOP_SENSOR);
 }
 
-void PinneMotor::_TopStopSensorOut()
+void KoppMotor::_TopStopSensorOut()
 {
   int direction;
   direction = GetDirection();
@@ -303,14 +304,14 @@ void PinneMotor::_TopStopSensorOut()
   }
 }
 
-void PinneMotor::_SlackStopSensorOut()
+void KoppMotor::_SlackStopSensorOut()
 {
   Stop();
   _state = BLOCKED_BY_SLACK_SENSOR;
-  NotifyStateChange(BLOCKED_BY_SLACK_SENSOR, _address);
+  NotifyStateChange(BLOCKED_BY_SLACK_SENSOR);
 }
 
-void PinneMotor::_SlackStopSensorIn()
+void KoppMotor::_SlackStopSensorIn()
 {
  int direction;
   direction = GetDirection();
@@ -323,72 +324,72 @@ void PinneMotor::_SlackStopSensorIn()
 }
 
 
-void PinneMotor::_GoingUp()
+void KoppMotor::_GoingUp()
 {
   if(_state != GOING_UP)
   {
-    NotifyStateChange(GOING_UP, _address);
+    NotifyStateChange(GOING_UP);
     _state = GOING_UP;
   }
 }
 
-void PinneMotor::_GoingDown()
+void KoppMotor::_GoingDown()
 {
   if(_state != GOING_DOWN)
   {
-    NotifyStateChange(GOING_DOWN, _address);
+    NotifyStateChange(GOING_DOWN);
     _state = GOING_DOWN;
   }
 }
 
-void PinneMotor::_AbsMinPositionReached()
+void KoppMotor::_AbsMinPositionReached()
 {
   if(_state != BLOCKED_BY_ABS_MIN_POSITION)
   {
     Stop();
-    NotifyStateChange(BLOCKED_BY_ABS_MIN_POSITION, _address);
+    NotifyStateChange(BLOCKED_BY_ABS_MIN_POSITION);
     _state = BLOCKED_BY_ABS_MIN_POSITION;
   }
 }
 
-void PinneMotor::_MinPositionReached()
+void KoppMotor::_MinPositionReached()
 {
   if(_state != BLOCKED_BY_MIN_POSITION)
   {
     Stop();
-    NotifyStateChange(BLOCKED_BY_MIN_POSITION, _address);
+    NotifyStateChange(BLOCKED_BY_MIN_POSITION);
     _state = BLOCKED_BY_MIN_POSITION;
   }
 }
 
-void PinneMotor::_MaxPositionReached()
+void KoppMotor::_MaxPositionReached()
 {
   if(_state != BLOCKED_BY_MAX_POSITION)
   {
     Stop();
-    NotifyStateChange(BLOCKED_BY_MAX_POSITION, _address);
+    NotifyStateChange(BLOCKED_BY_MAX_POSITION);
     _state = BLOCKED_BY_MAX_POSITION;
   }
 }
 
-void PinneMotor::_TargetReached()
+void KoppMotor::_TargetReached()
 {
   if(_state != STOPPED_AT_TARGET)
   {
     Stop();
     _targetPosition = TARGET_NONE;
-    NotifyStateChange(STOPPED_AT_TARGET, _address);
+    NotifyStateChange(STOPPED_AT_TARGET);
     _state = STOPPED_AT_TARGET;
   }
 }
 
-void PinneMotor::_GoingToTarget()
+void KoppMotor::_GoingToTarget()
 {
   _state = GOING_TO_TARGET;
-  NotifyStateChange(GOING_TO_TARGET, _address);
+  NotifyStateChange(GOING_TO_TARGET);
 }
 
-void PinneMotor::SetTargetPosition(int targetPosition)
+void KoppMotor::SetTargetPosition(int targetPosition)
 {
   int value;
   if(targetPosition == TARGET_NONE)
@@ -415,7 +416,7 @@ void PinneMotor::SetTargetPosition(int targetPosition)
   }
 }
 
-void PinneMotor::SetCurrentPosition(int currentPosition)
+void KoppMotor::SetCurrentPosition(int currentPosition)
 {
   currentPosition = constrain(currentPosition, GetMinPosition(), GetMaxPosition());
   noInterrupts();
@@ -423,22 +424,22 @@ void PinneMotor::SetCurrentPosition(int currentPosition)
   interrupts();
 }
 
-void PinneMotor::SetBrake(int brake)
+void KoppMotor::SetBrake(int brake)
 {
   _driver->SetBrake(brake);
 }
 
-void PinneMotor::SetMinPosition(int minPosition)
+void KoppMotor::SetMinPosition(int minPosition)
 {
   _minPosition = max(minPosition, POSITION_ALL_UP);
 }
 
-void PinneMotor::SetMaxPosition(int maxPosition)
+void KoppMotor::SetMaxPosition(int maxPosition)
 {
   _maxPosition = min(maxPosition, POSITION_DEFAULT_MAX);
 }
 
-void PinneMotor::GoToParkingPosition()
+void KoppMotor::GoToParkingPosition()
 {
   //Check if already at top and do parking only if the sensor is out
   _topStopSensorValue = digitalRead(_topStopSensorPin);
@@ -451,7 +452,7 @@ void PinneMotor::GoToParkingPosition()
   }
 }
 
-void PinneMotor::GoToTargetPosition(int value)
+void KoppMotor::GoToTargetPosition(int value)
 {
   if(value > 0)
   {
@@ -470,17 +471,17 @@ void PinneMotor::GoToTargetPosition(int value)
   }
 }
 
-void PinneMotor::SetGoToSpeedRampUp(int value)
+void KoppMotor::SetGoToSpeedRampUp(int value)
 {
   _speedRamper->SetRampUp(static_cast<float>(value));
 }
 
-void PinneMotor::SetGoToSpeedRampDown(int value)
+void KoppMotor::SetGoToSpeedRampDown(int value)
 {
   _speedRamper->SetRampDown(static_cast<float>(value));
 }
 
-void PinneMotor::SetGoToSpeedScaling(int value)
+void KoppMotor::SetGoToSpeedScaling(int value)
 {
   _speedRamper->SetSpeedScaling(static_cast<float>(value) / 1000.0);
 }

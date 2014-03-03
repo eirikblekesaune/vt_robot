@@ -17,7 +17,7 @@ SerialPort.devices
 //p = SerialPort("/dev/tty.usbserial-FT3EET44B", 9600, crtscts:true,xonxoff:true);// pinne en
 //p = SerialPort("/dev/tty.usbserial-FT3EET4IA", 9600, crtscts:true,xonxoff:true);// pinne to
 //p = SerialPort("/dev/tty.usbserial-FT3EET4IB", 9600, crtscts:true,xonxoff:true);// pinne tre
-p = SerialPort("/dev/tty.usbserial-FT3EET52A", 9600, crtscts:true,xonxoff:true);// pinne fire
+p = SerialPort("/dev/tty.usbserial-FT5QT6JNA", 9600, crtscts:true,xonxoff:true);// pinne fire
 Tdef(\listenToSerial, {
 	loop{
 		var byte;
@@ -449,10 +449,19 @@ win.front;
 )
 
 p.putAll(~buildMessage.value(\rotation, \get, \currentPosition));
-p.putAll(~buildMessage.value(\rotation, \set, \targetPosition, 0));
-p.putAll(~buildMessage.value(\rotation, \get, \currentPosition));
+p.putAll(~buildMessage.value(\rotation, \set, \targetPosition, 300));
+(
+t = {
+	loop {
+		p.putAll(~buildMessage.value(\rotation, \get, \currentPosition));
+		1.0.wait;
+	}
+}.fork;
+)
+t.stop
 p.putAll(~buildMessage.value(\left, \get, \speed));
-p.putAll(~buildMessage.value(\rotation, \set, \speed, 0));
+p.putAll(~buildMessage.value(\rotation, \set, \speed, 300));
+p.putAll(~buildMessage.value(\rotation, \get, \speed));
 
 (
 f = fork{

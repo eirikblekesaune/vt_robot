@@ -387,6 +387,6 @@ VTPinneRobotParser{
     }
 
     *parseDataBytes{arg bytes;
-        ^bytes.at(0).leftShift(7).bitOr(bytes.at(1));
+		^bytes.at(0).leftShift(7).bitOr(bytes.at(1));
     }
 }
