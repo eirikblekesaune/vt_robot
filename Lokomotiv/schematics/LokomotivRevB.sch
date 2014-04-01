@@ -4760,8 +4760,8 @@ W = angled&lt;p&gt;
 <variantdefs>
 </variantdefs>
 <classes>
-<class number="0" name="Default" width="0.2032" drill="0.381">
-<clearance class="0" value="0.635"/>
+<class number="0" name="Default" width="0.4064" drill="0.381">
+<clearance class="0" value="1.016"/>
 </class>
 <class number="1" name="vcc" width="0" drill="0">
 </class>
