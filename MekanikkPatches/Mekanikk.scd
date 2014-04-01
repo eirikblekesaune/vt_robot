@@ -235,6 +235,29 @@ MIDIIn.connectAll;
 	~togLED3.setLEDValue(val);
 });
 
+
+OSCdef(\flashTog1,{arg msg, time, addr, port;
+	~xbee.sendTXFrame(~togLED1[\address], ~togLED1[\networkAddress], ["ms".ascii, 250, 13, 10].flatten, 1);
+	~xbee.sendTXFrame(~togLED1[\address], ~togLED1[\networkAddress], ["ms".ascii, 0, 13, 10].flatten, 1);
+
+}, '/robot/tog.1/flash');
+
+OSCdef(\flashTog2,{
+	~xbee.sendTXFrame(~togLED2[\address], ~togLED2[\networkAddress], ["ms".ascii, 250, 13, 10].flatten, 1);
+	~xbee.sendTXFrame(~togLED2[\address], ~togLED2[\networkAddress], ["ms".ascii, 0, 13, 10].flatten, 1);
+}, '/robot/tog.2/flash');
+
+OSCdef(\flashTog2,{
+	~xbee.sendTXFrame(~togLED3[\address], ~togLED3[\networkAddress], ["ms".ascii, 250, 13, 10].flatten, 1);
+	~xbee.sendTXFrame(~togLED3[\address], ~togLED3[\networkAddress], ["ms".ascii, 0, 13, 10].flatten, 1);
+}, '/robot/tog.3/flash');
+
+OSCdef(\flashTog4,{
+	~xbee.sendTXFrame(~togLED4[\address], ~togLED4[\networkAddress], ["ms".ascii, 250, 13, 10].flatten, 1);
+	~xbee.sendTXFrame(~togLED4[\address], ~togLED4[\networkAddress], ["ms".ascii, 0, 13, 10].flatten, 1);
+}, '/robot/tog.4/flash');
+
+
 //Fuglen
 ~fuglAddr = NetAddr("1.2.3.112", 50004);
 ~flyingCtrl.components['rotaryA.8'].action_({arg comp;
@@ -365,9 +388,14 @@ OSCdef(\pinneResponder, {arg msg, time, addr, port;
 
 OSCdef(\pinneParking, {arg msg, time, addr, port;
 	~pinnerne.do({arg item;
-		item.putAll(~buildMessage.value(\global, \set, \goToParkingPosition, 0));
+		item.putAll(~buildMessage.value(\right, \set, \goToParkingPosition, 0));
+		item.putAll(~buildMessage.value(\left, \set, \goToParkingPosition, 0));
 	});
 }, '/robot/pinne/park');
-
+OSCdef(\pinneStopper, {arg msg, time, addr, port;
+	~pinnerne.do({arg item;
+		item.putAll(~buildMessage.value(\global, \set, \stop, 0));
+	});
+}, '/robot/pinne/stop')
 //w = Window.new.front;
 //w.onClose_({0.exit});
