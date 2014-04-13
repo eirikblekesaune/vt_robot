@@ -1,3 +1,8 @@
 .DS_Store
 *.swo
 *.swn
+*.o
+*.zip
+*.dri
+*.b#*
+*.s#*
