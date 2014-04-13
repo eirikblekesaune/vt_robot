@@ -1,5 +1,7 @@
+SerialPort.devices.do(_.postln)
 (
-p = SerialPort("/dev/tty.usbserial-FTCVPEA5", 9600, crtscts:true,xonxoff:true);
+p = SerialPort("/dev/tty.usbserial-FT5QT6JNA", 9600, crtscts:true,xonxoff:true);
+//p = SerialPort("/dev/tty.usbserial-FTCVPEA5", 9600, crtscts:true,xonxoff:true);
 Tdef(\listenToSerial, {
 	loop{
 		var byte;
@@ -163,10 +165,11 @@ p.putAll(~buildMessage.value(\get, \direction));
 p.putAll(~buildMessage.value(\set, \direction, 0));
 p.putAll(~buildMessage.value(\get, \speed));
 p.putAll(~buildMessage.value(\set, \speed, 0));
-p.putAll(~buildMessage.value(\set, \speed, 100));
+p.putAll(~buildMessage.value(\set, \speed, 300));
 p.putAll(~buildMessage.value(\get, \currentPosition));
 p.putAll(~buildMessage.value(\set, \currentPosition, 1024));
 p.putAll(~buildMessage.value(\set, \goToTargetPosition, 0));
+p.putAll(~buildMessage.value(\set, \goToParkingPosition, 0));
 
 
 (
