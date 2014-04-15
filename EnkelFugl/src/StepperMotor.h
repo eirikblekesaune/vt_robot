@@ -1,7 +1,7 @@
 #ifndef _STEPPER_MOTOR_H
 #define _STEPPER_MOTOR_H
-
-
+#include <Arduino.h>
+#include "StepperDriver.h"
 //a more appropriate name for this class would be
 //PositionableMotor composed with a Motor and a
 //PositionSensor.

@@ -11,26 +11,28 @@ A4988Driver::A4988Driver(
 	_enablePin(enablePin),
 	_directionPin(directionPin),
 	_stepPin(stepPin),
+	//_msPins( {modePin1, modePin2, modePin3}),
 	_stepInterval(1000)
 {
+	_minSpeed = A4988Driver::MIN_SPEED;
+	_maxSpeed = A4988Driver::MAX_SPEED;
 	pinMode(_enablePin, OUTPUT);
 	//temporary diable the diver while initializing
   digitalWrite(_enablePin, HIGH);
   pinMode(_stepPin, OUTPUT);
-  pinMode(_dirPin, OUTPUT);
+  pinMode(_directionPin, OUTPUT);
 
-	_msPins = {modePin1, modePin2, modePin3};
 
   for(int i = 0; i< 3; i++) {
     pinMode(_msPins[i], OUTPUT);
   }
-	setSpeed(STOP_SPEED);
-	setDirection(0);
+	SetSpeed(A4988Driver::STOP_SPEED);
+	SetDirection(0);
 	//re enable the driver
-	setEnabled(1);
+	SetEnabled(1);
 }
 
-void A4988Driver::SetSpeed(int16_t newSpeed)
+void A4988Driver::SetSpeed(const int16_t& newSpeed)
 {	
 	int16_t newStepType;
 	switch(newSpeed)

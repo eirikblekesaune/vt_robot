@@ -29,7 +29,6 @@ TODO:
 -state notification to mekanikk
 */
 
-
 #include <SPI.h>
 #include <Ethernet.h>
 #include "ArdOSC.h"
