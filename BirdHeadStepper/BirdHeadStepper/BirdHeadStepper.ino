@@ -47,7 +47,8 @@ const int dirPin = 2;
 const int stepPin = 3;
 const int enablePin = 8;
 const int msPins[3] = {7,6,5}; //ms3, ms2, ms1
-const int potPin = 0;
+
+const int positionPin = 0;
 //speed bytes
 #define STOP 0xF
 #define FULL_STEP 0x0
@@ -55,10 +56,6 @@ const int potPin = 0;
 #define QUARTER_STEP 0x2
 #define EIGHT_STEP 0x3
 #define SIXTEENTH_STEP 0x7
-
-#define MAX_POSITION 1023
-#define MIN_POSITION 0
-#define NO_TARGET -1
 
 //parameter enum
 enum param {
@@ -68,17 +65,23 @@ enum param {
   kParamInterval
 };
 
+int potValue;
 int currentSpeed = STOP;
 unsigned long lastStepTime = 0;
-unsigned long stepInterval = 1000;
+unsigned long stepInterval = 3000;
+unsigned long lastReadTime = 0;
+unsigned long readInterval = 20;
 #define UP 0
 #define DOWN 1
+#define MAX_POSITION 510
+#define MIN_POSITION 30
+#define WITHIN_RANGE 0
+#define AT_MAX 1
+#define AT_MIN 2
+int state = WITHIN_RANGE;
 int16_t currentDirection = UP;
 int16_t enabled = 1;
-int16_t currentPosition;
-int16_t currentMaxPosition = MAX_POSITION;
-int16_t currentMinPosition = MIN_POSITION;
-int16_t targetPosition;
+long stepPos = 0;
 
 void setup() {
   pinMode(enablePin, OUTPUT);
@@ -90,7 +93,6 @@ void setup() {
     pinMode(msPins[i], OUTPUT);
   }
   
-	currentPosition = analogRead(potPin);
   //Init ethernet/OSC
   Ethernet.begin(mac, ip);
   server.begin(receivePort);
@@ -98,9 +100,8 @@ void setup() {
   server.addCallback("/robot/fugl/speed", &handleSpeedMsg);
   server.addCallback("/robot/fugl/stepinterval", &handleStepIntervalMsg);
   server.addCallback("/robot/fugl/enable", &handleEnableMsg);
-	server.addCallback("/robot/fugl/goToPosition", &handleGoToPosition);
-  server.addCallback("/robot/fugl/setMax", &handleSetMax);
-  server.addCallback("/robot/fugl/setMin", &handleSetMin);
+//  server.addCallback("/robot/fugl/setmax", &handleSetMax);
+//  server.addCallback("/robot/fugl/setmin", &handleSetMin);
   
   //init serial
   Serial.begin(9600);
@@ -108,47 +109,68 @@ void setup() {
 }
 
 void loop() {
-//  if(server.aviableCheck()>0){
-//     Serial.println("alive! "); 
-//  }
-	currentPosition = analogRead(potPin);
-  if((currentSpeed != STOP)) {
+  if(server.aviableCheck()>0){
+     //Serial.println("alive! "); 
+  }
+  if((millis() - lastReadTime) >= readInterval)
+  {
+    potValue = analogRead(positionPin);
+    //Serial.println(potValue);
+    if((potValue < MAX_POSITION) && (potValue > MIN_POSITION))
+    {
+      state = WITHIN_RANGE;
+      //Serial.println("inrange");
+    } else if(
+            (potValue >= MAX_POSITION) && 
+            (state != AT_MAX) &&
+            (currentDirection == UP))
+    {
+      state = AT_MAX;
+      currentSpeed = STOP;
+      //Serial.println("atmax");
+    } else if(
+            (potValue <= MIN_POSITION) && 
+            (state != AT_MIN) &&
+            (currentDirection == DOWN))
+    {
+      state = AT_MIN;
+      currentSpeed = STOP;
+      //Serial.println("atmin");
+    }
+  }
+  if(currentSpeed != STOP) {
     if((micros() - lastStepTime) >= stepInterval) {
-			if(canStep())
-			{
-				doStep();
-			}
+      if(state == WITHIN_RANGE)
+      {
+        doStep();
+      } else {
+        if((currentDirection == UP) && (state == AT_MIN))
+        {
+          //Serial.println("a");
+          doStep();
+        } else if((currentDirection == DOWN) && (state == AT_MAX))
+        {
+          //Serial.println("b");
+          doStep();
+        }
+      }
     }
   }
 }
 
-bool canStep()
-{
-	bool result = true;
-	if((currentDirection == DOWN) && (currentPosition <= currentMinPosition))
-	{
-		result = false;
-	} else if((currentDirection == UP) && (currentPosition >= currentMaxPosition))
-	{
-		result = false;
-	}
-	return result;
-}
-
 void doStep()
 {
-	digitalWrite(stepPin, LOW);
-	delayMicroseconds(2);
-	digitalWrite(stepPin, HIGH);
-	lastStepTime = micros();
+  digitalWrite(stepPin, LOW);
+  //if(currentDirection == UP) {stepPos--;}
+  //if(currentDirection == DOWN) {stepPos++;}
+  delayMicroseconds(2);
+  digitalWrite(stepPin, HIGH);
+  lastStepTime = micros();
 }
 
-////////////////////////////////////////
-///OSC message handler functions
-////////////////////////////////////////
 void handleDirectionMsg(OSCMessage *_msg) {
   int16_t numargs;
-  //Serial.println("got direction");
+  Serial.println("got direction");
   numargs = _msg->getArgsNum();
   if(numargs == 1) {
     if(_msg->getArgTypeTag(0) == kTagString) {
@@ -163,7 +185,7 @@ void handleDirectionMsg(OSCMessage *_msg) {
 }
 
 void handleSpeedMsg(OSCMessage *_msg) {
-  //Serial.println("got speed");
+  Serial.println("got speed");
   int16_t numargs = _msg->getArgsNum();
   if(numargs == 1) {
     if(_msg->getArgTypeTag(0) == kTagInt32) {
@@ -173,7 +195,7 @@ void handleSpeedMsg(OSCMessage *_msg) {
 }
 
 void handleStepIntervalMsg(OSCMessage *_msg) {
-  //Serial.println("got interval");
+  Serial.println("got interval");
   int16_t numargs = _msg->getArgsNum();
   if(numargs == 1) {
     if(_msg->getArgTypeTag(0) == kTagInt32) {
@@ -183,7 +205,7 @@ void handleStepIntervalMsg(OSCMessage *_msg) {
 }
 
 void handleEnableMsg(OSCMessage *_msg) {
-  //Serial.println("got enabled");
+  Serial.println("got enabled");
   int16_t numargs = _msg->getArgsNum();
   if(numargs == 1) {
     if(_msg->getArgTypeTag(0) == kTagInt32) {
@@ -193,45 +215,13 @@ void handleEnableMsg(OSCMessage *_msg) {
 }
 
 void handleSetMax(OSCMessage *_msg) {
-  //Serial.println("got set max");
+  Serial.println("got set max");
   int16_t numargs = _msg->getArgsNum();
   if(numargs == 1) {
     if(_msg->getArgTypeTag(0) == kTagInt32) {
-      setMaxPosition((int16_t)_msg->getArgInt32(0));
+      setEnabled((int16_t)_msg->getArgInt32(0));
     }
   }
-}
-
-void handleSetMin(OSCMessage *_msg) {
-  //Serial.println("got set max");
-  int16_t numargs = _msg->getArgsNum();
-  if(numargs == 1) {
-    if(_msg->getArgTypeTag(0) == kTagInt32) {
-      setMinPosition((int16_t)_msg->getArgInt32(0));
-    }
-  }
-}
-
-void handleGoToPosition(OSCMessage *_msg)
-{
-	int16_t numArgs = _msg->getArgsNum();
-	if(numArgs == 1)
-	{
-		if(_msg->getArgTypeTag(0) == kTagInt32)
-		{
-			setGoToPosition((int16_t)_msg->getArgInt32(0));
-		}
-	}
-}
-
-void setGoToPosition(int16_t pos)
-{
-	targetPosition = constrain(pos, MIN_POSITION, MAX_POSITION);
-}
-
-void reachedTarget()
-{
-	targetPosition = NO_TARGET;
 }
 
 void setDirection(char *dir) {
@@ -244,20 +234,9 @@ void setDirection(char *dir) {
     currentDirection = DOWN;
     digitalWrite(dirPin, LOW);
   }
-  //Serial.print("set direction");
-  //Serial.println(currentDirection);
+  Serial.print("set direction");
+  Serial.println(currentDirection);
 } 
-
-
-void setMaxPosition(int16_t pos)
-{
-	currentMaxPosition = constrain(pos, MIN_POSITION, MAX_POSITION);
-}
-
-void setMinPosition(int16_t pos)
-{
-	currentMinPosition = constrain(pos, MIN_POSITION, MAX_POSITION);
-}
 
 void setStepperSpeed(int16_t spd) {
   int stepType;
@@ -285,8 +264,8 @@ void setStepperSpeed(int16_t spd) {
     currentSpeed = stepType;
     if(currentSpeed != STOP) PORTD = (PORTD & 0x1F) | (currentSpeed << 5);
   }
-  //Serial.print("set speed: ");
-  //Serial.println(currentSpeed);
+  Serial.print("set speed: ");
+  Serial.println(currentSpeed);
 }
 
 void setEnabled(int16_t enb) {
@@ -297,12 +276,12 @@ void setEnabled(int16_t enb) {
     enabled = 1;
     digitalWrite(enablePin, LOW);
   }
-  //Serial.print("set enabled: ");
-  //Serial.println(enabled);
+  Serial.print("set enabled: ");
+  Serial.println(enabled);
 }
 
 void setStepInterval(int16_t inr) {
-  int16_t intr = constrain(inr, 10, 10000);
+  int16_t intr = constrain(inr, 100, 10000);
   stepInterval = intr;
   Serial.print("set interval: "); Serial.println(stepInterval);
 }
@@ -333,4 +312,3 @@ void updateClient(uint8_t *ip, int16_t parameter) {
   }
   client.send(&updateMsg);
 }
-
