@@ -173,7 +173,16 @@ VTPinneRobotMotor{
 		this.prInvalidateParameter(\goToParkingPosition, 0);
 	}
 
+	goToParkingPosition_{//temp hack
+		this.prInvalidateParameter(\goToParkingPosition, 0);
+	}
+
 	goToTargetPosition{arg duration;
+		duration = duration ? specs.at(\goToTargetPosition).constrain(duration);
+		this.prInvalidateParameter(\goToTargetPosition, duration);
+	}
+
+	goToTargetPosition_{arg duration;
 		duration = duration ? specs.at(\goToTargetPosition).constrain(duration);
 		this.prInvalidateParameter(\goToTargetPosition, duration);
 	}
@@ -278,7 +287,7 @@ VTPinneRobotParser{
 			\minPosition -> 2r1000,
 			\maxPosition -> 2r1001,
 			\goToParkingPosition -> 2r1010,
-			\goToTargetPosition -> 2r1011,
+			\goToTargetPosition -> 2r1011,//0x0B
 			\goToSpeedRampUp -> 2r1100,//argument is ramp up percent of halfway point
 			\goToSpeedRampDown -> 2r1101,//ramp down time will take effect after halfway point
 			\goToSpeedScaling -> 2r1110
