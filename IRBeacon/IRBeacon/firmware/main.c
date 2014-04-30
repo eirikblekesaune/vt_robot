@@ -115,23 +115,16 @@ int main(void)
 	//start timer interrupts
     while(1)
     {
-		//while(sequenceCounter < 3)
-		//{
-		//	sendNECByte(leadSequence[sequenceCounter]);
-		//	sequenceCounter++;
-		//	_delay_ms(100);
-		//}
-		
-		sendNECByte(leadSequence[0]);
-		_delay_ms(50);
-		sendNECByte(leadSequence[1]);
-		_delay_ms(50);
-		sendNECByte(leadSequence[2]);
-		_delay_ms(50);
-		sendNECByte(address | magicNumber);
-		//read address bytes again
-		address = (unsigned long)(PINA);
-		_delay_ms(100);
+			sendNECByte(leadSequence[0]);
+			_delay_ms(50);
+			sendNECByte(leadSequence[1]);
+			_delay_ms(50);
+			sendNECByte(leadSequence[2]);
+			_delay_ms(50);
+			sendNECByte(address | magicNumber);
+			//read address bytes again
+			address = (unsigned long)(PINA);
+			_delay_ms(100);
     }
 }
 
