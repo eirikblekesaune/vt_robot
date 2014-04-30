@@ -29,7 +29,7 @@ void VNH5019Driver::init()
   //
   // PWM frequency calculation
   // 16MHz / 1 (prescaler) / 2 (phase-correct) / SPPED_MAX (512) = 15.625Hz
-  TCCR1A = 0b10100000;
+  TCCR1A = 0b11100000;
   TCCR1B = 0b00010001;
   ICR1 = SPEED_MAX;
   #endif

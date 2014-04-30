@@ -12,12 +12,12 @@ SerialPort.devices.do(_.postln)
 ~pinne4.put(22)
 SerialPort.devices
 (
-//p = SerialPort("/dev/tty.usbserial-FT5QT6JNA", 9600, crtscts:true,xonxoff:true);
+p = SerialPort("/dev/tty.usbserial-FT5QT6JNA", 9600, crtscts:true);
 //p = SerialPort("/dev/tty.usbserial-FT5QT6TQA", 9600, crtscts:true,xonxoff:true);//EN
 //p = SerialPort("/dev/tty.usbserial-FT3EET44B", 9600, crtscts:true,xonxoff:true);// pinne en
 //p = SerialPort("/dev/tty.usbserial-FT3EET4IA", 9600, crtscts:true,xonxoff:true);// pinne to
 //p = SerialPort("/dev/tty.usbserial-FT3EET4IB", 9600, crtscts:true,xonxoff:true);// pinne tre
-p = SerialPort("/dev/tty.usbserial-FT5QT6JNA", 9600, crtscts:true,xonxoff:true);// pinne fire
+//p = SerialPort("/dev/tty.usbserial-FT5QT6JNA", 9600, crtscts:true,xonxoff:true);// pinne fire
 Tdef(\listenToSerial, {
 	loop{
 		var byte;
@@ -443,33 +443,35 @@ Button(rotationView,200@50)
 	.action_({arg butt;p.putAll(~buildMessage.value(\rotation, \set, \stop, 0))})
 	.states_([["STOP Rot"]]);
 Button(win, 200@50).action_({arg butt;
-	p.putAll(~buildMessage.value(\global, \set, \goToParkingPosition, 0));
+//	p.putAll(~buildMessage.value(\global, \set, \goToParkingPosition, 0));
 }).states_([["Parkering"]]);
 win.front;
 )
+p.putAll(~buildMessage.value(\right, \set, \goToParkingPosition, 0));
+p.putAll(~buildMessage.value(\left, \set, \goToParkingPosition, 0));
+p.putAll(~buildMessage.value(\rotation, \set, \goToParkingPosition, 0));
+p.putAll(~buildMessage.value(\global, \set, \goToParkingPosition, 0));
+
+p.putAll(~buildMessage.value(\left, \set, \speed, 100));
+
 
 p.putAll(~buildMessage.value(\rotation, \get, \currentPosition));
 p.putAll(~buildMessage.value(\rotation, \set, \targetPosition, 300));
+
+p.putAll(~buildMessage.value(\left, \set, \currentPosition, 10));
+
+p.putAll(~buildMessage.value(\left, \set, \minPosition, 100));
+p.putAll(~buildMessage.value(\left, \set, \maxPosition, 200));
 (
-t = {
+Tdef(\checkPos, {
 	loop {
-		p.putAll(~buildMessage.value(\rotation, \get, \currentPosition));
+		// p.putAll(~buildMessage.value(\rotation, \get, \currentPosition));
+		// p.putAll(~buildMessage.value(\left, \get, \currentPosition));
+		p.putAll(~buildMessage.value(\right, \get, \currentPosition));
 		1.0.wait;
 	}
-}.fork;
+}).play;
 )
-t.stop
-p.putAll(~buildMessage.value(\left, \get, \speed));
-p.putAll(~buildMessage.value(\rotation, \set, \speed, 300));
-p.putAll(~buildMessage.value(\rotation, \get, \speed));
+Tdef(\checkPos).stop
 
-(
-f = fork{
-loop {
-		p.putAll(~buildMessage.value(\rotation, \get, \currentPosition)); 1.0.wait;
-	};
-}
-)
-f.play;
-f.stop;
-		p.putAll(~buildMessage.value(\rotation, \get, \currentPosition))
+//LEAP motion controller

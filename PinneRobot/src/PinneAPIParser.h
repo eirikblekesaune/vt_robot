@@ -34,6 +34,7 @@ class PinneAPIParser
     void _processSetGoToSpeedRampUpCommand();
     void _processSetGoToSpeedRampDownCommand();
     void _processSetGoToSpeedScalingCommand();
+		void _processSetGotoParkingPosition();
     
     void _processGetStateCommand();
     void _processGetSpeedCommand();    

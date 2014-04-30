@@ -50,7 +50,7 @@ void PinneAPIParser::_parseCommand(byte inByte)
               _processSetMaxPositionCommand();
               break;
             case CMD_GOTO_PARKING_POSITION:
-              _robot->GoToParkingPosition();
+							_processSetGotoParkingPosition();
               break;
             case CMD_GOTO_TARGET:
               _processSetGoToTargetCommand();
@@ -328,6 +328,31 @@ void PinneAPIParser::_processGetTargetPositionCommand()
     ReturnGetValue(_currentCommand, _currentAddress, value);
   } else {
     //DEBUG_PRINT("Something wrong with geting target position");DEBUG_NL;
+  }
+}
+////PARKING COMMAND
+
+void PinneAPIParser::_processSetGotoParkingPosition()
+{
+  int value = _parseDataValue();
+  switch(_currentAddress)
+  {
+    case ADDRESS_LEFT:
+      _robot->leftMotor->GoToParkingPosition();
+      break;
+    case ADDRESS_RIGHT:
+      _robot->rightMotor->GoToParkingPosition();
+      break;
+    case ADDRESS_ROTATION:
+      _robot->rotationMotor->GoToParkingPosition();
+      break;
+    case ADDRESS_GLOBAL:
+      _robot->leftMotor->GoToParkingPosition();
+      _robot->rightMotor->GoToParkingPosition();
+      _robot->rotationMotor->GoToParkingPosition();
+      break;
+    default:
+      DEBUG_PRINT("Unknown address");DEBUG_NL;
   }
 }
 

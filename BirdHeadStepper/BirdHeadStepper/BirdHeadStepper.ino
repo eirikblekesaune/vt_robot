@@ -47,6 +47,8 @@ const int dirPin = 2;
 const int stepPin = 3;
 const int enablePin = 8;
 const int msPins[3] = {7,6,5}; //ms3, ms2, ms1
+
+const int positionPin = 0;
 //speed bytes
 #define STOP 0xF
 #define FULL_STEP 0x0
@@ -63,11 +65,20 @@ enum param {
   kParamInterval
 };
 
+int potValue;
 int currentSpeed = STOP;
 unsigned long lastStepTime = 0;
-unsigned long stepInterval = 1000;
+unsigned long stepInterval = 3000;
+unsigned long lastReadTime = 0;
+unsigned long readInterval = 20;
 #define UP 0
 #define DOWN 1
+#define MAX_POSITION 510
+#define MIN_POSITION 30
+#define WITHIN_RANGE 0
+#define AT_MAX 1
+#define AT_MIN 2
+int state = WITHIN_RANGE;
 int16_t currentDirection = UP;
 int16_t enabled = 1;
 long stepPos = 0;
@@ -99,19 +110,62 @@ void setup() {
 
 void loop() {
   if(server.aviableCheck()>0){
-     Serial.println("alive! "); 
+     //Serial.println("alive! "); 
   }
-  if((currentSpeed != STOP)) {
-    if((micros() - lastStepTime) >= stepInterval) {
-      digitalWrite(stepPin, LOW);
-      if(currentDirection == UP) {stepPos--;}
-      if(currentDirection == DOWN) {stepPos++;}
-      delayMicroseconds(2);
-      digitalWrite(stepPin, HIGH);
-      lastStepTime = micros();
-      Serial.println(stepPos);
+  if((millis() - lastReadTime) >= readInterval)
+  {
+    potValue = analogRead(positionPin);
+    //Serial.println(potValue);
+    if((potValue < MAX_POSITION) && (potValue > MIN_POSITION))
+    {
+      state = WITHIN_RANGE;
+      //Serial.println("inrange");
+    } else if(
+            (potValue >= MAX_POSITION) && 
+            (state != AT_MAX) &&
+            (currentDirection == UP))
+    {
+      state = AT_MAX;
+      currentSpeed = STOP;
+      //Serial.println("atmax");
+    } else if(
+            (potValue <= MIN_POSITION) && 
+            (state != AT_MIN) &&
+            (currentDirection == DOWN))
+    {
+      state = AT_MIN;
+      currentSpeed = STOP;
+      //Serial.println("atmin");
     }
   }
+  if(currentSpeed != STOP) {
+    if((micros() - lastStepTime) >= stepInterval) {
+      if(state == WITHIN_RANGE)
+      {
+        doStep();
+      } else {
+        if((currentDirection == UP) && (state == AT_MIN))
+        {
+          //Serial.println("a");
+          doStep();
+        } else if((currentDirection == DOWN) && (state == AT_MAX))
+        {
+          //Serial.println("b");
+          doStep();
+        }
+      }
+    }
+  }
+}
+
+void doStep()
+{
+  digitalWrite(stepPin, LOW);
+  //if(currentDirection == UP) {stepPos--;}
+  //if(currentDirection == DOWN) {stepPos++;}
+  delayMicroseconds(2);
+  digitalWrite(stepPin, HIGH);
+  lastStepTime = micros();
 }
 
 void handleDirectionMsg(OSCMessage *_msg) {
@@ -258,4 +312,3 @@ void updateClient(uint8_t *ip, int16_t parameter) {
   }
   client.send(&updateMsg);
 }
-

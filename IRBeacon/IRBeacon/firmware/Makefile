@@ -16,15 +16,13 @@
 #                   default_programmer = "stk500v2"
 #                   default_serial = "avrdoper"
 # FUSES ........ Parameters for avrdude to flash the fuses appropriately.
-
-DEVICE     = attiny85# t44#
-DUDEDEVICE = t85
-CLOCK      = 1000000
-PROGRAMMER = -c arduino -P /dev/tty.usbmodem621 #-c stk500v2 -P avrdoper
-OBJECTS    = main.o
-FUSES     = -U lfuse:w:0x62:m -U hfuse:w:0xdf:m -U efuse:w:0xff:m
-
-
+DEVICE     = attiny44a
+DUDEDEVICE = t44
+CLOCK      = 8000000
+PROGRAMMER = -c avrispmkII #-P /dev/tty.usbserial621
+OBJECTS    = main.o 
+#FUSES      = -U hfuse:w:0xdc:m -U lfuse:w:0xbf:m
+FUSES			 = -U lfuse:w:0xe2:m -U hfuse:w:0xdf:m -U efuse:w:0xff:m
 # ATMega8 fuse bits used above (fuse bits for other devices are different!):
 # Example for 8 MHz internal oscillator
 # Fuse high byte:
@@ -50,7 +48,7 @@ FUSES     = -U lfuse:w:0x62:m -U hfuse:w:0xdf:m -U efuse:w:0xff:m
 
 # Tune the lines below only if you know what you are doing:
 
-AVRDUDE = avrdude $(PROGRAMMER) -p $(DUDEDEVICE) 
+AVRDUDE = avrdude $(PROGRAMMER) -p $(DUDEDEVICE)
 COMPILE = avr-gcc -Wall -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE)
 
 # symbolic targets:
