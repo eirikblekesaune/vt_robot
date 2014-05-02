@@ -67,27 +67,28 @@ MIDIIn.connectAll;
 };
 /*//map faders to kopper
 8.do{arg i;
-	var fader, tog, button;
-	fader = ~flyingCtrl.components.at(("fader." ++ (i + 1)).asSymbol);
-	tog = ~koppMonster.channels[i];
-	fader.addDependant(tog);
-	tog.addDependant(fader);
+var fader, tog, button;
+fader = ~flyingCtrl.components.at(("fader." ++ (i + 1)).asSymbol);
+tog = ~koppMonster.channels[i];
+fader.addDependant(tog);
+tog.addDependant(fader);
 
-	button = ~flyingCtrl.components.at(("button." ++ (i + 9)).asSymbol);
-	button.action = {arg butt;
-		if(butt.value != 0, {
-			tog.stop;
-			tog.changed(butt, \value);
-		});
-	};
+button = ~flyingCtrl.components.at(("button." ++ (i + 9)).asSymbol);
+button.action = {arg butt;
+if(butt.value != 0, {
+tog.stop;
+tog.changed(butt, \value);
+});
+};
 };
 ~flyingCtrl.components['button.20'].action_({arg comp;
-	8.do{arg i;
-		~koppMonster.channels[i].stop;
-		~koppMonster.channels[i].changed(comp, \value);
-	};
-	"global koppstopp".postln;
+8.do{arg i;
+~koppMonster.channels[i].stop;
+~koppMonster.channels[i].changed(comp, \value);
+};
+"global koppstopp".postln;
 });*/
+
 //Wireless LED fader
 ~xbee = XBeeAPI(SerialPort('/dev/tty.usbserial-A600ezu2', 9600));
 ~xbee.rxAction = {|serialAddr, networkAddr, receiveOptions, data|
@@ -282,18 +283,20 @@ OSCFunc({arg msg, time, addr, port;
 }, '/robot/fugl.1/speed');
 
 
-//OSC repsonders for flying
-6.do{arg i;
-	OSCFunc({arg msg, time, addr, resp;
-		~koppMonster.channels[i].valueAction_(msg[1].clip(-512, 512).asInteger);
-	}.inEnvir, ("/robot/flying." ++ (i + 1) ++ "/speed").asSymbol);
-	OSCFunc({arg msg, time, addr, resp;
-		~koppMonster.channels[i].stop;
-	}.inEnvir, ("/robot/flying." ++ (i + 1) ++ "/stop").asSymbol);
-};
-OSCFunc({arg msg, time, addr, resp;
-	~koppMonster.channels.do(_.stop);
-}.inEnvir, '/robot/flying/stop');
+//OSC repsonders for flying (LD)
+// 6.do{arg i;
+// 	OSCFunc({arg msg, time, addr, resp;
+// 		~koppMonster.channels[i].valueAction_(msg[1].clip(-512, 512).asInteger);
+// 	}.inEnvir, ("/robot/flying." ++ (i + 1) ++ "/speed").asSymbol);
+// 	OSCFunc({arg msg, time, addr, resp;
+// 		~koppMonster.channels[i].stop;
+// 	}.inEnvir, ("/robot/flying." ++ (i + 1) ++ "/stop").asSymbol);
+// };
+// OSCFunc({arg msg, time, addr, resp;
+// 	~koppMonster.channels.do(_.stop);
+// }.inEnvir, '/robot/flying/stop');
+
+
 
 ~lysResponders = 256.collect({arg i;
 	var num = i + 1;
@@ -462,6 +465,89 @@ data.keysValueDo({arg settingKey, settingData;
 	VTPinneRobot("/dev/tty.usbserial-FT5QT6ULA"),// pinne syv
 	VTPinneRobot("/dev/tty.usbserial-FT5QT6ULB")// pinne aatte
 ];
+
+~kopper = [
+	VTKoppRobot("/dev/tty.usbserial-FT5QT6UUA"), //9 //OK kobling
+	VTKoppRobot("/dev/tty.usbserial-FT5QT6UUB"), //10 // svarer ikke
+	VTKoppRobot("/dev/tty.usbserial-FT5QT6VAA"), //11 // ok svarer
+	VTKoppRobot("/dev/tty.usbserial-FT5QT6VAB"), //12 // ok svarer
+	VTKoppRobot("/dev/tty.usbserial-FT5QT6VKA"), //13
+	VTKoppRobot("/dev/tty.usbserial-FT5QT6VKB") //14 OK koblet til kopp nr 3
+];
+
+[0, 1, 2, 3, 5].do{arg i;
+	OSCFunc({arg msg, time, addr, resp;
+		var dir;
+		dir = msg[1].isNegative.not.asInt;
+		"kopper: % speed: %, dir: %".format(i + 1, msg, dir).postln;
+		~kopper[i].sendMsg(\set, \direction, dir);
+		~kopper[i].sendMsg(\set, \speed, msg[1].clip(-512, 512).asInteger.abs);
+	}.inEnvir, ("/robot/flying." ++ (i + 1) ++ "/speed").asSymbol);
+	OSCFunc({arg msg, time, addr, resp;
+		~kopper[i].stop;
+	}.inEnvir, ("/robot/flying." ++ (i + 1) ++ "/stop").asSymbol);
+};
+[0, 1, 2, 3, 5].do{arg i;
+	OSCFunc({arg msg, time, addr, resp;
+		~kopper[i].sendMsg(\set, \goToParkingPosition, 0);
+	}.inEnvir, ("/robot/flying." ++ (i + 1) ++ "/goToParkingPosition").asSymbol);
+};
+[0, 1, 2, 3, 5].do{arg i;
+	OSCFunc({arg msg, time, addr, resp;
+		~kopper[i].sendMsg(\set, \targetPosition, msg[1]);
+	}.inEnvir, ("/robot/flying." ++ (i + 1) ++ "/targetPosition").asSymbol);
+};
+OSCFunc({arg msg, time, addr, resp;
+	~kopper.do(_.stop);
+}.inEnvir, '/robot/flying/stop');
+
+~koppWalkStart = {
+	[0,1,2,3,5].do({arg koppIndex;
+	var koppNum = koppIndex + 1;
+	var doNextTarget = {
+		var taskKey = "koppWalk%".format(koppNum).asSymbol;
+		Tdef(taskKey).clear;
+		Tdef(taskKey, {
+				var waitTime = rrand(5.0, 20.0);
+				var newPos = rrand(250, 600);
+				var speedRamp = Env([0, rrand(80, 150), 40], [5, rrand(1, 10)]).asPseg.asStream;
+				"setting new target kopp %: %".format(koppNum, newPos).postln;
+				"going in % seconds".format(waitTime).postln;
+				waitTime.wait;
+				~kopper[koppIndex].sendMsg(\set, \targetPosition, newPos);
+				loop{
+					var newSpeed = speedRamp.next;
+					newSpeed !? { ~kopper[koppIndex].sendMsg(\set, \speed, newSpeed.asInteger); };
+					0.1.wait;
+				};
+			}.inEnvir).play;
+	};
+	~kopper[koppIndex].stateChangeAction_({arg newState;
+		if(newState == \stoppedAtTarget, {
+			doNextTarget.value;
+		});
+	});
+	doNextTarget.value;
+});
+};
+~koppWalkStop = {
+	~kopper.do({arg item, i;
+		var taskKey = "koppWalk%".format(i + 1).asSymbol;
+		Tdef(taskKey).clear;
+		item.stateChangeAction_(nil);
+		item.sendMsg(\set, \speed, 0);
+	});
+};
+OSCdef(\koppWalkResponder, {arg msg, time, addr, port;
+	if(msg[1] == 1, {
+		"Started kopp walk".postln;
+		~koppWalkStart.value;
+	});
+	if(msg[1] == 0, {
+		"Stopped kopp walk".postln;
+		~koppWalkStop.value;
+	});
+}, '/robot/flying/walk');
 
 OSCdef(\pinneClassResponder, {arg msg, time, addr, port;
 	var index, motor, val, key, pinne, pinneMotor;
