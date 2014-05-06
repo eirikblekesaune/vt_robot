@@ -56,7 +56,9 @@ void IRReader::Update()
 					resetParser_();
 				}
 			}
-		}
+		} else {
+			resetParser_();
+		} 
 		receiver_->resume();
 	}
 }

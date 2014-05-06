@@ -111,14 +111,15 @@ void Lokomotiv::GotAddr(unsigned char addr)
 	//second.
 	if(addr != _lastBeaconAddress)
 	{
-		Serial.print("New address:"); Serial.println(addr, HEX);
+		Serial.print("New address:"); Serial.println(addr);
 		_lastBeaconAddress = addr;
 		_lastBeaconAddressUpdate = millis();
 	}
 
 	if((_lastBeaconAddressUpdate + _beaconAddressUpdateInterval) < millis())
 	{
-		Serial.print("Addr update:"); Serial.println(_lastBeaconAddress, HEX);
+		//Serial.print("Addr update:"); Serial.println(_lastBeaconAddress);
+		Serial.print("Addr update:"); Serial.println(addr);
 		_lastBeaconAddressUpdate = millis();
 	}
 	_distanceFromLastBeacon = 0;
