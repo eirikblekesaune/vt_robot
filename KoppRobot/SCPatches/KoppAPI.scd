@@ -1,6 +1,13 @@
 SerialPort.devices.do(_.postln)
+p.close
 (
-p = SerialPort("/dev/tty.usbserial-FT5QT6JNA", 9600, crtscts:true,xonxoff:true);
+p = SerialPort("/dev/tty.usbserial-FT5QT6UUA", 9600, crtscts:true, xonxoff:true); //9 OK
+//p = SerialPort("/dev/tty.usbserial-FT5QT6UUB", 9600, crtscts:true, xonxoff:true); //10, svarer ikke
+//p = SerialPort("/dev/tty.usbserial-FT5QT6VAA", 9600, crtscts:true, xonxoff:true); //11, OK
+//p = SerialPort("/dev/tty.usbserial-FT5QT6VAB", 9600, crtscts:true, xonxoff:true); //12 OK
+//p = SerialPort("/dev/tty.usbserial-FT5QT6VKA", 9600, crtscts:true, xonxoff:true); //13 svarer ikke
+//p = SerialPort("/dev/tty.usbserial-FT5QT6VKB", 9600, crtscts:true, xonxoff:true); //14 OK koblet til kopp nr 3
+
 //p = SerialPort("/dev/tty.usbserial-FTCVPEA5", 9600, crtscts:true,xonxoff:true);
 Tdef(\listenToSerial, {
 	loop{
@@ -162,10 +169,10 @@ Tdef(\listenToSerial, {
 );
 )
 p.putAll(~buildMessage.value(\get, \direction));
-p.putAll(~buildMessage.value(\set, \direction, 0));
+p.putAll(~buildMessage.value(\set, \direction, 1));
 p.putAll(~buildMessage.value(\get, \speed));
 p.putAll(~buildMessage.value(\set, \speed, 0));
-p.putAll(~buildMessage.value(\set, \speed, 300));
+p.putAll(~buildMessage.value(\set, \speed, 150));
 p.putAll(~buildMessage.value(\get, \currentPosition));
 p.putAll(~buildMessage.value(\set, \currentPosition, 1024));
 p.putAll(~buildMessage.value(\set, \goToTargetPosition, 0));

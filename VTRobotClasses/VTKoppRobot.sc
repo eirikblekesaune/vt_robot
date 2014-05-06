@@ -1,86 +1,4 @@
-VTPinneRobot {
-	var parser, <online = false;
-	var <leftMotor, <rightMotor, <rotationMotor;
-	var refreshTask, <>refreshInterval = 0.01;//refresh is when cached values are sent to the robot
-	var updateTask, <>updateInterval = 1.0;//update is when values are requested from the robot
-	var semaphore;
-
-	*new{arg path;
-		^super.new.init(path);
-	}
-
-	init{arg path_;
-		leftMotor = VTPinneRobotMotor.new(this, \left);
-		rightMotor = VTPinneRobotMotor.new(this, \right);
-		rotationMotor = VTPinneRotationMotor.new(this, \rotation);
-		this.connect(path_);
-		if(this.connected.not, {"PinneRobot is offline".warn});
-		refreshTask = Task({
-			loop{
-				this.refresh;
-				refreshInterval.wait;
-			}
-		}).play;
-		updateTask = Task({
-			loop{
-				this.requestValuesFromRobot([\currentPosition]);
-				updateInterval.wait;
-			}
-		}).play;
-	}
-
-	connect{arg path;
-		parser = VTPinneRobotParser(this, path);
-	}
-
-	connected{
-		^parser.connected;
-	}
-
-	disconnect{
-		parser.disconnect;
-	}
-
-	startRefreshTask{
-		refreshTask.play;
-		updateTask.play;
-	}
-
-	stopRefreshTask{
-		refreshTask.stop;
-		updateTask.stop;
-	}
-
-	sendMsg{arg address, setGet, command, val;
-		parser.sendMsg(address, setGet, command, val);
-	}
-
-	refresh{
-		[leftMotor, rightMotor, rotationMotor].do(_.refresh);
-	}
-
-	stop{
-		[leftMotor, rightMotor, rotationMotor].do(_.stop);
-	}
-
-	requestValuesFromRobot{arg which;//a list of keys to be updated
-		[leftMotor, rightMotor, rotationMotor].do(_.requestValuesFromRobot(which));
-	}
-
-	update{arg theChanged, theChanger, address, key, value;
-//		"Robot update: %".format([theChanged, theChanger, address, key, value]).postln;
-		if(theChanger !== this, {
-
-			switch(address,
-				\left, {this.leftMotor.perform(key.asSetter, value, sync: false);},
-				\right, {this.rightMotor.perform(key.asSetter, value, sync: false);},
-				\rotation, {this.rotationMotor.perform(key.asSetter, value, sync: false);},
-			);
-		});
-	}
-}
-
-VTPinneRobotMotor{
+VTKoppRobotMotor{
 	var robot;
 	var <speed = 0;
 	var <direction = \down; //symbol up or down
@@ -95,18 +13,16 @@ VTPinneRobotMotor{
 	var <stopTime = 0;
 	var <specs;
 	var <directionEnum;
-	var <address;
 	var needsRefresh;//parameters that need to be sent to the robot
 	var outputCache;//parameter values to be sent to the robot
 	var needsUpdate;//parameter values to be update from the robot
 
-	*new{arg robot, address;
-		^super.new.init(robot, address);
+	*new{arg robot;
+		^super.new.init(robot);
 	}
 
-	init{arg robot_, address_;
+	init{arg robot_;
 		robot = robot_;
-		address = address_;
 		directionEnum = TwoWayIdentityDictionary[\down -> 0, \up -> 1];
 		specs = (
 			speed: ControlSpec(0, 512,step:1,default:0),
@@ -213,7 +129,7 @@ VTPinneRobotMotor{
 		var cachedValue, cachedKey;
 		cachedKey = needsRefresh.pop;
 		while({cachedKey.notNil}, {
-			robot.sendMsg(address, \set, cachedKey, outputCache.removeAt(cachedKey));
+			robot.sendMsg(\set, cachedKey, outputCache.removeAt(cachedKey));
 			cachedKey = needsRefresh.pop;
 		});
 	}
@@ -222,12 +138,12 @@ VTPinneRobotMotor{
 		if(which.isNil, {
 			//"reqeusting all".postln;
 			specs.keys.do({arg item;
-				//robot.sendMsg(address, \get, item);
+				//robot.sendMsg(\get, item);
 			});
 			}, {
 				//"Requesting: %\n".postf(which);
 				which.do({arg item;
-					robot.sendMsg(address, \get, item, 0);
+					robot.sendMsg(\get, item, 0);
 				})
 		});
 	}
@@ -242,39 +158,20 @@ VTPinneRobotMotor{
 	}
 }
 
-VTPinneRotationMotor : VTPinneRobotMotor {
-	*new{arg robot, address;
-		^super.new(robot, address);
-	}
-
-	init{arg robot_, address_;
-		super.init(robot_, address_);
-		directionEnum = TwoWayIdentityDictionary[\right -> 0, \left -> 1];
-	}
-}
-
-
-VTPinneRobotParser{
+VTKoppRobotParser{
 	var state = \waitingForCommandByte;
 	var dataBytesReceived = 0;
 	var robot;
 	var <serialPort, readTask, serialPortLock;
 	var currentCommand;
-	var currentAddress;
 	var currentSetGet;
 	var infoBytes;
 	var valueBytes;
 	var valueBytesBuffer;
 
-	classvar <addressMasks, <commandMasks, <setGetMasks, <stateChangeMasks;
+	classvar <commandMasks, <setGetMasks, <stateChangeMasks;
 
 	*initClass{
-		addressMasks = TwoWayIdentityDictionary[
-			\left -> 2r00000000,
-			\right -> 2r00010000,
-			\rotation -> 2r00100000,
-			\global -> 2r00110000
-		];
 		commandMasks = TwoWayIdentityDictionary[
 			\stop -> 2r0000,
 			\speed -> 2r0001,
@@ -340,13 +237,12 @@ VTPinneRobotParser{
 	parseByte{arg byte;
 		//		"Praser state: %".format([state, byte]).postln;
 		if(byte.bitAnd(128) > 0 and: {state == \waitingForCommandByte}, {//if first bit is 1
-			var command, nextParserState, address, setGet;
+			var command, nextParserState, setGet;
 			//byte is a command byte
 			dataBytesReceived = 0;
 			valueBytesBuffer = nil;
 			nextParserState = \waitingForDataByte;
 			command = this.class.commandMasks.getID(byte.bitAnd(2r00001111));//keep the lower 4 bits, and get command symbol
-			address = this.class.addressMasks.getID(byte.bitAnd(2r00110000));//get address symbol
 			setGet = this.class.setGetMasks.getID(byte.bitAnd(2r01000000));//get set or get command
 			switch(command,
 				\stop, {"Received stop command".postln},
@@ -367,7 +263,6 @@ VTPinneRobotParser{
 			);
 			state = nextParserState;
 			currentCommand = command;
-			currentAddress = address;
 			currentSetGet = setGet;
 			}, {
 				if(state == \waitingForDataByte, {
@@ -390,8 +285,8 @@ VTPinneRobotParser{
 					if(byte != 4, {//4 is end of transmission byte according to ASCII
 						infoBytes = infoBytes.add(byte);
 						}, {
-							"INFO: [%]: ".postf(currentAddress);
-							String.newFrom(infoBytes).collect(_.asAscii).postln;
+							"INFO: kopp : ".postln;
+							String.newFrom(infoBytes).collect(_.asAscii);
 							infoBytes = Array.new;
 							this.reset;
 					});
@@ -402,21 +297,20 @@ VTPinneRobotParser{
 	doCommand{
 		var value;
 		value = this.class.parseDataBytes(valueBytes);
-		robot.update(robot, this, currentAddress, currentCommand, value);
+		robot.update(robot, this, currentCommand, value);
 		this.reset;
 	}
 
 	doStateCommand{arg newState;
 		//		"State change: %".format(this.class.stateChangeMasks.getID(newState)).postln;
-		robot.update(robot, this, currentAddress, \state, this.class.stateChangeMasks.getID(newState));
+		robot.update(robot, this, \state, this.class.stateChangeMasks.getID(newState));
 		this.reset;
 	}
 
-	prBuildMessage{ arg address, setGet, command, value;
+	prBuildMessage{ arg setGet, command, value;
 		var msg;
 		msg = [
 			128,//2r10000000 signifies a command byte
-			this.class.addressMasks[address],
 			this.class.setGetMasks[setGet],
 			this.class.commandMasks[command],
 		].reduce(\bitOr).asArray;
@@ -426,13 +320,13 @@ VTPinneRobotParser{
 		^msg;
 	}
 
-	sendMsg{arg addr, setGet, command, value;
-		//"Sending message: %".format([addr, setGet, command, value]).postln;
+	sendMsg{arg setGet, command, value;
+//		"Sending message: %".format([setGet, command, value]).postln;
 		forkIfNeeded{
 			serialPortLock.wait;
-			serialPort.putAll(this.prBuildMessage(addr, setGet, command, value));
+			serialPort.putAll(this.prBuildMessage(setGet, command, value));
 			serialPortLock.signal;
-		}
+		};
 	}
 
 	connect{arg path;
@@ -455,5 +349,85 @@ VTPinneRobotParser{
 
 	*parseDataBytes{arg bytes;
 		^bytes.at(0).leftShift(7).bitOr(bytes.at(1));
+	}
+}
+
+
+VTKoppRobot {
+	var parser, <online = false;
+	var <motor;
+	var refreshTask, <>refreshInterval = 0.01;//refresh is when cached values are sent to the robot
+	var updateTask, <>updateInterval = 1.0;//update is when values are requested from the robot
+	var semaphore;
+	var <>stateChangeAction;
+
+	*new{arg path;
+		^super.new.init(path);
+	}
+
+	init{arg path_;
+		motor = VTKoppRobotMotor.new(this);
+		this.connect(path_);
+		if(this.connected.not, {"KoppRobot is offline".warn});
+		refreshTask = Task({
+			loop{
+				this.refresh;
+				refreshInterval.wait;
+			}
+		}).play;
+		updateTask = Task({
+			loop{//this doesnt work
+				this.requestValuesFromRobot([\currentPosition]);
+				updateInterval.wait;
+			}
+		});
+	}
+
+	connect{arg path;
+		parser = VTKoppRobotParser(this, path);
+	}
+
+	connected{
+		^parser.connected;
+	}
+
+	disconnect{
+		parser.disconnect;
+	}
+
+	startRefreshTask{
+		refreshTask.play;
+		updateTask.play;
+	}
+
+	stopRefreshTask{
+		refreshTask.stop;
+		updateTask.stop;
+	}
+
+	sendMsg{arg setGet, command, val;
+		parser.sendMsg(setGet, command, val);
+	}
+
+	refresh{
+		motor.refresh;
+	}
+
+	stop{
+		motor.stop;
+	}
+
+	requestValuesFromRobot{arg which;//a list of keys to be updated
+		motor.requestValuesFromRobot(which);
+	}
+
+	update{arg theChanged, theChanger, key, value;
+		"Kopp Robot update: %".format([theChanged, theChanger, key, value]).postln;
+		if(theChanger !== this, {
+			this.motor.perform(key.asSetter, value, sync: false);
+			if(key == \state, {
+				this.stateChangeAction.value(value);
+			});
+		});
 	}
 }

@@ -11,13 +11,14 @@
 );
 
 
-~pinne = ~pinne5;
+~pinne = ~pinner[1];
 ~pinne.stop;
-~pinne.leftMotor.speed_(80);
+~pinne.leftMotor.speed_(120);
 ~pinne.leftMotor.speed_(0);
 ~pinne.leftMotor.direction_(\down);
 ~pinne.leftMotor.direction_(\up);
-~pinne.rightMotor.speed_(80);
+~pinne.rightMotor.speed_(100);
+~pinne.rightMotor.stop(1000);
 ~pinne.rightMotor.speed_(0);
 ~pinne.rightMotor.direction_(\down);
 ~pinne.rightMotor.direction_(\up);
@@ -28,6 +29,17 @@
 ~pinne.leftMotor.currentPosition;
 ~pinne.rightMotor.currentPosition;
 ~pinne.rotationMotor.currentPosition;
+
+~pinne.leftMotor.speed_(120);
+~pinne.rightMotor.speed_(120);
+~pinne.leftMotor.targetPosition_(200);
+~pinne.rightMotor.targetPosition_(200);
+~pinne.leftMotor.goToTargetPosition(10);
+~pinne.rightMotor.goToTargetPosition(10);
+~pinne.leftMotor.speedScaling_(200);
+~pinne.rightMotor.speedScaling_(200);
+
+
 
 ~pinne.leftMotor.goToParkingPosition;
 ~pinne.rightMotor.goToParkingPosition;
@@ -44,21 +56,39 @@ f.stop;
 	\2: (
 		rotation: (minPosition: 200, maxPosition: 800),
 		left: (minPosition: 0, maxPosition: 590),
-		right: (minPosition: 0, maxPosition: 590)//traad maa forlenges
+		right: (minPosition: 0, maxPosition: 590)
 	),
 	\3: (
 		rotation: (minPosition: 367, maxPosition: 576),
 		left: (minPosition: 0, maxPosition: 580),
-		right: (minPosition: 0, maxPosition: 580)//traad maa forlenges
+		right: (minPosition: 0, maxPosition: 580)
 	),
 	\4: (
 		rotation: (minPosition: 200, maxPosition: 800),
 		left: (minPosition: 0, maxPosition: 650),
-		right: (minPosition: 0, maxPosition: 650)//traad maa forlenges
+		right: (minPosition: 0, maxPosition: 650)
 	),
 	\5: (
-		rotation: (minPosition: 360, maxPosition: 506),
+		rotation: (minPosition: 485, maxPosition: 550),
 		left: (minPosition: 0, maxPosition: 600),
-		right: (minPosition: 0, maxPosition: 600)//traad maa forlenges
+		right: (minPosition: 0, maxPosition: 600)//noe rart med rot pot feste her
 	),
+	\6: (
+		rotation: (minPosition: 406, maxPosition: 722),
+		left: (minPosition: 0, maxPosition: 600),
+		right: (minPosition: 0, maxPosition: 600)//noe rart med rot pot feste her
+	),
+	\7: (
+		rotation: (minPosition: 300, maxPosition: 700),//rot pot funker ikke
+		left: (minPosition: 0, maxPosition: 600),
+		right: (minPosition: 0, maxPosition: 600)
+	),
+	\8: (
+		rotation: (minPosition: 300, maxPosition: 700),//rot pot funker ikke
+		left: (minPosition: 0, maxPosition: 600),
+		right: (minPosition: 0, maxPosition: 600)
+	)
 )
+
+
+
