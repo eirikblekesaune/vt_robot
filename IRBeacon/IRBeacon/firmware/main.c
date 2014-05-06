@@ -111,10 +111,13 @@ int main(void)
 	TCCR0B |= (1 << CS00); //set prescaler to 1
 	OCR0A = 104;//output compare for getting 38kHz
 	sei();
-	
+	unsigned char input;
 	//start timer interrupts
     while(1)
     {
+			input = ~(PINA);
+			address = (unsigned long)(input);
+
 			sendNECByte(leadSequence[0]);
 			_delay_ms(50);
 			sendNECByte(leadSequence[1]);
@@ -123,7 +126,6 @@ int main(void)
 			_delay_ms(50);
 			sendNECByte(address | magicNumber);
 			//read address bytes again
-			address = (unsigned long)(PINA);
 			_delay_ms(100);
     }
 }
