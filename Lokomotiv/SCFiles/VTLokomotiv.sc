@@ -225,6 +225,8 @@ VTLokomotiv {
 			\pidPValue -> 0x0A,
 			\pidIValue -> 0x0B,
 			\pidDValue -> 0x0C,
+			\glideToSpeed -> 0x0D,
+			\endSpeed -> 0x0E,
 			\endTransmission -> 0x0F
 		];
 		setGet = TwoWayIdentityDictionary[

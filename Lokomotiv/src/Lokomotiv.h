@@ -7,7 +7,6 @@
 #define TWI_FREQ 50000L
 #include "Wire.h"
 
-
 class Lokomotiv{
 public:
 	Lokomotiv();
@@ -16,6 +15,7 @@ public:
 	long GetDistanceFromLastIRBeaconDetection();
 	
 	long GetSpeed();
+	long GetEndSpeed() {_motor->GetEndSpeed();};
 	long GetDirection();
 	long GetTargetPosition();
 	long GetDistanceFromLastAddress();
@@ -27,8 +27,10 @@ public:
 	double GetPidIValue();
 	double GetPidDValue();
 
-	void SetSpeed(long val);
-	void SetDirection(long val);
+	void SetSpeed(long val) {_motor->SetSpeed(static_cast<speed_t>(val));};
+	void SetEndSpeed(long val) {_motor->SetEndSpeed(static_cast<speed_t>(val));};
+	void SetGlideToSpeed(long val) {_motor->GlideToSpeed(static_cast<int16_t>(val));};
+	void SetDirection(long val) {_motor->SetDirection(static_cast<int16_t>(val));};
 	void SetTargetPosition(long val);
 	void SetDistanceFromLastAddress(long val);
 	void SetLed(long val);
@@ -38,7 +40,7 @@ public:
 	void SetPidPValue(double val);
 	void SetPidIValue(double val);
 	void SetPidDValue(double val);
-	void Stop() {}
+	void Stop(long val) {_motor->Stop(static_cast<int16_t>(val));};
 	void Init();
 	void Update();
 	void GotAddr(unsigned char);
@@ -51,8 +53,6 @@ private:
 	long _lastBeaconAddressUpdate;
 	static const long _beaconAddressUpdateInterval;
 
-	int16_t _speed;
-	long _direction;
 	long _targetPosition;
 	long _distanceFromLastAddress;
 	int16_t _led;

@@ -19,6 +19,8 @@ enum command_t
 	CMD_PID_P_VALUE = 0x0A,
 	CMD_PID_I_VALUE = 0x0B,
 	CMD_PID_D_VALUE = 0x0C,
+	CMD_GLIDE_TO_SPEED = 0x0D,
+	CMD_END_SPEED = 0x0E,
 	CMD_END_TRANSMISSION = 0x0F,
   CMD_UNKNOWN
 };
@@ -147,6 +149,21 @@ static void DebugPrint(int msg)
   Serial.print(msg);
   Serial.write(4);
 }
+
+static void DebugPrint(float msg)
+{
+  Serial.write(BYTE_COMMAND | SET_MESSAGE | CMD_INFO );
+  Serial.print(msg);
+  Serial.write(4);
+}
+
+static void DebugPrint(long msg)
+{
+  Serial.write(BYTE_COMMAND | SET_MESSAGE | CMD_INFO );
+  Serial.print(msg);
+  Serial.write(4);
+}
+
 
 #define DEBUG
 #ifdef DEBUG 

@@ -2,30 +2,53 @@
 #define LOKOMOTIV_MOTOR_H
 
 #include "PID_v1.h"
-#include "VNH5019Driver.h"
 #include "HallEncoder.h"
+#include "MotorDriver.h"
 
-class LokomotivMotor {
+#define NO_TARGET -1
+class LokomotivMotor: public MotorDriver{
 public:
-	LokomotivMotor(VNH5019Driver *driver, int isrIndex);
+	LokomotivMotor();
 	~LokomotivMotor();
 	static const int kSpeedMin;
 	static const int kSpeedMax;
 	static const int kSpeedStop;
-	void SetSpeed(int speed) {driver_->SetSpeed(speed);};
-	void SetDirection(int direction) {driver_->SetDirection(direction);};
-	int GetSpeed() {return driver_->GetSpeed();};
-	int GetMeasuredSpeed() {return encoder_->CalculateSpeed();}
-	int GetDirection() {return driver_->GetDirection();};
+	static const long kSpeedUpdateInterval;
+	void init() {};
+	void SetSpeed(speed_t speed);
+	void Stop(int stopTime);
+	void SetEndSpeed(speed_t endSpeed) {_endSpeed = endSpeed;};
+	speed_t GetEndSpeed() {return _endSpeed;};
+	void GlideToSpeed(int duration);
+	speed_t GetStartSpeed() {return _startSpeed;};
+	void InterpolateSpeed(speed_t begin, speed_t target, int duration);
+	void SetDirection(int direction);
+	void SetBrake(speed_t brake) {};
+	int GetMeasuredSpeed() {return _encoder->CalculateSpeed();}
+	bool GetPidEnabled() {return _pidEnabled;};
+	void SetPidEnabled(bool val) {_pidEnabled = val;};
 	void Update();
 	void ResetPositionCounter();
+	void UpdateDirection();
 private:
-	VNH5019Driver *driver_;
-	PID *pid_;
-	HallEncoder *encoder_;
-	double setpoint_;
-	double input_;
-	double output_;
+	PID *_pid;
+	int _encoderISRNumber;
+	bool _pidEnabled;
+	HallEncoder *_encoder;
+	double _setpoint;
+	double _input;
+	double _output;
+	bool _isInterpolating;
+	speed_t _beginSpeed;
+	speed_t _endSpeed;
+	speed_t _startSpeed;
+	bool _hasReachedEndSpeed();
+	long _lastSpeedUpdateTime;
+	float _speedInterpolationDelta;
+	unsigned char _INA;
+	unsigned char _INB;
+	unsigned char _PWM;
+	
 };
 #endif
 

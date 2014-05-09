@@ -4,12 +4,16 @@
 
 Lokomotiv *lok;
 LokomotivAPIParser *parser;
-unsigned long interval = 1000;
+unsigned long updateInterval = 10;
 unsigned long lastTime;
 
 void setup()
 {	
 	lok = new Lokomotiv();
+	Serial1.begin(9600);
+	while(!Serial1) {
+		;
+	}
 	Serial.begin(9600);
 	while(!Serial) {
 		;
@@ -25,9 +29,10 @@ void loop()
 	{
 		parser->parseIncomingByte(Serial.read());
 	}
-	lok->Update();
-	if(millis() >= (interval + lastTime))
+	//lok->Update();
+	if(millis() >= (updateInterval + lastTime))
 	{
+		lok->Update();
 		lastTime = millis();
 	}
 }

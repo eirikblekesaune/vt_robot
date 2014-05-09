@@ -101,7 +101,7 @@ void LokomotivAPIParser::_executeCommand()
 			switch(_currentCommand)
 			{
 				case CMD_STOP:
-					_robot->Stop();
+					_robot->Stop(_decodeIntegerValue(_data));
 					break;
 				case CMD_SPEED:
 					_robot->SetSpeed(_decodeIntegerValue(_data));
@@ -141,6 +141,12 @@ void LokomotivAPIParser::_executeCommand()
 					break;
 				case CMD_PID_D_VALUE:
 					_robot->SetPidDValue(_decodeDecimalValue(_data));
+					break;
+				case CMD_GLIDE_TO_SPEED:
+					_robot->SetGlideToSpeed(_decodeIntegerValue(_data));
+					break;
+				case CMD_END_SPEED:
+					_robot->SetEndSpeed(_decodeIntegerValue(_data));
 					break;
 				default:
 					DebugPrint("Unknown command");
@@ -186,6 +192,11 @@ void LokomotivAPIParser::_executeCommand()
 					break;
 				case CMD_PID_D_VALUE:
 					ReturnGetValue(CMD_PID_D_VALUE,_robot->GetPidDValue());
+					break;
+				case CMD_GLIDE_TO_SPEED:
+					break;
+				case CMD_END_SPEED:
+					ReturnGetValue(CMD_END_SPEED,_robot->GetEndSpeed());
 					break;
 				default:
 					DebugPrint("Unknown command");

@@ -4,8 +4,18 @@
 ~controller = {arg ...args; "changed: %: %".format(args, args[0].perform(args[1].asSymbol)).postln};
 ~lok.addDependant(~controller);
 )
-~lok.set(\speed, 512.rand.postln);
-~lok.set(\direction, -1);
+~lok.set(\speed, 0);
+~lok.set(\direction, 2.rand);
+~lok.set(\speed, 2.rand);
+
+~lok.set(\stop, 3000);
+~lok.set(\glideToSpeed, 3000);
+~lok.set(\endSpeed, 0);
+
+9216.asBinaryString(16)
+
+2r10010000000000
+
 ~lok.set(\targetPosition, 123);
 ~lok.set(\distanceFromLastAddress, -2198798);
 ~lok.set(\led, 0);
