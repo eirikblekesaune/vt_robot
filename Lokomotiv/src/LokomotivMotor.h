@@ -2,7 +2,6 @@
 #define LOKOMOTIV_MOTOR_H
 
 #include "PID_v1.h"
-#include "HallEncoder.h"
 #include "MotorDriver.h"
 
 #define NO_TARGET -1
@@ -24,7 +23,6 @@ public:
 	void InterpolateSpeed(speed_t begin, speed_t target, int duration);
 	void SetDirection(int direction);
 	void SetBrake(speed_t brake) {};
-	int GetMeasuredSpeed() {return _encoder->CalculateSpeed();}
 	bool GetPidEnabled() {return _pidEnabled;};
 	void SetPidEnabled(bool val) {_pidEnabled = val;};
 	void Update();
@@ -32,9 +30,7 @@ public:
 	void UpdateDirection();
 private:
 	PID *_pid;
-	int _encoderISRNumber;
 	bool _pidEnabled;
-	HallEncoder *_encoder;
 	double _setpoint;
 	double _input;
 	double _output;

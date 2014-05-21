@@ -1,16 +1,24 @@
 (
-~port = SerialPort('/dev/tty.usbmodem411');
-~lok = VTLokomotiv.new(~port, "eirik");
+~coordinator = XBeeCoordinatorAPIMode(SerialPort('/dev/tty.usbserial-A600ezu2', 9600));
+~coordinator.start;
+//~coordinator.rxAction_({arg byte; "Coordinator received: \t%\t%\t%".format(byte.asHexString(2), byte, byte.asAscii).postln;});
+~coordinator.sendATCommand('NodeDiscover');
+)
+(
+
+~lok = VTLokomotiv.new(~coordinator, ~coordinator.getChildDeviceByName('TOG08').addressLo);
 ~controller = {arg ...args; "changed: %: %".format(args, args[0].perform(args[1].asSymbol)).postln};
 ~lok.addDependant(~controller);
 )
-~lok.set(\speed, 0);
+
+~coordinator.sendATCommand('NodeDiscover', "TOG08".ascii);
+~lok.set(\speed, 512);
 ~lok.set(\direction, 2.rand);
 ~lok.set(\speed, 2.rand);
 
-~lok.set(\stop, 3000);
+~lok.set(\stop, 5000);
 ~lok.set(\glideToSpeed, 3000);
-~lok.set(\endSpeed, 0);
+~lok.set(\endSpeed, 150);
 
 9216.asBinaryString(16)
 
@@ -19,7 +27,6 @@
 ~lok.set(\targetPosition, 123);
 ~lok.set(\distanceFromLastAddress, -2198798);
 ~lok.set(\led, 0);
-~lok.set(\measuredSpeed, -9423);
 ~lok.set(\lastDetectedAddress, 14513457);
 ~lok.set(\pidPValue, -1.1345);
 ~lok.set(\pidIValue, 2.2);

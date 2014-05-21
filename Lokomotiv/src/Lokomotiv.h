@@ -1,11 +1,11 @@
 #ifndef LOKOMOTIV_H
 #define LOKOMOTIV_H
 #include "IRReader.h"
-#include "LedDimmer.h"
 #include "LokomotivMotor.h"
+#include "LokomotivSpeedometer.h"
 //Change the default i2c rate
-#define TWI_FREQ 50000L
-#include "Wire.h"
+//#define TWI_FREQ 50000L
+//#include "Wire.h"
 
 class Lokomotiv{
 public:
@@ -35,7 +35,6 @@ public:
 	void SetDistanceFromLastAddress(long val);
 	void SetLed(long val);
 	void SetState(long val);
-	void SetMeasuredSpeed(long val);
 	void SetLastDetectedAddress(long val);
 	void SetPidPValue(double val);
 	void SetPidIValue(double val);
@@ -49,6 +48,7 @@ public:
 private:
 	LokomotivMotor *_motor;
 	IRReader *_irReader;
+	LokomotivSpeedometer *_speedometer;
 	unsigned char _lastBeaconAddress;
 	long _lastBeaconAddressUpdate;
 	static const long _beaconAddressUpdateInterval;

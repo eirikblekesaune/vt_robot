@@ -28,6 +28,7 @@ Lokomotiv::Lokomotiv() :
 	_pidDValue(0)
 {
 	_motor = new LokomotivMotor();
+	_speedometer = new LokomotivSpeedometer();
 	//_irReader = new IRReader(irReaderReceivePin, this);
 }
 
@@ -38,7 +39,7 @@ long Lokomotiv::GetTargetPosition(){return _targetPosition;}
 long Lokomotiv::GetDistanceFromLastAddress(){return _distanceFromLastAddress;}
 long Lokomotiv::GetLed(){return _led;}
 long Lokomotiv::GetState(){return _state;}
-long Lokomotiv::GetMeasuredSpeed(){return _measuredSpeed;}
+long Lokomotiv::GetMeasuredSpeed(){return _speedometer->GetMeasuredSpeed();};
 long Lokomotiv::GetLastDetectedAddress(){return _lastDetectedAddress;}
 double Lokomotiv::GetPidPValue(){return _pidPValue;}
 double Lokomotiv::GetPidIValue(){return _pidIValue;}
@@ -60,7 +61,6 @@ void Lokomotiv::SetLed(long val)
 //	}
 }
 void Lokomotiv::SetState(long val){_state = val;}
-void Lokomotiv::SetMeasuredSpeed(long val){_measuredSpeed = val;}
 void Lokomotiv::SetLastDetectedAddress(long val){_lastDetectedAddress = val;}
 void Lokomotiv::SetPidPValue(double val){_pidPValue = val;}
 void Lokomotiv::SetPidIValue(double val){_pidIValue = val;}

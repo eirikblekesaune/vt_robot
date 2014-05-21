@@ -6,16 +6,19 @@ Lokomotiv *lok;
 LokomotivAPIParser *parser;
 unsigned long updateInterval = 10;
 unsigned long lastTime;
+unsigned long lastHeartbeat;
 
 void setup()
 {	
+	//shut down the USB clock, which itnerferes with timer1
+	//PRR1 |= (1<<PRUSB);
+	//Clear timer1 settings
+	TCCR1A = 0x00;
+	TCCR1B = 0x00;
+	
 	lok = new Lokomotiv();
 	Serial1.begin(9600);
 	while(!Serial1) {
-		;
-	}
-	Serial.begin(9600);
-	while(!Serial) {
 		;
 	}
 	lastTime = millis();
@@ -25,9 +28,9 @@ void setup()
 
 void loop()
 {
-	while(Serial.available() > 0)
+	while(Serial1.available() > 0)
 	{
-		parser->parseIncomingByte(Serial.read());
+		parser->parseIncomingByte(Serial1.read());
 	}
 	//lok->Update();
 	if(millis() >= (updateInterval + lastTime))

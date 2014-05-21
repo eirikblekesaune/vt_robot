@@ -113,25 +113,17 @@ void LokomotivAPIParser::_executeCommand()
 					_robot->SetTargetPosition(_decodeIntegerValue(_data));
 					break;
 				case CMD_DISTANCE_FROM_LAST_ADDRESS:
-					//will remove after implementation is done
-					_robot->SetDistanceFromLastAddress(_decodeIntegerValue(_data));
 					break;
 				case CMD_LED:
 					_robot->SetLed(_decodeIntegerValue(_data));
 					break;
 				case CMD_STATE:
-					//will remove after implementation is done
-					_robot->SetState(_decodeIntegerValue(_data));
 					break;
 				case CMD_INFO:
 					break;
 				case CMD_MEASURED_SPEED:
-					//will remove after implementation is done
-					_robot->SetMeasuredSpeed(_decodeIntegerValue(_data));
 					break;
 				case CMD_LAST_DETECTED_ADDRESS:
-					//will remove after implementation is done
-					_robot->SetLastDetectedAddress(_decodeIntegerValue(_data));
 					break;
 				case CMD_PID_P_VALUE:
 					_robot->SetPidPValue(_decodeDecimalValue(_data));

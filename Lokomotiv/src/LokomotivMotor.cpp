@@ -5,13 +5,11 @@ const int LokomotivMotor::kSpeedStop = LokomotivMotor::kSpeedMin;
 const int LokomotivMotor::kSpeedMax = 511;
 const long LokomotivMotor::kSpeedUpdateInterval = 50;
 
-
 LokomotivMotor::LokomotivMotor() :
 	_pidEnabled(false),
 	_INA(12),
 	_INB(11),
 	_PWM(10),
-	_encoderISRNumber(4),
 	_endSpeed(50),
 	_lastSpeedUpdateTime(0),
 	_isInterpolating(false)
@@ -33,7 +31,6 @@ LokomotivMotor::LokomotivMotor() :
 //	//set max speed
 	ICR1 = 0x01FF;
 
-	//encoder_ = new HallEncoder(hallISRIndex);
 	//pid_ = new PID(&setpoint_, &input_, &output_, 4.0, 0.2, 1.0, DIRECT);
 	//pid_->SetOutputLimits(LokomotivMotor::kSpeedMin, LokomotivMotor::kSpeedMax);
 	//pid_->SetMode(AUTOMATIC);
@@ -55,9 +52,9 @@ void LokomotivMotor::Update()
 			_lastSpeedUpdateTime = millis();
 		}
 	}
-//	input_ = encoder_->CalculateSpeed();
 //	if(pidEnabled_)
 //	{
+//	input_ = _speedometer->CalculateSpeed();
 //		if(pid_->Compute())
 //		{
 //			if(driver_->GetSpeed() != kSpeedStop)
@@ -70,8 +67,6 @@ void LokomotivMotor::Update()
 
 void LokomotivMotor::SetSpeed(speed_t newSpeed)
 {
-	DebugPrint("speedin");
-	DebugPrint(newSpeed);
 	if(newSpeed > kSpeedMax)
 		newSpeed = kSpeedMax;
 	if(newSpeed < kSpeedMin)
