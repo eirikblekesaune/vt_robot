@@ -27,7 +27,7 @@ VTLokomotiv {
 		xbeeDevice = xbeeDevice_;
 		remoteXBeeDeviceAddress = remoteXBeeDeviceAddress_;
 		this.device.rxAction_({arg data;
-			"Parsing incoming lokomotiv data".postln;
+			//"Parsing incoming lokomotiv data".postln;
 			data.do{arg item; this.prParseByte(item); };
 		});
 		pid = (P: 0.0, I: 0.0, D: 0.0);
@@ -199,7 +199,7 @@ VTLokomotiv {
 	}
 
 	prSend{arg msg;
-		msg = msg.asString.ascii.as(Int8Array);
+		//msg = msg.asString.ascii.as(Int8Array);
 		this.device.sendTXData(msg);
 	}
 

@@ -101,6 +101,7 @@ void LokomotivAPIParser::_executeCommand()
 			switch(_currentCommand)
 			{
 				case CMD_STOP:
+					DebugPrint("Stoping");
 					_robot->Stop(_decodeIntegerValue(_data));
 					break;
 				case CMD_SPEED:
