@@ -2,79 +2,51 @@
  * PWMDimmer.c
  *
  * Created: 27.01.2014 18:36:22
- *  Author: Eirik
+ *  Author: Eirik Blekesaune
+ *
+ *  Much of the USI implementation has been based on
+ *  Adam Honse's usi_i2c_slave.c/h (). 
  */ 
 
 #define F_CPU 20000000
 #include <avr/io.h>
 #include <util/delay.h>
-#include "usi_i2c_slave.h"
+#include "LEDDimmerSimple.h"
+#include "LEDDimmer_USI.h"
 
-#define LED_PIN PORTA5
-#define LED_PORT PORTA
-#define LED_DDR DDRA
-#define DEVICE_ADDRESS 2
+#define ADDR_PINS PINA
+#define ADDR_PIN0 PINA3
+#define ADDR_PIN1 PINA2
+#define ADDR_PIN2 PINA1
+#define ADDR_PIN3 PINA0
 
-//command message enum
-enum _command_t {
-	NO_CMD,
-	LED_VALUE_CMD,
-	FADE_LED_CMD,
-	FLASH_LED_CMD
-} command_t;
-
-uint32_t inData = 0;
-uint8_t command = 0;
-extern char* USI_Slave_register_buffer[];
-
-uint16_t ledValue = 0;
-double fadeFactor = 1.0;
-//set pullups for dip dwitch pins
-//
-//
-void setFadeValues(uint16_t targetValue, uint16_t fadeTime)
+uint8_t readI2CAddressPins()
 {
+	uint8_t result;
+	result = ADDR_PINS & (1<<ADDR_PIN0);
+	result |= ADDR_PINS & (1<<ADDR_PIN1);
+	result |= ADDR_PINS & (1<<ADDR_PIN2);
+	result |= ADDR_PINS & (1<<ADDR_PIN3);
+	return result;
 }
 
 int main(void)
 {
-	//set pin direction for PWM pin
-	LED_DDR |= (1<<LED_PIN);
-	LED_PORT &= ~(1<<LED_PIN);
-	TCCR1A = 0b00100000;
-	TCCR1B = 0b00010001;
-	ICR1 = 0x0FFF;
-	OCR1B = 0x0000;
+	//init dip switch pin pullups
+	PORTA |= 0x0F;
+	//set switch pins as inputs
+	DDRA = 0x00;
+
+	InitLEDDimmer();
+	InitUSI(readI2CAddressPins());
 	sei();
-	//initialize I2C module
-	USI_I2C_Init(DEVICE_ADDRESS);
-	USI_Slave_register_buffer[0] = (char*)&command;
-	USI_Slave_register_buffer[1] = (char*)&inData;
-	USI_Slave_register_buffer[2] = (char*)&inData + 1; 
-	USI_Slave_register_buffer[3] = (char*)&inData + 2;
-	USI_Slave_register_buffer[4] = (char*)&inData + 3;
 
 	while(1)
-    {
-		
+	{
 		//Find the I2C address by reading the dip switch
-		////if this has changed
-		////reinit the i2c connection	
-		if(command != NO_CMD)
-		{
-			switch(command)
-			{
-				case LED_VALUE_CMD:
-					OCR1B = inData;
-					break;
-				case FADE_LED_CMD:
-					setFadeValues((uint16_t)&inData, (uint16_t)&inData + 2);
-			}
-			command = NO_CMD;
-		}
 
-
-		asm volatile ("nop");	
+		asm volatile ("nop");
+		SetI2CAddress(readI2CAddressPins());
 		_delay_ms(10);
 	}
 }
