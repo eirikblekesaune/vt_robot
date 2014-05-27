@@ -7,9 +7,14 @@
 volatile uint32_t ticks = 0;
 volatile uint32_t binks = 0;
 
-void registerSpeedTick()
+void registerForwardSpeedTick()
 {
-	ticks = ticks + 1;
+	ticks++; 
+}
+
+void registerBackwardSpeedTick()
+{
+	ticks--;
 }
 
 ISR(TIMER3_COMPA_vect)
@@ -22,7 +27,7 @@ LokomotivSpeedometer::LokomotivSpeedometer() :
 {
 	cli();
 	//Interrupt no. 4 (INT.6) will register ticks from the encoder
-	attachInterrupt(_isrNumber, registerSpeedTick, CHANGE);
+	attachInterrupt(_isrNumber, registerForwardSpeedTick, CHANGE);
 	//Using timer3 for calculating speed, i.e. ticks per second.
 	//CTC mode with OCR3A as TOP
 	TCCR3A = 0;
@@ -40,7 +45,22 @@ long LokomotivSpeedometer::GetMeasuredSpeed()
 {
 	long result;
 	result = ticks;
-	DebugPrint("binks");
-	DebugPrint(binks);
 	return result;
+}
+
+long LokomotivSpeedometer::GetCurrentTicks()
+{
+	long result;
+	result = ticks;
+	return result;
+}
+
+void LokomotivSpeedometer::DirectionChanged(int newDirection)
+{
+	if(newDirection == 0)
+	{
+		attachInterrupt(_isrNumber, registerForwardSpeedTick, CHANGE);
+	} else {
+		attachInterrupt(_isrNumber, registerBackwardSpeedTick, CHANGE);
+	}
 }

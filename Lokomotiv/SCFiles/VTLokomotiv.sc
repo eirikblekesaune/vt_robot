@@ -210,7 +210,7 @@ VTLokomotiv {
 			\direction -> 0x02,
 			\targetPosition -> 0x03,
 			\distanceFromLastAddress -> 0x04,
-			\led -> 0x05,
+			\peripheral -> 0x05,
 			\state -> 0x06,
 			\info -> 0x07,
 			\measuredSpeed -> 0x08,
@@ -220,7 +220,9 @@ VTLokomotiv {
 			\pidDValue -> 0x0C,
 			\glideToSpeed -> 0x0D,
 			\endSpeed -> 0x0E,
-			\endTransmission -> 0x0F
+			\endTransmission -> 0x0F,
+			\requestPeripheral -> 0x10,
+			\motorMode -> 0x11
 		];
 		setGet = TwoWayIdentityDictionary[
 			\set -> 0x00,

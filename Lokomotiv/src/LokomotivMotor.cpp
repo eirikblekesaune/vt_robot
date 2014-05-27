@@ -5,7 +5,8 @@ const int LokomotivMotor::kSpeedStop = LokomotivMotor::kSpeedMin;
 const int LokomotivMotor::kSpeedMax = 511;
 const long LokomotivMotor::kSpeedUpdateInterval = 50;
 
-LokomotivMotor::LokomotivMotor() :
+LokomotivMotor::LokomotivMotor(LokomotivSpeedometer* speedometer) :
+	_speedometer(speedometer),
 	_pidEnabled(false),
 	_INA(12),
 	_INB(11),
@@ -91,6 +92,7 @@ void LokomotivMotor::SetDirection(int newDirection)
 	if(newDirection>1)
 		newDirection = 1;
 	_direction = newDirection;
+	_speedometer->DirectionChanged(newDirection);
 	UpdateDirection();
 }
 

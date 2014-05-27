@@ -1,8 +1,10 @@
 (
 ~coordinator = XBeeCoordinatorAPIMode(SerialPort('/dev/tty.usbserial-A600ezu2', 9600));
+//~coordinator = XBeeCoordinatorAPIMode(SerialPort('/dev/tty.usbserial-13X2XBD8', 9600));
 ~coordinator.start;
-//~coordinator.rxAction_({arg byte; "Coordinator received: \t%\t%\t%".format(byte.asHexString(2), byte, byte.asAscii).postln;});
-//~coordinator.sendATCommand('NodeDiscover');
+// ~coordinator.rxAction_({arg byte; "Coordinator received: \t%\t%\t%".format(byte.asHexString(2), byte, byte.asAscii).postln;});
+~coordinator.rxAction_(nil);
+~coordinator.sendATCommand('NodeDiscover');
 )
 (
 ~lok = VTLokomotiv.new(~coordinator, 1084801684);
@@ -14,12 +16,21 @@
 ~coordinator.sendATCommand('NodeDiscover', "TOG08".ascii);
 ~coordinator.childDevices
 ~lok.set(\speed, 100);
-~lok.set(\direction, 2.rand);
+~lok.set(\speed, 0);
+~lok.set(\direction, 1);//right, position decrements (minus) backward
+~lok.set(\direction, 0);//left, position increments (pluss) forward
+~lok.set(\speed, 0);
+~lok.get(\measuredSpeed); //10441
+~lok.get(\distanceFromLastAddress);
+~lok.get(\lastDetectedAddress);
+
+//0 is the driection of the arduino chassis
+
 ~lok.set(\speed, 2.rand);
 
-~lok.set(\stop, 5000);
+~lok.set(\stop, 4000);
 ~lok.set(\glideToSpeed, 3000);
-~lok.set(\endSpeed, 0);
+~lok.set(\endSpeed, 150);
 
 9216.asBinaryString(16)
 
@@ -41,7 +52,7 @@
 ~lok.get(\distanceFromLastAddress);
 ~lok.get(\led);
 ~lok.get(\state);
-~lok.get(\measuredSpeed);
+~lok.get(\measuredSpeed); //10441
 ~lok.get(\lastDetectedAddress);
 ~lok.get(\pid);
 ~lok.get(\pidPValue);
@@ -69,3 +80,5 @@ f = fork {512.do{arg i;
 f.stop;
 ~lok.set(\led, 120);
 ~lok.set(\led, 0);
+
+

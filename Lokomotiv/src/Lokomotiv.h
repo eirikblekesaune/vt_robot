@@ -4,8 +4,8 @@
 #include "LokomotivMotor.h"
 #include "LokomotivSpeedometer.h"
 //Change the default i2c rate
-//#define TWI_FREQ 50000L
-//#include "Wire.h"
+#define TWI_FREQ 50000L
+#include "Wire.h"
 
 class Lokomotiv{
 public:
@@ -19,7 +19,7 @@ public:
 	long GetDirection();
 	long GetTargetPosition();
 	long GetDistanceFromLastAddress();
-	long GetLed();
+	long GetPeripheral(long data);
 	long GetState();
 	long GetMeasuredSpeed();
 	long GetLastDetectedAddress();
@@ -33,7 +33,7 @@ public:
 	void SetDirection(long val) {_motor->SetDirection(static_cast<int16_t>(val));};
 	void SetTargetPosition(long val);
 	void SetDistanceFromLastAddress(long val);
-	void SetLed(long val);
+	void SetPeripheral(long val);
 	void SetState(long val);
 	void SetLastDetectedAddress(long val);
 	void SetPidPValue(double val);
@@ -49,8 +49,8 @@ private:
 	LokomotivMotor *_motor;
 	IRReader *_irReader;
 	LokomotivSpeedometer *_speedometer;
-	unsigned char _lastBeaconAddress;
-	long _lastBeaconAddressUpdate;
+	long _lastDetectedAddressUpdate;
+	long _encoderCounterAtLastAddress;
 	static const long _beaconAddressUpdateInterval;
 
 	long _targetPosition;

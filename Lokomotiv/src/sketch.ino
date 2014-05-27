@@ -33,9 +33,10 @@ void loop()
 		parser->parseIncomingByte(Serial1.read());
 	}
 	//lok->Update();
-	if(millis() >= (updateInterval + lastTime))
-	{
-		lok->Update();
-		lastTime = millis();
-	}
+	lok->Update();
+//	if(millis() >= (updateInterval + lastTime))
+//	{
+//		lok->Update();
+//		lastTime = millis();
+//	}
 }

@@ -101,7 +101,6 @@ void LokomotivAPIParser::_executeCommand()
 			switch(_currentCommand)
 			{
 				case CMD_STOP:
-					DebugPrint("Stoping");
 					_robot->Stop(_decodeIntegerValue(_data));
 					break;
 				case CMD_SPEED:
@@ -115,8 +114,8 @@ void LokomotivAPIParser::_executeCommand()
 					break;
 				case CMD_DISTANCE_FROM_LAST_ADDRESS:
 					break;
-				case CMD_LED:
-					_robot->SetLed(_decodeIntegerValue(_data));
+				case CMD_PERIPHERAL:
+					_robot->SetPeripheral(_decodeIntegerValue(_data));
 					break;
 				case CMD_STATE:
 					break;
@@ -163,8 +162,8 @@ void LokomotivAPIParser::_executeCommand()
 				case CMD_DISTANCE_FROM_LAST_ADDRESS:
 					ReturnGetValue(CMD_DISTANCE_FROM_LAST_ADDRESS,_robot->GetDistanceFromLastAddress());
 					break;
-				case CMD_LED:
-					ReturnGetValue(CMD_LED,_robot->GetLed());
+				case CMD_PERIPHERAL:
+					ReturnGetValue(CMD_PERIPHERAL,_robot->GetPeripheral(0));
 					break;
 				case CMD_STATE:
 					ReturnGetValue(CMD_STATE,_robot->GetState());

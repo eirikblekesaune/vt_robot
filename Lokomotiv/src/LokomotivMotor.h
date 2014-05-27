@@ -3,11 +3,12 @@
 
 #include "PID_v1.h"
 #include "MotorDriver.h"
+#include "LokomotivSpeedometer.h"
 
 #define NO_TARGET -1
 class LokomotivMotor: public MotorDriver{
 public:
-	LokomotivMotor();
+	LokomotivMotor(LokomotivSpeedometer* speedometer);
 	~LokomotivMotor();
 	static const int kSpeedMin;
 	static const int kSpeedMax;
@@ -29,6 +30,7 @@ public:
 	void ResetPositionCounter();
 	void UpdateDirection();
 private:
+	LokomotivSpeedometer* _speedometer;
 	PID *_pid;
 	bool _pidEnabled;
 	double _setpoint;

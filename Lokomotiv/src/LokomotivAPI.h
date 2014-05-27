@@ -11,7 +11,7 @@ enum command_t
   CMD_DIRECTION = 0x02,
   CMD_TARGET_POSITION = 0x03,
   CMD_DISTANCE_FROM_LAST_ADDRESS = 0x04,
-  CMD_LED = 0x05,
+  CMD_PERIPHERAL = 0x05,
   CMD_STATE = 0x06,
   CMD_INFO = 0x07,//used for debugging, arbitrary numboer of asci characters
   CMD_MEASURED_SPEED = 0x08,
@@ -22,6 +22,8 @@ enum command_t
 	CMD_GLIDE_TO_SPEED = 0x0D,
 	CMD_END_SPEED = 0x0E,
 	CMD_END_TRANSMISSION = 0x0F,
+	CMD_REQUEST_PERIPHERAL = 0x10,
+	CMD_MOTOR_MODE = 0x11,
   CMD_UNKNOWN
 };
 
@@ -42,7 +44,7 @@ enum setGet_t
 enum parseMask_t {
   PARSE_MASK_MESSAGE_TYPE = 0x80,//command byte of data byte
   PARSE_MASK_SETGET = 0x40,//setter or getter
-  PARSE_MASK_COMMAND = 0x0F,
+  PARSE_MASK_COMMAND = 0x1F,
   PARSE_MASK_UNKNOWN
 };
 #define PARSE_MASK_DATA_TYPE 0x40

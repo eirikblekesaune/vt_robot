@@ -7,6 +7,8 @@ public:
 	LokomotivSpeedometer();
 	~LokomotivSpeedometer();
 	long GetMeasuredSpeed(); 
+	long GetCurrentTicks();
+	void DirectionChanged(int newDirection);
 private:
 	long _measuredSpeed;
 	int _isrNumber;
