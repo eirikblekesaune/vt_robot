@@ -3,8 +3,6 @@
 #include "IRReader.h"
 #include "LokomotivMotor.h"
 #include "LokomotivSpeedometer.h"
-//Change the default i2c rate
-#define TWI_FREQ 50000L
 #include "Wire.h"
 
 class Lokomotiv{
@@ -34,6 +32,7 @@ public:
 	void SetTargetPosition(long val);
 	void SetDistanceFromLastAddress(long val);
 	void SetPeripheral(long val);
+	void SetPeripheralRequest(long val);
 	void SetState(long val);
 	void SetLastDetectedAddress(long val);
 	void SetPidPValue(double val);

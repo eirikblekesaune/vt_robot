@@ -4,15 +4,13 @@
  * Created: 27.01.2014 18:36:22
  *  Author: Eirik Blekesaune
  *
- *  Much of the USI implementation has been based on
- *  Adam Honse's usi_i2c_slave.c/h (). 
  */ 
 
 #define F_CPU 20000000
 #include <avr/io.h>
 #include <util/delay.h>
 #include "LEDDimmerSimple.h"
-#include "LEDDimmer_USI.h"
+//#include "LEDDimmer_USI.h"
 
 #define ADDR_PINS PINA
 #define ADDR_PIN_MASK 0x0F
@@ -54,9 +52,9 @@ int main(void)
 	PORTA |= 0x0F;
 	//set switch pins as inputs
 	InitLEDDimmer();
-	InitUSI(readTWIAddressPins());
+	//InitUSI(readTWIAddressPins());
+	
 	sei();
-
 	while(1)
 	{
 		//Find the TWI address by reading the dip switch

@@ -56,16 +56,34 @@ void Lokomotiv::SetDistanceFromLastAddress(long val){
 
 void Lokomotiv::SetPeripheral(long data)
 {
-	uint8_t device, command;
-	uint16_t value;
-	device = static_cast<uint8_t>(data >> 24);
-	command = static_cast<uint8_t>((data >> 16) & 0x00FF);
-	value = static_cast<uint16_t>(data & 0x00FF);
+	int8_t device, command;
+	uint16_t valueMSB, valueLSB;
+	device = static_cast<int8_t>((data >> 24) & 0x000000FF);
+	command = static_cast<int8_t>((data >> 16) & 0x000000FF);
+	valueMSB = static_cast<uint8_t>((data >> 8) & 0x000000FF);
+	valueLSB = static_cast<uint8_t>(data & 0x000000FF);
 	Wire.beginTransmission(device);
 	Wire.write(command);
-	Wire.write(value);
+	Wire.write(valueMSB);
+	Wire.write(valueLSB);
 	Wire.endTransmission();
 }
+
+void Lokomotiv::SetPeripheralRequest(long data)
+{
+	int8_t device, command;
+	device = static_cast<int8_t>((data >> 24) & 0x000000FF);
+	command = static_cast<int8_t>((data >> 16) & 0x000000FF);
+	Wire.beginTransmission(device);
+	Wire.write(command);
+	Wire.endTransmission(false);
+	Wire.requestFrom(device, 2, true);
+	while(Wire.available())    // slave may send less than requested
+  { 
+    DebugPrint(Wire.read());         // print the character
+  }
+}
+
 void Lokomotiv::SetState(long val){_state = val;}
 void Lokomotiv::SetLastDetectedAddress(long val){_lastDetectedAddress = val;}
 void Lokomotiv::SetPidPValue(double val){_pidPValue = val;}

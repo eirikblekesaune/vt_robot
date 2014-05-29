@@ -1,3 +1,4 @@
+#define SERIAL Serial
 #include "Lokomotiv.h"
 #include "LokomotivAPI.h"
 #include "LokomotivAPIParser.h"
@@ -17,23 +18,22 @@ void setup()
 	TCCR1B = 0x00;
 	
 	lok = new Lokomotiv();
-	Serial1.begin(9600);
-	while(!Serial1) {
+	SERIAL.begin(9600);
+	while(!SERIAL)
+	{
 		;
 	}
-	lastTime = millis();
 	parser = new LokomotivAPIParser(lok);
 	lok->Init();
 }
 
 void loop()
 {
-	while(Serial1.available() > 0)
+	while(SERIAL.available() > 0)
 	{
-		parser->parseIncomingByte(Serial1.read());
+		parser->parseIncomingByte(SERIAL.read());
 	}
-	//lok->Update();
-	lok->Update();
+//	lok->Update();
 //	if(millis() >= (updateInterval + lastTime))
 //	{
 //		lok->Update();

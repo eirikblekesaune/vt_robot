@@ -21,7 +21,7 @@ DEVICE     = attiny44a
 DUDEDEVICE = t44
 CLOCK      = 20000000
 PROGRAMMER = -c avrispmkII #-P /dev/tty.usbserial621
-OBJECTS    = main.o LEDDimmer_USI.o LEDDimmerSimple.o#usi_i2c_slave.o
+OBJECTS    = main.o LEDDimmerSimple.o usi_i2c_slave.o
 #FUSES      = -U hfuse:w:0xdc:m -U lfuse:w:0xbf:m
 FUSES			 = -U lfuse:w:0xce:m -U hfuse:w:0xdf:m -U efuse:w:0xff:m
 # ATMega8 fuse bits used above (fuse bits for other devices are different!):

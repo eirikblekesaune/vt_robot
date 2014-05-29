@@ -64,12 +64,10 @@ enum
 void InitUSI(uint8_t addr)
 {
 	FlushTWIBuffers();
-	PORT_USI &= ~(1 << PORT_USI_SCL);
-	PORT_USI &= ~(1 << PORT_USI_SDA);
 
-	//PORT_USI |= (1<<PORT_USI_SCL);// Set SCL high
-	//PORT_USI |= (1<<PORT_USI_SDA);// Set SDA high
-	USI_SET_SCL_INPUT();// Set SCL as output
+	PORT_USI |= (1<<PORT_USI_SCL);// Set SCL high
+	PORT_USI |= (1<<PORT_USI_SDA);// Set SDA high
+	USI_SET_SCL_OUTPUT();// Set SCL as output
 	USI_SET_SDA_INPUT();// Set SDA as input
 
 	SetTWIAddress(addr);

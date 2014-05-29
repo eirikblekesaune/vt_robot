@@ -24,12 +24,12 @@ VTLokomotiv {
 	}
 
 	init{arg xbeeDevice_, remoteXBeeDeviceAddress_;
-		xbeeDevice = xbeeDevice_;
-		remoteXBeeDeviceAddress = remoteXBeeDeviceAddress_;
-		this.device.rxAction_({arg data;
-			//"Parsing incoming lokomotiv data".postln;
-			data.do{arg item; this.prParseByte(item); };
-		});
+		// xbeeDevice = xbeeDevice_;
+		// remoteXBeeDeviceAddress = remoteXBeeDeviceAddress_;
+		// this.device.rxAction_({arg data;
+		// 	//"Parsing incoming lokomotiv data".postln;
+		// 	data.do{arg item; this.prParseByte(item); };
+		// });
 		pid = (P: 0.0, I: 0.0, D: 0.0);
 		currentStringData = String.new(128);
 		currentValueBytes = Array.new(4);
@@ -172,8 +172,9 @@ VTLokomotiv {
 			this.class.byteType[\command]
 		);
 		//		msg = msg.as(Int8Array);
-		this.prSend(msg);
+		//this.prSend(msg);
 		"Sending mess: %".format(msg).postln;
+		^msg;
 	}
 
 	get{arg command;
@@ -221,7 +222,7 @@ VTLokomotiv {
 			\glideToSpeed -> 0x0D,
 			\endSpeed -> 0x0E,
 			\endTransmission -> 0x0F,
-			\requestPeripheral -> 0x10,
+			\peripheralRequest -> 0x10,
 			\motorMode -> 0x11
 		];
 		setGet = TwoWayIdentityDictionary[

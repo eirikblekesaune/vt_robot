@@ -117,6 +117,9 @@ void LokomotivAPIParser::_executeCommand()
 				case CMD_PERIPHERAL:
 					_robot->SetPeripheral(_decodeIntegerValue(_data));
 					break;
+				case CMD_PERIPHERAL_REQUEST:
+					_robot->SetPeripheralRequest(_decodeIntegerValue(_data));
+					break;
 				case CMD_STATE:
 					break;
 				case CMD_INFO:
@@ -164,6 +167,8 @@ void LokomotivAPIParser::_executeCommand()
 					break;
 				case CMD_PERIPHERAL:
 					ReturnGetValue(CMD_PERIPHERAL,_robot->GetPeripheral(0));
+					break;
+				case CMD_PERIPHERAL_REQUEST:
 					break;
 				case CMD_STATE:
 					ReturnGetValue(CMD_STATE,_robot->GetState());
