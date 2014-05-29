@@ -1,35 +1,78 @@
 #include "LEDDimmer_USI.h"
 
 uint8_t address;
-uint8_t commandQueue[I2C_BUFFER_SIZE];
-uint8_t commandQueueHead;
-uint8_t commandQueueTail;
-
-uint16_t dataQueue[I2C_BUFFER_SIZE];
 
 volatile uint8_t currentCommand;
-volatile uint16_t currentData;
+volatile uint8_t currentDataByte0;
+volatile uint8_t currentDataByte1;
+
+uint8_t commandQueue[TWI_BUFFER_SIZE];
+uint16_t commandDataQueue[TWI_BUFFER_SIZE];
+volatile uint8_t commandQueueHead;
+volatile uint8_t commandQueueTail;
+
+uint8_t transmitQueue[TWI_BUFFER_SIZE];
+uint16_t transmitDataQueue[TWI_BUFFER_SIZE];
+volatile uint8_t transmitQueueHead;
+volatile uint8_t transmitQueueTail;
+
+volatile uint8_t numBytesReceived = 0;
+volatile uint8_t numBytesTransmitted = 0;
+
+//Function defined as macro to be used i ISR routine
+#define PUSH_DATA_TO_COMMAND_QUEUE()\
+{\
+	commandQueueHead++;\
+	commandQueue[commandQueueHead] = currentCommand;\
+	commandDataQueue[commandQueueHead] = ((uint16_t)currentDataByte1 << 8) | currentDataByte0;\
+}\
+
+///The GetNextCommand and GetDataAtTail functions are to
+//be called in conjuction since the first function increases
+//the tail pointer in the queue by one.
+uint8_t GetNextCommand()
+{
+	commandQueueTail++;
+	return commandQueue[commandQueueTail];
+}
+
+uint16_t GetDataAtTail()
+{
+	return commandDataQueue[commandQueueTail];
+}
+
+uint8_t HasQueuedCommands()
+{
+	return commandQueueHead != commandQueueTail;
+}
 
 enum
 {
-  I2C_SLAVE_WAITING_FOR_ADDRESS_BYTE,
-	I2C_SLAVE_WAITING_FOR_COMMAND_BYTE,
-	I2C_SLAVE_WAITING_FOR_DATA_BYTE0,
-	I2C_SLAVE_WAITING_FOR_DATA_BYTE1,
+  USI_OVF_WAITING_FOR_ADDRESS_BYTE,
+	USI_OVF_SENDING_ACK,
+	USI_OVF_WAITING_FOR_COMMAND_BYTE,
+	USI_OVF_WAITING_FOR_DATA_BYTE0,
+	USI_OVF_WAITING_FOR_DATA_BYTE1,
+	USI_OVF_SENDING_ACK_FOR_COMMAND_REQUEST,
+	USI_OVF_WAITING_FOR_ACK,
+	USI_OVF_WAITING_FOR_REQUESTED_COMMAND_BYTE,
+	USI_OVF_SENDING_COMMAND_BYTE,
+	USI_OVF_SENDING_DATA_BYTE0,
+	USI_OVF_SENDING_DATA_BYTE1,
 } USIOverflowParserState;
 
 void InitUSI(uint8_t addr)
 {
-	// Set SCL high
-	PORT_USI |= (1<<PORT_USI_SCL);
-	// Set SDA high
-	PORT_USI |= (1<<PORT_USI_SDA);
-	// Set SCL as output
-	USI_SET_SCL_OUTPUT();
-	// Set SDA as input
-	USI_SET_SDA_INPUT();
+	FlushTWIBuffers();
+	PORT_USI &= ~(1 << PORT_USI_SCL);
+	PORT_USI &= ~(1 << PORT_USI_SDA);
 
-	address = addr;
+	//PORT_USI |= (1<<PORT_USI_SCL);// Set SCL high
+	//PORT_USI |= (1<<PORT_USI_SDA);// Set SDA high
+	USI_SET_SCL_INPUT();// Set SCL as output
+	USI_SET_SDA_INPUT();// Set SDA as input
+
+	SetTWIAddress(addr);
 	
 	USICR = (1 << USISIE) | //Enable start condition interrupt 
 					(0 << USIOIE) | //Overflow interrupt is disabled
@@ -43,26 +86,23 @@ void InitUSI(uint8_t addr)
 					(1 << USIOIF) | //clear counter overflow interupt flag
 					(1 << USIPF) | //clear stop condition flag
 					(1 << USIDC); //clear data collistion flag
-	FlushI2CBuffers();
+	SET_USI_TO_RECEIVE_START_CONDITION_MODE();
 }
 
-void SetI2CAddress(uint8_t val)
+void SetTWIAddress(uint8_t val)
 {
 	address = val;
 }
 
-void FlushI2CBuffers()
+void FlushTWIBuffers()
 {
 	commandQueueHead = 0;
 	commandQueueTail = 0;
-	dataQueueHead = 0;
-	dataQueueTail = 0;
+	transmitQueueHead = 0;
+	transmitQueueTail = 0;
+
 }
 
-uint8_t HasQueuedCommands()
-{
-	return !(commandQueueHead == commandQueueTail);
-}
 
 
 //Disable counter interrupt, enable start condition interrupt, 
@@ -77,7 +117,8 @@ uint8_t HasQueuedCommands()
 //Start condition interrupt routine
 ISR(USI_STR_vect)
 {
-	USIOverflowParserState = I2C_SLAVE_WAITING_FOR_ADDRESS_BYTE;
+	OCR1B = 0x0FFF;
+	USIOverflowParserState = USI_OVF_WAITING_FOR_ADDRESS_BYTE;
 	//wait until SCL line goes low to ensure that a full start condition
 	//has been met. Both SDA and SCL must be pulled low for that to happen.
 	while((PIN_USI & (1 << PIN_USI_SCL)) && !((PIN_USI & (1 << PIN_USI_SDA))));	
@@ -86,9 +127,9 @@ ISR(USI_STR_vect)
 	//If that is the case we restart the parsing process.
 	if(PORT_USI & (1<<PIN_USI_SDA))
 	{
-		USICR = USICR_PREPARE_FOR_RECEIVING_START_CONDITION;
+		SET_USI_TO_RECEIVE_START_CONDITION_MODE();
 	} else {
-		USICR = USICR_PREPARE_FOR_RECEIVING_DATA_BYTES;
+		SET_USI_TO_RECEIVE_DATA_BYTES_MODE();
 	}
 	USISR = USISR_CLEAR_COUNTER_AND_FLAGS;
 }
@@ -97,37 +138,119 @@ ISR(USI_OVF_vect)
 {
 	switch(USIOverflowParserState)
 	{
-		case I2C_SLAVE_WAITING_FOR_ADDRESS_BYTE:
-			//check if address is a match
+		case USI_OVF_WAITING_FOR_ADDRESS_BYTE:
+			//check if address is a match, or if global broadcast message
 			if((USIDR == 0) || (USIDR >> 1) == address)
 			{
-				//check r/w bit
+				//check r/w bit, 1 if master request 
 				if(USIDR & 0x01)
 				{
-					//USIOverflowParserState = I2C_SLAVE_SEND_DATA;
-				} else {
-					USIOverflowParserState = I2C_SLAVE_WAITING_FOR_COMMAND_BYTE;
+					USIOverflowParserState = USI_OVF_SENDING_ACK_FOR_COMMAND_REQUEST;
 					SET_USI_TO_SEND_ACK();
+				} else {
+					USIOverflowParserState = USI_OVF_SENDING_ACK;
+					SET_USI_TO_SEND_ACK();
+					numBytesReceived = 0;
+				}
+			} else {
+				SET_USI_TO_RECEIVE_START_CONDITION_MODE();
+			}
+			break;
+		case USI_OVF_SENDING_ACK:
+			switch(numBytesReceived)
+			{
+				case 0:
+					USIOverflowParserState = USI_OVF_WAITING_FOR_COMMAND_BYTE;
+					numBytesReceived++;
+					SET_USI_TO_RECEIVE_DATA_BYTES_MODE();
+					break;
+				case 1:
+					USIOverflowParserState = USI_OVF_WAITING_FOR_DATA_BYTE0;
+					numBytesReceived++;
+					SET_USI_TO_RECEIVE_DATA_BYTES_MODE();
+					break;
+				case 2:
+					USIOverflowParserState = USI_OVF_WAITING_FOR_DATA_BYTE1;
+					numBytesReceived++;
+					SET_USI_TO_RECEIVE_DATA_BYTES_MODE();
+					break;
+				case 3:
+					USIOverflowParserState = USI_OVF_WAITING_FOR_ADDRESS_BYTE;
+					numBytesReceived++;
+					SET_USI_TO_RECEIVE_START_CONDITION_MODE();
+					break;
+				default:
+					USIOverflowParserState = USI_OVF_WAITING_FOR_ADDRESS_BYTE;
+					SET_USI_TO_RECEIVE_START_CONDITION_MODE();
+			}
+			break;
+		case USI_OVF_WAITING_FOR_COMMAND_BYTE:
+			currentCommand = USIDR;
+			USIOverflowParserState = USI_OVF_SENDING_ACK;
+			SET_USI_TO_SEND_ACK();
+			break;
+		case USI_OVF_WAITING_FOR_DATA_BYTE0:
+			currentDataByte0 = USIDR;
+			USIOverflowParserState = USI_OVF_SENDING_ACK;
+			SET_USI_TO_SEND_ACK();
+			break;
+		case USI_OVF_WAITING_FOR_DATA_BYTE1:
+			currentDataByte1 = USIDR;
+			USIOverflowParserState = USI_OVF_SENDING_ACK;
+			PUSH_DATA_TO_COMMAND_QUEUE();
+			SET_USI_TO_SEND_ACK();
+			break;
+		case USI_OVF_SENDING_ACK_FOR_COMMAND_REQUEST:
+			USIOverflowParserState = USI_OVF_WAITING_FOR_REQUESTED_COMMAND_BYTE;
+			break;
+		case USI_OVF_WAITING_FOR_ACK:
+			//if the incoming data is not 0 it means that an ACK has not
+			//been sent from the master. Parser will then be reset.
+			if(USIDR)
+			{
+				USIOverflowParserState = USI_OVF_WAITING_FOR_ADDRESS_BYTE;
+				SET_USI_TO_RECEIVE_START_CONDITION_MODE();
+			} else {
+				switch(numBytesTransmitted)
+				{
+					case 0:
+						USIOverflowParserState = USI_OVF_SENDING_COMMAND_BYTE;
+						break;
+					case 1:
+						USIOverflowParserState = USI_OVF_SENDING_DATA_BYTE0;
+						break;
+					case 2:
+						USIOverflowParserState = USI_OVF_SENDING_DATA_BYTE1;
+						break;
+					case 3:
+						USIOverflowParserState = USI_OVF_WAITING_FOR_ADDRESS_BYTE;
+						break;
+					default:
+						USIOverflowParserState = USI_OVF_WAITING_FOR_ADDRESS_BYTE;
+						break;
 				}
 			}
 			break;
-		case I2C_SLAVE_WAITING_FOR_COMMAND_BYTE:
-			commandQueue[++commandQueueHead] = USIDR;
-			USIOverflowParserState = I2C_SLAVE_WAITING_FOR_DATA_BYTE0;
+		case USI_OVF_WAITING_FOR_REQUESTED_COMMAND_BYTE:
+			currentCommand = USIDR;
+			USIOverflowParserState = USI_OVF_SENDING_ACK;
 			SET_USI_TO_SEND_ACK();
 			break;
-		case I2C_SLAVE_WAITING_FOR_DATA_BYTE0:
-			dataQueue[commandQueueHead] = USIDR;
-			USIOverflowParserState = I2C_SLAVE_WAITING_FOR_DATA_BYTE1;
-			SET_USI_TO_SEND_ACK();
+		case USI_OVF_SENDING_COMMAND_BYTE:
+			currentCommand = 0x00;//here the command keys is loaded for sending
+			USIDR = currentCommand;
+			USIOverflowParserState = USI_OVF_WAITING_FOR_ACK;
 			break;
-		case I2C_SLAVE_WAITING_FOR_DATA_BYTE1:
-			dataQueue[commandQueueHead] |= ((uint16_t)USIDR) << 8;
-			USIOverflowParserState = I2C_SLAVE_WAITING_FOR_ADDRESS_BYTE;
-			SET_USI_TO_SEND_ACK();
+		case USI_OVF_SENDING_DATA_BYTE0:
+			currentDataByte0 = 0x01;
+			USIDR = currentDataByte0;
+			USIOverflowParserState = USI_OVF_WAITING_FOR_ACK;
 			break;
-
-
+		case USI_OVF_SENDING_DATA_BYTE1:
+			currentDataByte1 = 0x02;
+			USIDR = currentDataByte1;
+			USIOverflowParserState = USI_OVF_WAITING_FOR_ACK;
+			break;
 	}
 }
 

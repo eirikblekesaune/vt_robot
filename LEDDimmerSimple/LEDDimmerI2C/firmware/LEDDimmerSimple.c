@@ -31,11 +31,11 @@ void SetLEDValue(uint16_t val)
 	OCR1B = ledValue;
 }
 
-void FlashLED()
+void FlashLED(uint16_t val)
 {
 	int i;
 	OCR1B = LED_MAX_VALUE;
-	for(i = 0; i < 9; i++)
+	for(i = 0; i < val; i++)
 	{
 		_delay_ms(10);
 	}

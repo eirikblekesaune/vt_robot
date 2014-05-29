@@ -15,19 +15,37 @@
 #include "LEDDimmer_USI.h"
 
 #define ADDR_PINS PINA
-#define ADDR_PIN0 PINA3
-#define ADDR_PIN1 PINA2
-#define ADDR_PIN2 PINA1
-#define ADDR_PIN3 PINA0
+#define ADDR_PIN_MASK 0x0F
 
-uint8_t readI2CAddressPins()
+uint8_t readTWIAddressPins()
 {
-	uint8_t result;
-	result = ADDR_PINS & (1<<ADDR_PIN0);
-	result |= ADDR_PINS & (1<<ADDR_PIN1);
-	result |= ADDR_PINS & (1<<ADDR_PIN2);
-	result |= ADDR_PINS & (1<<ADDR_PIN3);
+	int8_t pinValues, result;
+	pinValues = ADDR_PINS & ADDR_PIN_MASK;
+	pinValues = ~(pinValues | 0xF0);
+	result = ((pinValues & 0x08) >> 3) |
+					((pinValues & 0x04) >> 1) |
+					((pinValues & 0x02) << 1) |
+					((pinValues & 0x01) << 3);
 	return result;
+}
+
+void doCommand(uint8_t commandKey, uint16_t commandData)
+{
+	switch(commandKey)
+	{
+		case LED_VALUE_CMD:
+			SetLEDValue(commandData);
+			break;
+		case FADE_TARGET_LED_CMD:
+			SetLEDFadeTarget(commandData);
+			break;
+		case FADE_TIME_LED_CMD:
+			SetLEDFadeTime(commandData);
+			break;
+		case FLASH_LED_CMD:
+			FlashLED(commandData);
+			break;
+	}
 }
 
 int main(void)
@@ -35,18 +53,20 @@ int main(void)
 	//init dip switch pin pullups
 	PORTA |= 0x0F;
 	//set switch pins as inputs
-	DDRA = 0x00;
-
 	InitLEDDimmer();
-	InitUSI(readI2CAddressPins());
+	InitUSI(readTWIAddressPins());
 	sei();
 
 	while(1)
 	{
-		//Find the I2C address by reading the dip switch
-
+		//Find the TWI address by reading the dip switch
+		while(HasQueuedCommands())
+		{
+			uint8_t nextCommand = GetNextCommand();
+			uint16_t nextCommandData = GetDataAtTail();
+			doCommand(nextCommand, nextCommandData);
+		}
 		asm volatile ("nop");
-		SetI2CAddress(readI2CAddressPins());
-		_delay_ms(10);
+		SetTWIAddress(readTWIAddressPins());
 	}
 }
