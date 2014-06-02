@@ -43,6 +43,7 @@ void SetLiftMotorSpeed(uint8_t val)
 		val = MIN_LIFT_SPEED;
 	}
 	liftSpeed = val;
+	//OCR2B = liftSpeed;
 	analogWrite(liftMotorPWMPin, liftSpeed);
 }
 
@@ -180,18 +181,19 @@ void loop()
 void setup()
 {
 	Serial.begin(9600);
+	Serial.println(TCCR2A, HEX);
+	Serial.println(TCCR2B, HEX);
 	pinMode(directionPinA, OUTPUT);
 	pinMode(directionPinB, OUTPUT);
 	pinMode(liftMotorPWMPin, OUTPUT);
 	pinMode(headRotationServoPin, OUTPUT);
 	pinMode(topStopPin, INPUT_PULLUP); 
 	pinMode(bottomStopPin, INPUT_PULLUP);
-
 	headServo.attach(HEAD_ROTATE_PIN);
 	//init timer2 register for headServo
 	//phase correct, prescale 32, OCR2A/OCR2B output
-	//TCCR2A = 0b10100001;
-	//TCCR2B = 0b00001001;
+	//TCCR2A = 0b10000010;
+	TCCR2B = 0b00000001;
 	SetLiftMotorDirection(UP);
 	SetLiftMotorSpeed(0);
 	SetHeadRotationServoPosition(90);
