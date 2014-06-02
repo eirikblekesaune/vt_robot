@@ -1,5 +1,4 @@
 VTLokomotiv {
-	var port, <name;
 	var <pid;
 	var <speed;
 	var <direction;
@@ -9,6 +8,9 @@ VTLokomotiv {
 	var <distanceFromLastAddress;
 	var <led;
 	var <state;
+	var <xbeeDevice;
+	var <remoteXBeeDeviceAddress;
+	var <mode;
 
 	var parserState, parseRoutine, currentCommand, currentValueBytes;
 	var currentStringData;
@@ -17,42 +19,34 @@ VTLokomotiv {
 	classvar <byteType;
 	classvar <valueType;
 
-	*new{arg serialPort, name;
-		^super.new.init(serialPort, name);
+	*new{arg xbeeDevice, remoteXBeeDeviceAddress;
+		^super.new.init(xbeeDevice, remoteXBeeDeviceAddress);
 	}
 
-	init{arg serialPort_, name_;
-		port = serialPort_;
-		name = name_;
+	init{arg xbeeDevice_, remoteXBeeDeviceAddress_;
+		// xbeeDevice = xbeeDevice_;
+		// remoteXBeeDeviceAddress = remoteXBeeDeviceAddress_;
+		// this.device.rxAction_({arg data;
+		// 	//"Parsing incoming lokomotiv data".postln;
+		// 	data.do{arg item; this.prParseByte(item); };
+		// });
 		pid = (P: 0.0, I: 0.0, D: 0.0);
 		currentStringData = String.new(128);
 		currentValueBytes = Array.new(4);
 		this.prResetParser;
-		this.startParser;
-		//poll values from robot
-		//...
+	}
+
+	device{
+		^xbeeDevice.childDevices.at(remoteXBeeDeviceAddress);
+	}
+
+	name{
+		^this.device.name;
 	}
 
 	prResetParser{
 		parserState = \waitingForCommandByte;
 		currentCommand = nil;
-	}
-
-	startParser{
-		parseRoutine = Routine({
-			loop{
-				this.prParseByte(port.read);
-			}
-		}).play;
-	}
-
-	stopParser{
-		parseRoutine.stop;
-		this.prResetParser;
-	}
-
-	close{
-		port.close;
 	}
 
 	prParseByte{arg byte;
@@ -178,9 +172,9 @@ VTLokomotiv {
 			this.class.byteType[\command]
 		);
 		//		msg = msg.as(Int8Array);
-		port.putAll(msg);
+		//this.prSend(msg);
 		"Sending mess: %".format(msg).postln;
-
+		^msg;
 	}
 
 	get{arg command;
@@ -188,7 +182,7 @@ VTLokomotiv {
 		if(command == \pid, {
 			fork{
 				[\pidPValue, \pidIValue, \pidDValue].do({arg item;
-					port.put(
+					this.prSend(
 						this.class.command[item] |
 						this.class.setGet[\get] |
 						this.class.byteType[\command]
@@ -198,7 +192,7 @@ VTLokomotiv {
 			};
 			^this;
 		});
-		port.put(
+		this.prSend(
 			this.class.command[command.asSymbol] |
 			this.class.setGet[\get] |
 			this.class.byteType[\command]
@@ -206,8 +200,8 @@ VTLokomotiv {
 	}
 
 	prSend{arg msg;
-		msg = msg.asString.ascii.as(Int8Array);
-		port.putAll(msg);
+		//msg = msg.asString.ascii.as(Int8Array);
+		this.device.sendTXData(msg);
 	}
 
 	*initClass{
@@ -217,7 +211,7 @@ VTLokomotiv {
 			\direction -> 0x02,
 			\targetPosition -> 0x03,
 			\distanceFromLastAddress -> 0x04,
-			\led -> 0x05,
+			\peripheral -> 0x05,
 			\state -> 0x06,
 			\info -> 0x07,
 			\measuredSpeed -> 0x08,
@@ -225,7 +219,11 @@ VTLokomotiv {
 			\pidPValue -> 0x0A,
 			\pidIValue -> 0x0B,
 			\pidDValue -> 0x0C,
-			\endTransmission -> 0x0F
+			\glideToSpeed -> 0x0D,
+			\endSpeed -> 0x0E,
+			\endTransmission -> 0x0F,
+			\peripheralRequest -> 0x10,
+			\motorMode -> 0x11
 		];
 		setGet = TwoWayIdentityDictionary[
 			\set -> 0x00,

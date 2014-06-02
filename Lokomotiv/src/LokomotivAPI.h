@@ -2,7 +2,7 @@
 #define LOKOMOTIV_API_H
 #include <Arduino.h>
 //This file contains all global definitions, macros, typedefs, enums etc.
-
+#define SERIAL Serial
 static void DebugPrint(const char* msg);
 enum command_t
 {
@@ -11,7 +11,7 @@ enum command_t
   CMD_DIRECTION = 0x02,
   CMD_TARGET_POSITION = 0x03,
   CMD_DISTANCE_FROM_LAST_ADDRESS = 0x04,
-  CMD_LED = 0x05,
+  CMD_PERIPHERAL = 0x05,
   CMD_STATE = 0x06,
   CMD_INFO = 0x07,//used for debugging, arbitrary numboer of asci characters
   CMD_MEASURED_SPEED = 0x08,
@@ -19,7 +19,11 @@ enum command_t
 	CMD_PID_P_VALUE = 0x0A,
 	CMD_PID_I_VALUE = 0x0B,
 	CMD_PID_D_VALUE = 0x0C,
+	CMD_GLIDE_TO_SPEED = 0x0D,
+	CMD_END_SPEED = 0x0E,
 	CMD_END_TRANSMISSION = 0x0F,
+	CMD_PERIPHERAL_REQUEST = 0x10,
+	CMD_MOTOR_MODE = 0x11,
   CMD_UNKNOWN
 };
 
@@ -40,7 +44,7 @@ enum setGet_t
 enum parseMask_t {
   PARSE_MASK_MESSAGE_TYPE = 0x80,//command byte of data byte
   PARSE_MASK_SETGET = 0x40,//setter or getter
-  PARSE_MASK_COMMAND = 0x0F,
+  PARSE_MASK_COMMAND = 0x1F,
   PARSE_MASK_UNKNOWN
 };
 #define PARSE_MASK_DATA_TYPE 0x40
@@ -63,7 +67,7 @@ enum stateChange_t
 
 static void Reply(const char* str)
 {
-  Serial.println(str);
+  SERIAL.println(str);
 }
 
 
@@ -76,13 +80,13 @@ static void ReturnGetValue(command_t command, long value)
   data[2] = static_cast<unsigned char>(value >> 14) & 0x7F;//bits[20:14]
 	data[3] = static_cast<unsigned char>(value >> 7) & 0x7F;//bits[13:8]
 	data[4] = static_cast<unsigned char>(value & 0x7F);//bits[7:0]
-  Serial.write(BYTE_COMMAND | SET_MESSAGE | command);
-  Serial.write(data[0] & 0x0F);
-  Serial.write(data[1]);
-  Serial.write(data[2]);
-  Serial.write(data[3]);
-  Serial.write(data[4]);//forces four upper bits to zero for cmd byte and int sign
-	Serial.write(BYTE_COMMAND | SET_MESSAGE | CMD_END_TRANSMISSION);
+  SERIAL.write(BYTE_COMMAND | SET_MESSAGE | command);
+  SERIAL.write(data[0] & 0x0F);
+  SERIAL.write(data[1]);
+  SERIAL.write(data[2]);
+  SERIAL.write(data[3]);
+  SERIAL.write(data[4]);//forces four upper bits to zero for cmd byte and int sign
+	SERIAL.write(BYTE_COMMAND | SET_MESSAGE | CMD_END_TRANSMISSION);
 }
 
 static void ReturnGetValue(command_t command, int value)
@@ -100,13 +104,13 @@ static void ReturnGetValue(command_t command, double value)
   data[2] = static_cast<unsigned char>(numberToSend >> 14) & 0x7F;//bits[20:14]
 	data[3] = static_cast<unsigned char>(numberToSend >> 7) & 0x7F;//bits[13:8]
 	data[4] = static_cast<unsigned char>(numberToSend) & 0x7F;//bits[7:0]
-  Serial.write(BYTE_COMMAND | SET_MESSAGE | command);
-  Serial.write(data[0] | TYPE_DECIMAL);
-  Serial.write(data[1]);
-  Serial.write(data[2]);
-  Serial.write(data[3]);
-  Serial.write(data[4]);//forces four upper bits to zero for cmd byte and int sign
-	Serial.write(BYTE_COMMAND | SET_MESSAGE | CMD_END_TRANSMISSION);
+  SERIAL.write(BYTE_COMMAND | SET_MESSAGE | command);
+  SERIAL.write(data[0] | TYPE_DECIMAL);
+  SERIAL.write(data[1]);
+  SERIAL.write(data[2]);
+  SERIAL.write(data[3]);
+  SERIAL.write(data[4]);//forces four upper bits to zero for cmd byte and int sign
+	SERIAL.write(BYTE_COMMAND | SET_MESSAGE | CMD_END_TRANSMISSION);
 }
 
 static void ReturnGetValue(command_t command, float value)
@@ -116,37 +120,59 @@ static void ReturnGetValue(command_t command, float value)
 
 static void NotifyStateChange(stateChange_t stateChange)
 {
-  Serial.write(BYTE_COMMAND | SET_MESSAGE | CMD_STATE);
-  Serial.write(stateChange);
+  SERIAL.write(BYTE_COMMAND | SET_MESSAGE | CMD_STATE);
+  SERIAL.write(stateChange);
 }
 
 static void DebugUnitPrint(const char* msg)
 {
-  Serial.write(BYTE_COMMAND | SET_MESSAGE | CMD_INFO );
-  Serial.print(msg);
-  Serial.write(4);
+  SERIAL.write(BYTE_COMMAND | SET_MESSAGE | CMD_INFO );
+  SERIAL.print(msg);
+  SERIAL.write(4);
 }
 
 static void DebugUnitPrint(int msg)
 {
-  Serial.write(BYTE_COMMAND | SET_MESSAGE | CMD_INFO );
-  Serial.print(msg);
-  Serial.write(4);
+  SERIAL.write(BYTE_COMMAND | SET_MESSAGE | CMD_INFO );
+  SERIAL.print(msg);
+  SERIAL.write(4);
 }
 
 static void DebugPrint(const char* msg)
 {
-  Serial.write(BYTE_COMMAND | SET_MESSAGE | CMD_INFO );
-  Serial.print(msg);
-  Serial.write(4);
+  SERIAL.write(BYTE_COMMAND | SET_MESSAGE | CMD_INFO );
+  SERIAL.print(msg);
+  SERIAL.write(4);
 }
 
 static void DebugPrint(int msg)
 {
-  Serial.write(BYTE_COMMAND | SET_MESSAGE | CMD_INFO );
-  Serial.print(msg);
-  Serial.write(4);
+  SERIAL.write(BYTE_COMMAND | SET_MESSAGE | CMD_INFO );
+  SERIAL.print(msg);
+  SERIAL.write(4);
 }
+
+static void DebugPrint(float msg)
+{
+  SERIAL.write(BYTE_COMMAND | SET_MESSAGE | CMD_INFO );
+  SERIAL.print(msg);
+  SERIAL.write(4);
+}
+
+static void DebugPrint(long msg)
+{
+  SERIAL.write(BYTE_COMMAND | SET_MESSAGE | CMD_INFO );
+  SERIAL.print(msg);
+  SERIAL.write(4);
+}
+
+static void DebugPrint(uint32_t msg)
+{
+  SERIAL.write(BYTE_COMMAND | SET_MESSAGE | CMD_INFO );
+  SERIAL.print(msg);
+  SERIAL.write(4);
+}
+
 
 #define DEBUG
 #ifdef DEBUG 

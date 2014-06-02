@@ -101,7 +101,7 @@ void LokomotivAPIParser::_executeCommand()
 			switch(_currentCommand)
 			{
 				case CMD_STOP:
-					_robot->Stop();
+					_robot->Stop(_decodeIntegerValue(_data));
 					break;
 				case CMD_SPEED:
 					_robot->SetSpeed(_decodeIntegerValue(_data));
@@ -113,25 +113,20 @@ void LokomotivAPIParser::_executeCommand()
 					_robot->SetTargetPosition(_decodeIntegerValue(_data));
 					break;
 				case CMD_DISTANCE_FROM_LAST_ADDRESS:
-					//will remove after implementation is done
-					_robot->SetDistanceFromLastAddress(_decodeIntegerValue(_data));
 					break;
-				case CMD_LED:
-					_robot->SetLed(_decodeIntegerValue(_data));
+				case CMD_PERIPHERAL:
+					_robot->SetPeripheral(_decodeIntegerValue(_data));
+					break;
+				case CMD_PERIPHERAL_REQUEST:
+					_robot->SetPeripheralRequest(_decodeIntegerValue(_data));
 					break;
 				case CMD_STATE:
-					//will remove after implementation is done
-					_robot->SetState(_decodeIntegerValue(_data));
 					break;
 				case CMD_INFO:
 					break;
 				case CMD_MEASURED_SPEED:
-					//will remove after implementation is done
-					_robot->SetMeasuredSpeed(_decodeIntegerValue(_data));
 					break;
 				case CMD_LAST_DETECTED_ADDRESS:
-					//will remove after implementation is done
-					_robot->SetLastDetectedAddress(_decodeIntegerValue(_data));
 					break;
 				case CMD_PID_P_VALUE:
 					_robot->SetPidPValue(_decodeDecimalValue(_data));
@@ -141,6 +136,12 @@ void LokomotivAPIParser::_executeCommand()
 					break;
 				case CMD_PID_D_VALUE:
 					_robot->SetPidDValue(_decodeDecimalValue(_data));
+					break;
+				case CMD_GLIDE_TO_SPEED:
+					_robot->SetGlideToSpeed(_decodeIntegerValue(_data));
+					break;
+				case CMD_END_SPEED:
+					_robot->SetEndSpeed(_decodeIntegerValue(_data));
 					break;
 				default:
 					DebugPrint("Unknown command");
@@ -164,8 +165,10 @@ void LokomotivAPIParser::_executeCommand()
 				case CMD_DISTANCE_FROM_LAST_ADDRESS:
 					ReturnGetValue(CMD_DISTANCE_FROM_LAST_ADDRESS,_robot->GetDistanceFromLastAddress());
 					break;
-				case CMD_LED:
-					ReturnGetValue(CMD_LED,_robot->GetLed());
+				case CMD_PERIPHERAL:
+					ReturnGetValue(CMD_PERIPHERAL,_robot->GetPeripheral(0));
+					break;
+				case CMD_PERIPHERAL_REQUEST:
 					break;
 				case CMD_STATE:
 					ReturnGetValue(CMD_STATE,_robot->GetState());
@@ -186,6 +189,11 @@ void LokomotivAPIParser::_executeCommand()
 					break;
 				case CMD_PID_D_VALUE:
 					ReturnGetValue(CMD_PID_D_VALUE,_robot->GetPidDValue());
+					break;
+				case CMD_GLIDE_TO_SPEED:
+					break;
+				case CMD_END_SPEED:
+					ReturnGetValue(CMD_END_SPEED,_robot->GetEndSpeed());
 					break;
 				default:
 					DebugPrint("Unknown command");

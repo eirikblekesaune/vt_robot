@@ -1,8 +1,8 @@
 #include "Lokomotiv.h"
 //motor pins
-const int driverPWM = 10;
-const int driverINA = 12;
-const int driverINB = 11;
+//const int driverPWM = 10;//The pins for VNHDriver are hardcoed in the LokomotivMotor class
+//const int driverINA = 12;
+//const int driverINB = 11;
 const int driverENDIAG = 6;
 const int motorEncoderInterruptIndex = 0;// digital pin 2 on Leonardo implicitly
 
@@ -15,10 +15,7 @@ const int irReaderReceivePin = 8;
 //const int ledPin = 5;
 
 Lokomotiv::Lokomotiv() :
-	_lastBeaconAddress(0),
-	_lastBeaconAddressUpdate(0),
-	_speed(0),
-	_direction(0),
+	_lastDetectedAddressUpdate(0),
 	_targetPosition(0),
 	_distanceFromLastAddress(0),
 	_led(0),
@@ -29,65 +26,65 @@ Lokomotiv::Lokomotiv() :
 	_pidIValue(0),
 	_pidDValue(0)
 {
-	//VNH5019Driver *driver = new VNH5019Driver(driverPWM, driverINA, driverINB, driverENDIAG);
-	//_motor = new LokomotivMotor(driver, motorEncoderInterruptIndex);
+	_speedometer = new LokomotivSpeedometer();
+	_motor = new LokomotivMotor(_speedometer);
 	_irReader = new IRReader(irReaderReceivePin, this);
 }
 
 //Getters
-long Lokomotiv::GetSpeed(){return _speed;}
-long Lokomotiv::GetDirection(){return _direction;}
+long Lokomotiv::GetSpeed(){return static_cast<long>(_motor->GetSpeed());}
+long Lokomotiv::GetDirection(){return static_cast<long>(_motor->GetDirection());}
 long Lokomotiv::GetTargetPosition(){return _targetPosition;}
-long Lokomotiv::GetDistanceFromLastAddress(){return _distanceFromLastAddress;}
-long Lokomotiv::GetLed(){return _led;}
+
+long Lokomotiv::GetDistanceFromLastAddress(){
+	return _encoderCounterAtLastAddress - _speedometer->GetCurrentTicks();
+}
+
+long Lokomotiv::GetPeripheral(long data){return 0;}
 long Lokomotiv::GetState(){return _state;}
-long Lokomotiv::GetMeasuredSpeed(){return _measuredSpeed;}
+long Lokomotiv::GetMeasuredSpeed(){return _speedometer->GetMeasuredSpeed();};
 long Lokomotiv::GetLastDetectedAddress(){return _lastDetectedAddress;}
 double Lokomotiv::GetPidPValue(){return _pidPValue;}
 double Lokomotiv::GetPidIValue(){return _pidIValue;}
 double Lokomotiv::GetPidDValue(){return _pidDValue;}
 //Setters
-void Lokomotiv::SetSpeed(long val) {
-	int16_t newSpeed = static_cast<int16_t>(val);
-	if(newSpeed != _speed)
-	{
-		_speed = newSpeed;
-		Wire.beginTransmission(4);
-		Wire.write(0xFF);//speed command
-		Wire.write(static_cast<byte>(_speed >> 8) );
-		Wire.write(static_cast<byte>(_speed));
-		Wire.endTransmission();
-	}
-}
-
-void Lokomotiv::SetDirection(long val) {
-	int16_t newDirection = static_cast<int16_t>(val);
-	if(newDirection != _direction)
-	{
-		_direction = newDirection;
-		Wire.beginTransmission(4);
-		Wire.write(0x0F);//direction command
-		Wire.write(static_cast<byte>(_direction));
-		Wire.endTransmission();
-	}
-}
 
 void Lokomotiv::SetTargetPosition(long val){_targetPosition = val;}
-void Lokomotiv::SetDistanceFromLastAddress(long val){_distanceFromLastAddress = val;}
-void Lokomotiv::SetLed(long val)
-{
-	int16_t newLed= static_cast<int16_t>(val);
-	if(1)//newLed != _led)
-	{
-		_led = newLed;
-		Wire.beginTransmission(2);
-		Wire.write(0x00);
-		Wire.write(static_cast<byte>(_led));
-		Wire.endTransmission();
-	}
+void Lokomotiv::SetDistanceFromLastAddress(long val){
+	_distanceFromLastAddress = val;
 }
+
+void Lokomotiv::SetPeripheral(long data)
+{
+	int8_t device, command;
+	uint16_t valueMSB, valueLSB;
+	device = static_cast<int8_t>((data >> 24) & 0x000000FF);
+	command = static_cast<int8_t>((data >> 16) & 0x000000FF);
+	valueMSB = static_cast<uint8_t>((data >> 8) & 0x000000FF);
+	valueLSB = static_cast<uint8_t>(data & 0x000000FF);
+	Wire.beginTransmission(device);
+	Wire.write(command);
+	Wire.write(valueMSB);
+	Wire.write(valueLSB);
+	Wire.endTransmission();
+}
+
+void Lokomotiv::SetPeripheralRequest(long data)
+{
+	int8_t device, command;
+	device = static_cast<int8_t>((data >> 24) & 0x000000FF);
+	command = static_cast<int8_t>((data >> 16) & 0x000000FF);
+	Wire.beginTransmission(device);
+	Wire.write(command);
+	Wire.endTransmission(false);
+	Wire.requestFrom(device, 2, true);
+	while(Wire.available())    // slave may send less than requested
+  { 
+    DebugPrint(Wire.read());         // print the character
+  }
+}
+
 void Lokomotiv::SetState(long val){_state = val;}
-void Lokomotiv::SetMeasuredSpeed(long val){_measuredSpeed = val;}
 void Lokomotiv::SetLastDetectedAddress(long val){_lastDetectedAddress = val;}
 void Lokomotiv::SetPidPValue(double val){_pidPValue = val;}
 void Lokomotiv::SetPidIValue(double val){_pidIValue = val;}
@@ -101,7 +98,7 @@ void Lokomotiv::Init()
 
 void Lokomotiv::Update()
 {
-	//_motor->Update();
+	_motor->Update();
 	_irReader->Update();
 }
 
@@ -109,17 +106,26 @@ void Lokomotiv::GotAddr(unsigned char addr)
 {
 	//We don't need to update repeating beacon addres more than once a
 	//second.
-	if(addr != _lastBeaconAddress)
+	//DebugPrint("Got Address");
+	//DebugPrint(addr);
+	long newAddress = static_cast<long>(addr);
+	
+	if(newAddress != _lastDetectedAddress)
 	{
-		Serial.print("New address:"); Serial.println(addr, HEX);
-		_lastBeaconAddress = addr;
-		_lastBeaconAddressUpdate = millis();
+		_encoderCounterAtLastAddress = _speedometer->GetCurrentTicks();
+		_lastDetectedAddress = newAddress;
+		//Serial.print("New address:"); Serial.println(addr);
+		ReturnGetValue(CMD_LAST_DETECTED_ADDRESS, GetLastDetectedAddress());
+		_lastDetectedAddress = addr;
+		_lastDetectedAddressUpdate = millis();
 	}
 
-	if((_lastBeaconAddressUpdate + _beaconAddressUpdateInterval) < millis())
+	if((_lastDetectedAddressUpdate + _beaconAddressUpdateInterval) < millis())
 	{
-		Serial.print("Addr update:"); Serial.println(_lastBeaconAddress, HEX);
-		_lastBeaconAddressUpdate = millis();
+		//Serial.print("Addr update:"); Serial.println(_lastDetectedAddress);
+	//	Serial.print("Addr update:"); Serial.println(addr);
+		ReturnGetValue(CMD_LAST_DETECTED_ADDRESS, GetLastDetectedAddress());
+		_lastDetectedAddressUpdate = millis();
 	}
 	_distanceFromLastBeacon = 0;
 }

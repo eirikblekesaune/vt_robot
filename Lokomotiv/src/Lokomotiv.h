@@ -1,12 +1,9 @@
 #ifndef LOKOMOTIV_H
 #define LOKOMOTIV_H
 #include "IRReader.h"
-#include "LedDimmer.h"
 #include "LokomotivMotor.h"
-//Change the default i2c rate
-#define TWI_FREQ 50000L
+#include "LokomotivSpeedometer.h"
 #include "Wire.h"
-
 
 class Lokomotiv{
 public:
@@ -16,10 +13,11 @@ public:
 	long GetDistanceFromLastIRBeaconDetection();
 	
 	long GetSpeed();
+	long GetEndSpeed() {_motor->GetEndSpeed();};
 	long GetDirection();
 	long GetTargetPosition();
 	long GetDistanceFromLastAddress();
-	long GetLed();
+	long GetPeripheral(long data);
 	long GetState();
 	long GetMeasuredSpeed();
 	long GetLastDetectedAddress();
@@ -27,18 +25,20 @@ public:
 	double GetPidIValue();
 	double GetPidDValue();
 
-	void SetSpeed(long val);
-	void SetDirection(long val);
+	void SetSpeed(long val) {_motor->SetSpeed(static_cast<speed_t>(val));};
+	void SetEndSpeed(long val) {_motor->SetEndSpeed(static_cast<speed_t>(val));};
+	void SetGlideToSpeed(long val) {_motor->GlideToSpeed(static_cast<int16_t>(val));};
+	void SetDirection(long val) {_motor->SetDirection(static_cast<int16_t>(val));};
 	void SetTargetPosition(long val);
 	void SetDistanceFromLastAddress(long val);
-	void SetLed(long val);
+	void SetPeripheral(long val);
+	void SetPeripheralRequest(long val);
 	void SetState(long val);
-	void SetMeasuredSpeed(long val);
 	void SetLastDetectedAddress(long val);
 	void SetPidPValue(double val);
 	void SetPidIValue(double val);
 	void SetPidDValue(double val);
-	void Stop() {}
+	void Stop(long val) {_motor->Stop(static_cast<int16_t>(val));};
 	void Init();
 	void Update();
 	void GotAddr(unsigned char);
@@ -47,12 +47,11 @@ public:
 private:
 	LokomotivMotor *_motor;
 	IRReader *_irReader;
-	unsigned char _lastBeaconAddress;
-	long _lastBeaconAddressUpdate;
+	LokomotivSpeedometer *_speedometer;
+	long _lastDetectedAddressUpdate;
+	long _encoderCounterAtLastAddress;
 	static const long _beaconAddressUpdateInterval;
 
-	int16_t _speed;
-	long _direction;
 	long _targetPosition;
 	long _distanceFromLastAddress;
 	int16_t _led;

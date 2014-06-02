@@ -15,6 +15,8 @@
 |            -calcprogrammer1@gmail.com                 |
 \*-----------------------------------------------------*/
 
+//VT notes:
+//This file has been modified for a different design for Verdensteatret
 #include "usi_i2c_slave.h"
 
 char usi_i2c_slave_internal_address;
@@ -25,7 +27,7 @@ char usi_i2c_mode;
 ////USI Slave States///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define USI_SLAVE_REGISTER_COUNT 5
+#define USI_SLAVE_REGISTER_COUNT 7
 
 // The I2C register file is stored as an array of pointers, point these to whatever your I2C registers
 // need to read/write in your code.  This abstracts the buffer and makes it easier to write directly

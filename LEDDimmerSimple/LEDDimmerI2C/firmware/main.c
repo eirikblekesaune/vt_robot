@@ -2,79 +2,69 @@
  * PWMDimmer.c
  *
  * Created: 27.01.2014 18:36:22
- *  Author: Eirik
+ *  Author: Eirik Blekesaune
+ *
  */ 
 
 #define F_CPU 20000000
 #include <avr/io.h>
 #include <util/delay.h>
-#include "usi_i2c_slave.h"
+#include "LEDDimmerSimple.h"
+//#include "LEDDimmer_USI.h"
 
-#define LED_PIN PORTA5
-#define LED_PORT PORTA
-#define LED_DDR DDRA
-#define DEVICE_ADDRESS 2
+#define ADDR_PINS PINA
+#define ADDR_PIN_MASK 0x0F
 
-//command message enum
-enum _command_t {
-	NO_CMD,
-	LED_VALUE_CMD,
-	FADE_LED_CMD,
-	FLASH_LED_CMD
-} command_t;
-
-uint32_t inData = 0;
-uint8_t command = 0;
-extern char* USI_Slave_register_buffer[];
-
-uint16_t ledValue = 0;
-double fadeFactor = 1.0;
-//set pullups for dip dwitch pins
-//
-//
-void setFadeValues(uint16_t targetValue, uint16_t fadeTime)
+uint8_t readTWIAddressPins()
 {
+	int8_t pinValues, result;
+	pinValues = ADDR_PINS & ADDR_PIN_MASK;
+	pinValues = ~(pinValues | 0xF0);
+	result = ((pinValues & 0x08) >> 3) |
+					((pinValues & 0x04) >> 1) |
+					((pinValues & 0x02) << 1) |
+					((pinValues & 0x01) << 3);
+	return result;
+}
+
+void doCommand(uint8_t commandKey, uint16_t commandData)
+{
+	switch(commandKey)
+	{
+		case LED_VALUE_CMD:
+			SetLEDValue(commandData);
+			break;
+		case FADE_TARGET_LED_CMD:
+			SetLEDFadeTarget(commandData);
+			break;
+		case FADE_TIME_LED_CMD:
+			SetLEDFadeTime(commandData);
+			break;
+		case FLASH_LED_CMD:
+			FlashLED(commandData);
+			break;
+	}
 }
 
 int main(void)
 {
-	//set pin direction for PWM pin
-	LED_DDR |= (1<<LED_PIN);
-	LED_PORT &= ~(1<<LED_PIN);
-	TCCR1A = 0b00100000;
-	TCCR1B = 0b00010001;
-	ICR1 = 0x0FFF;
-	OCR1B = 0x0000;
+	//init dip switch pin pullups
+	PORTA |= 0x0F;
+	//set switch pins as inputs
+	InitLEDDimmer();
+	//InitUSI(readTWIAddressPins());
+	
 	sei();
-	//initialize I2C module
-	USI_I2C_Init(DEVICE_ADDRESS);
-	USI_Slave_register_buffer[0] = (char*)&command;
-	USI_Slave_register_buffer[1] = (char*)&inData;
-	USI_Slave_register_buffer[2] = (char*)&inData + 1; 
-	USI_Slave_register_buffer[3] = (char*)&inData + 2;
-	USI_Slave_register_buffer[4] = (char*)&inData + 3;
-
 	while(1)
-    {
-		
-		//Find the I2C address by reading the dip switch
-		////if this has changed
-		////reinit the i2c connection	
-		if(command != NO_CMD)
+	{
+		//Find the TWI address by reading the dip switch
+		while(HasQueuedCommands())
 		{
-			switch(command)
-			{
-				case LED_VALUE_CMD:
-					OCR1B = inData;
-					break;
-				case FADE_LED_CMD:
-					setFadeValues((uint16_t)&inData, (uint16_t)&inData + 2);
-			}
-			command = NO_CMD;
+			uint8_t nextCommand = GetNextCommand();
+			uint16_t nextCommandData = GetDataAtTail();
+			doCommand(nextCommand, nextCommandData);
 		}
-
-
-		asm volatile ("nop");	
-		_delay_ms(10);
+		asm volatile ("nop");
+		SetTWIAddress(readTWIAddressPins());
 	}
 }

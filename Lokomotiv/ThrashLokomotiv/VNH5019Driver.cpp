@@ -39,6 +39,8 @@ void VNH5019Driver::init()
 
 void VNH5019Driver::SetSpeed(speed_t speed)
 {
+	DebugPrint("Setting speed");
+	DebugPrint(speed);
   if (speed < 0)
     speed = 0;
   if (speed > SPEED_MAX)  // Max PWM dutycycle
