@@ -7,15 +7,15 @@
 ~coordinator.sendATCommand('NodeDiscover');
 )
 (
-~lok = VTLokomotiv.new(~coordinator, 1084801684);
-//~lok = VTLokomotiv.new(~coordinator, ~coordinator.getChildDeviceByName('TOG08').addressLo);
+//~lok = VTLokomotiv.new(~coordinator, 1084801684);
+~lok = VTLokomotiv.new(~coordinator, ~coordinator.getChildDeviceByName('TOG05').addressLo);
 ~controller = {arg ...args; "changed: %: %".format(args, args[0].perform(args[1].asSymbol)).postln};
 ~lok.addDependant(~controller);
 )
 
 ~coordinator.sendATCommand('NodeDiscover', "TOG08".ascii);
 ~coordinator.childDevices
-~lok.set(\speed, 100);
+~lok.set(\speed, 150);
 ~lok.set(\speed, 0);
 ~lok.set(\direction, 1);//right, position decrements (minus) backward
 ~lok.set(\direction, 0);//left, position increments (pluss) forward

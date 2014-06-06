@@ -3,6 +3,7 @@
 uint8_t address;
 
 volatile uint8_t currentCommand;
+volatile uint8_t currentSetGet;
 volatile uint8_t currentDataByte0;
 volatile uint8_t currentDataByte1;
 
