@@ -3,7 +3,7 @@
 #include "IRReader.h"
 #include "LokomotivMotor.h"
 #include "LokomotivSpeedometer.h"
-#include "Wire.h"
+//#include "Wire.h"
 
 class Lokomotiv{
 public:

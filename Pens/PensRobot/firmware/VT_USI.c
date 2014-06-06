@@ -1,12 +1,12 @@
-#include "LEDDimmer_USI.h"
+#include "VT_USI.h"
 
-uint8_t address;
+volatile uint8_t address;
 
 volatile uint8_t currentCommand;
 volatile uint8_t currentSetGet;
 volatile uint8_t currentDataByte0;
 volatile uint8_t currentDataByte1;
-
+volatile uint16_t data;
 uint8_t commandQueue[TWI_BUFFER_SIZE];
 uint16_t commandDataQueue[TWI_BUFFER_SIZE];
 volatile uint8_t commandQueueHead;
@@ -16,6 +16,8 @@ uint8_t transmitQueue[TWI_BUFFER_SIZE];
 uint16_t transmitDataQueue[TWI_BUFFER_SIZE];
 volatile uint8_t transmitQueueHead;
 volatile uint8_t transmitQueueTail;
+SET_CALLBACK *setCommands[TWI_BUFFER_SIZE];
+GET_CALLBACK *getCommands[TWI_BUFFER_SIZE];
 
 volatile uint8_t numBytesReceived = 0;
 volatile uint8_t numBytesTransmitted = 0;
@@ -31,7 +33,7 @@ volatile uint8_t numBytesTransmitted = 0;
 ///The GetNextCommand and GetDataAtTail functions are to
 //be called in conjuction since the first function increases
 //the tail pointer in the queue by one.
-uint8_t GetNextCommand()
+uint8_t GetNextCommandID()
 {
 	commandQueueTail++;
 	return commandQueue[commandQueueTail];
@@ -50,16 +52,22 @@ uint8_t HasQueuedCommands()
 enum
 {
   USI_OVF_WAITING_FOR_ADDRESS_BYTE,
-	USI_OVF_SENDING_ACK,
-	USI_OVF_WAITING_FOR_COMMAND_BYTE,
-	USI_OVF_WAITING_FOR_DATA_BYTE0,
-	USI_OVF_WAITING_FOR_DATA_BYTE1,
-	USI_OVF_SENDING_ACK_FOR_COMMAND_REQUEST,
-	USI_OVF_WAITING_FOR_ACK,
-	USI_OVF_WAITING_FOR_REQUESTED_COMMAND_BYTE,
-	USI_OVF_SENDING_COMMAND_BYTE,
-	USI_OVF_SENDING_DATA_BYTE0,
-	USI_OVF_SENDING_DATA_BYTE1,
+	USI_OVF_SENDING_WRITE_ACK,
+	USI_OVF_WAITING_FOR_WRITE_COMMAND_BYTE,
+	USI_OVF_SENDING_WRITE_COMMAND_BYTE_ACK,
+	USI_OVF_WAITING_FOR_WRITE_DATA_BYTE0,
+	USI_OVF_SENDING_WRITE_DATA_BYTE0_ACK,
+	USI_OVF_WAITING_FOR_WRITE_DATA_BYTE1,
+	USI_OVF_SENDING_WRITE_DATA_BYTE1_ACK,//this might rather be a stop condition
+	USI_OVF_SENDING_READ_ACK,
+	USI_OVF_WAITING_FOR_READ_COMMAND_BYTE,
+	USI_OVF_SENDING_READ_COMMAND_BYTE_ACK,
+	USI_OVF_SENDING_READ_COMMAND_BYTE,
+	USI_OVF_WAITING_FOR_READ_COMMAND_ACK,
+	USI_OVF_SENDING_READ_DATA_BYTE0,
+	USI_OVF_WAITING_FOR_READ_DATA_BYTE0_ACK,
+	USI_OVF_SENDING_READ_DATA_BYTE1,
+	USI_OVF_WAITING_FOR_READ_DATA_BYTE1_ACK,//this might rather be waiting for NACK
 } USIOverflowParserState;
 
 void InitUSI(uint8_t addr)
@@ -99,9 +107,17 @@ void FlushTWIBuffers()
 	commandQueueTail = 0;
 	transmitQueueHead = 0;
 	transmitQueueTail = 0;
-
 }
 
+void AddGetCommandCallback(uint8_t commandID, GET_CALLBACK *callback)
+{
+	setCommands[commandID] = callback;
+}
+
+void AddSetCommandCallback(uint8_t commandID, SET_CALLBACK *callback)
+{
+	getCommands[commandID] = callback;
+}
 
 
 //Disable counter interrupt, enable start condition interrupt, 
@@ -114,9 +130,8 @@ void FlushTWIBuffers()
 #define USISR_CLEAR_COUNTER_AND_FLAGS 0b11110000 
 
 //Start condition interrupt routine
-ISR(USI_STR_vect)
+ISR(USI_START_VECTOR)
 {
-	OCR1B = 0x0FFF;
 	USIOverflowParserState = USI_OVF_WAITING_FOR_ADDRESS_BYTE;
 	//wait until SCL line goes low to ensure that a full start condition
 	//has been met. Both SDA and SCL must be pulled low for that to happen.
@@ -133,8 +148,98 @@ ISR(USI_STR_vect)
 	USISR = USISR_CLEAR_COUNTER_AND_FLAGS;
 }
 
-ISR(USI_OVF_vect)
+ISR(USI_OVERFLOW_VECTOR)
 {
+	switch(USIOverflowParserState)
+	{
+		case USI_OVF_WAITING_FOR_ADDRESS_BYTE:
+			//Now we have gotten the address from master
+			if((address == 0x00) || ((USIDR >> 7) == address))
+			{
+				//Check if read or write
+				if(USIDR & 0x01)
+				{//1 means it is a read message
+					USIOverflowParserState = USI_OVF_SENDING_READ_ACK; 
+				} else {
+					//it is 0 so it is a write message
+					USIOverflowParserState = USI_OVF_SENDING_WRITE_ACK;
+				}
+				SET_USI_TO_SEND_ACK();
+			}
+			break;
+		case USI_OVF_SENDING_WRITE_ACK:
+			USIOverflowParserState = USI_OVF_WAITING_FOR_WRITE_COMMAND_BYTE;
+			SET_USI_TO_RECEIVE_DATA_BYTES_MODE();
+			break;
+		case USI_OVF_WAITING_FOR_WRITE_COMMAND_BYTE:
+			USIOverflowParserState = USI_OVF_SENDING_WRITE_COMMAND_BYTE_ACK;
+			SET_USI_TO_SEND_ACK();
+			break;
+		case USI_OVF_SENDING_WRITE_COMMAND_BYTE_ACK:
+			USIOverflowParserState = USI_OVF_WAITING_FOR_WRITE_DATA_BYTE0;
+			SET_USI_TO_RECEIVE_DATA_BYTES_MODE();
+			break;
+		case USI_OVF_WAITING_FOR_WRITE_DATA_BYTE0:
+			USIOverflowParserState = USI_OVF_SENDING_WRITE_DATA_BYTE0_ACK;
+			SET_USI_TO_SEND_ACK();
+			break;
+		case USI_OVF_SENDING_WRITE_DATA_BYTE0_ACK:
+			USIOverflowParserState = USI_OVF_WAITING_FOR_WRITE_DATA_BYTE1;
+			SET_USI_TO_RECEIVE_DATA_BYTES_MODE();
+			break;
+		case USI_OVF_WAITING_FOR_WRITE_DATA_BYTE1:
+			USIOverflowParserState = USI_OVF_WAITING_FOR_ADDRESS_BYTE;
+			//maybe we should wait for the stop condition here...
+			SET_USI_TO_RECEIVE_START_CONDITION_MODE();
+			break;
+		case USI_OVF_SENDING_WRITE_DATA_BYTE1_ACK://this might rather be a stop condition
+			USIOverflowParserState = USI_OVF_WAITING_FOR_ADDRESS_BYTE; 
+			break;
+		case USI_OVF_SENDING_READ_ACK:
+			USIOverflowParserState = USI_OVF_WAITING_FOR_READ_COMMAND_BYTE;
+			SET_USI_TO_RECEIVE_DATA_BYTES_MODE();
+			break;
+		case USI_OVF_WAITING_FOR_READ_COMMAND_BYTE:
+			currentCommand = USIDR;
+			USIOverflowParserState = USI_OVF_SENDING_READ_COMMAND_BYTE_ACK;
+			SET_USI_TO_SEND_ACK();
+			break;
+		case USI_OVF_SENDING_READ_COMMAND_BYTE_ACK:
+			USIOverflowParserState = USI_OVF_SENDING_READ_COMMAND_BYTE;
+		  SET_USI_TO_SEND_DATA_BYTES_MODE();
+			break;
+		case USI_OVF_SENDING_READ_COMMAND_BYTE:
+			USIOverflowParserState = USI_OVF_WAITING_FOR_READ_COMMAND_ACK;
+			SET_USI_TO_READ_ACK();
+			break;
+		case USI_OVF_WAITING_FOR_READ_COMMAND_ACK:
+			//check if ACK
+			USIOverflowParserState = USI_OVF_SENDING_READ_DATA_BYTE0;
+			data = getCommands[currentCommand]();
+			currentDataByte0 = (uint8_t)(data & 0xFF);
+			currentDataByte1 =(uint8_t)(data >> 8);
+			SET_USI_TO_SEND_DATA_BYTES_MODE();
+			break;
+		case USI_OVF_SENDING_READ_DATA_BYTE0:
+			USIOverflowParserState = USI_OVF_WAITING_FOR_READ_DATA_BYTE0_ACK;
+			SET_USI_TO_READ_ACK();
+			break;
+		case USI_OVF_WAITING_FOR_READ_DATA_BYTE0_ACK:
+			//check if ACK
+			USIOverflowParserState = USI_OVF_SENDING_READ_DATA_BYTE1;
+			SET_USI_TO_SEND_DATA_BYTES_MODE();
+			break;
+		case USI_OVF_SENDING_READ_DATA_BYTE1:
+			USIOverflowParserState = USI_OVF_WAITING_FOR_ADDRESS_BYTE;
+			SET_USI_TO_RECEIVE_START_CONDITION_MODE();
+			break;
+		case USI_OVF_WAITING_FOR_READ_DATA_BYTE1_ACK://this might rather be waiting for NACK, or drop it entierely
+			USIOverflowParserState = USI_OVF_WAITING_FOR_ADDRESS_BYTE;
+			SET_USI_TO_RECEIVE_START_CONDITION_MODE();
+			break;
+	}
+}
+/*
 	switch(USIOverflowParserState)
 	{
 		case USI_OVF_WAITING_FOR_ADDRESS_BYTE:
@@ -251,5 +356,4 @@ ISR(USI_OVF_vect)
 			USIOverflowParserState = USI_OVF_WAITING_FOR_ACK;
 			break;
 	}
-}
-
+*/
