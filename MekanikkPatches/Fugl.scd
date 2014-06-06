@@ -1,0 +1,22 @@
+//Fuglen
+~fuglAddr = NetAddr("1.2.3.112", 50004);
+// ~flyingCtrl.components['rotaryA.8'].action_({arg comp;
+// 	var myval, mydir;
+// 	myval = comp.value.linlin(0, 127, -5, 5).asInteger;
+// 	mydir = if(myval.isNegative, {"down"}, {"up"});
+// 	["fugl", mydir, myval.abs.asInteger].postln;
+// 	~fuglAddr.sendMsg("/robot/fugl/direction", mydir);
+// 	~fuglAddr.sendMsg("/robot/fugl/speed", myval.abs);
+// });
+// ~flyingCtrl.components['rotaryButtonA.8'].action_({arg comp;
+// 	~fuglAddr.sendMsg("/robot/fugl/speed", 0);
+// 	~flyingCtrl.components['rotaryA.8'].valueAction_(64).refresh;
+// });
+OSCFunc({arg msg, time, addr, port;
+	var myval, mydir;
+	myval = msg[1].linlin(-512, 512, -5, 5).asInteger;
+	mydir = if(myval.isNegative, {"down"}, {"up"});
+	["fuglOSC", mydir, myval.abs.asInteger].postln;
+	~fuglAddr.sendMsg("/robot/fugl/direction", mydir);
+	~fuglAddr.sendMsg("/robot/fugl/speed", myval.abs);
+}, '/robot/fugl.1/speed');
