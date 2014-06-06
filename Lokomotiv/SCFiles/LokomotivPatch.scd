@@ -1,3 +1,4 @@
+SerialPort.devices
 (
 ~coordinator = XBeeCoordinatorAPIMode(SerialPort('/dev/tty.usbserial-A600ezu2', 9600));
 //~coordinator = XBeeCoordinatorAPIMode(SerialPort('/dev/tty.usbserial-13X2XBD8', 9600));
@@ -7,13 +8,20 @@
 ~coordinator.sendATCommand('NodeDiscover');
 )
 (
-//~lok = VTLokomotiv.new(~coordinator, 1084801684);
-~lok = VTLokomotiv.new(~coordinator, ~coordinator.getChildDeviceByName('TOG05').addressLo);
+~lok2 = VTLokomotiv.new(~coordinator, ~coordinator.getChildDeviceByName('TOG02').addressLo);
+~lok8 = VTLokomotiv.new(~coordinator, ~coordinator.getChildDeviceByName('TOG08').addressLo);
 ~controller = {arg ...args; "changed: %: %".format(args, args[0].perform(args[1].asSymbol)).postln};
-~lok.addDependant(~controller);
+~lok2.addDependant(~controller);
+~lok8.addDependant(~controller);
 )
+~lok = ~lok8;
+~lok = ~lok2;
+~lok.set(\speed, 250)
+~lok.set(\speed, 0)
+~lok.set(\direction, 1);//right, position decrements (minus) backward
+~lok.set(\direction, 0);//left, position increments (pluss) forward
 
-~coordinator.sendATCommand('NodeDiscover', "TOG08".ascii);
+~coordinator.sendATComand('NodeDiscover', "TOG08".ascii);
 ~coordinator.childDevices
 ~lok.set(\speed, 150);
 ~lok.set(\speed, 0);
@@ -30,7 +38,7 @@
 
 ~lok.set(\stop, 4000);
 ~lok.set(\glideToSpeed, 3000);
-~lok.set(\endSpeed, 150);
+~lok.set(\endSpeed, 0);
 
 9216.asBinaryString(16)
 
