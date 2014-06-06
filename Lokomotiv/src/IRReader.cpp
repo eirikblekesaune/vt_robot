@@ -24,6 +24,7 @@ void IRReader::Update()
 	if(receiver_->decode(&results_))
 	{
 		unsigned long result = results_.value;
+		DebugPrint("deconding");
 		if(results_.decode_type == NEC)
 		{
 			if(result == kPad1)
