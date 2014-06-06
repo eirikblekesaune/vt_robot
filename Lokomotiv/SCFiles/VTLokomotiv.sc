@@ -11,6 +11,7 @@ VTLokomotiv {
 	var <xbeeDevice;
 	var <remoteXBeeDeviceAddress;
 	var <mode;
+	var bipolarSpeed;
 
 	var parserState, parseRoutine, currentCommand, currentValueBytes;
 	var currentStringData;
@@ -24,12 +25,12 @@ VTLokomotiv {
 	}
 
 	init{arg xbeeDevice_, remoteXBeeDeviceAddress_;
-		// xbeeDevice = xbeeDevice_;
-		// remoteXBeeDeviceAddress = remoteXBeeDeviceAddress_;
-		// this.device.rxAction_({arg data;
-		// 	//"Parsing incoming lokomotiv data".postln;
-		// 	data.do{arg item; this.prParseByte(item); };
-		// });
+		xbeeDevice = xbeeDevice_;
+		remoteXBeeDeviceAddress = remoteXBeeDeviceAddress_;
+		this.device.rxAction_({arg data;
+			//"Parsing incoming lokomotiv data".postln;
+			data.do{arg item; this.prParseByte(item); };
+		});
 		pid = (P: 0.0, I: 0.0, D: 0.0);
 		currentStringData = String.new(128);
 		currentValueBytes = Array.new(4);
@@ -42,6 +43,38 @@ VTLokomotiv {
 
 	name{
 		^this.device.name;
+	}
+
+	speed_{arg val;
+		speed = val.clip(0, 512);
+		this.set(\speed, speed);
+		this.changed(\speed);
+	}
+
+	direction_{arg val;
+		direction = val.clip(0, 1);
+		this.set(\direction, val);
+		this.changed(\direction);
+	}
+
+	bipolarSpeed{
+		if(direction == 0, {^speed;}, {^speed.neg});
+	}
+
+	bipolarSpeed_{arg val;
+		if(val.isNegative and: {direction != 1}, {
+			this.direction_(1);
+		});
+		if(val.isPositive and: {direction != 0}, {
+			this.direction_(0);
+		});
+		this.speed_(val.abs);
+		this.changed(\bipolarSpeed);
+	}
+
+	stop{arg val;
+		this.speed_(0);
+		//this.changed(\stop);
 	}
 
 	prResetParser{
@@ -171,8 +204,8 @@ VTLokomotiv {
 			this.class.setGet[\set] |
 			this.class.byteType[\command]
 		);
-		//		msg = msg.as(Int8Array);
-		//this.prSend(msg);
+		//msg = msg.as(Int8Array);
+		this.prSend(msg);
 		"Sending mess: %".format(msg).postln;
 		^msg;
 	}
