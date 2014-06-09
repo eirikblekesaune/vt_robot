@@ -32,33 +32,31 @@
 };
 
 fork{
-	~coordinator = XBeeCoordinatorAPIMode(SerialPort('/dev/tty.usbserial-A600ezu2', 9600));
+	~coordinator = XBeeCoordinatorAPIMode(SerialPort('/dev/tty.usbserial-A600ezu2', 115200));
 	~coordinator.start;
 	~coordinator.rxAction_(nil);
 	~coordinator.sendATCommand('NodeDiscover');
 	~controller = {arg ...args; "changed: %: %".format(args, args[0].perform(args[1].asSymbol)).postln};
 	10.wait;
 	~lok = Dictionary.new;
-	["TOG08"].do{arg togName, i;
-		var togFader, togStopButton, faderUpdater;
-		var newLok = VTLokomotiv.new(~coordinator, ~coordinator.getChildDeviceByName(togName.asSymbol).addressLo);
-		togFader = ~togCtrlB.components.at(("fader." ++ (i + 1)).asSymbol);
-		togFader.action = {arg val; newLok.bipolarSpeed_(val.value.linlin(0, 1023, -512, 512).asInteger)};
-		togStopButton = ~togCtrlB.components.at(("button." ++ (i + 9)).asSymbol);
-		togStopButton.action = {arg val; newLok.stop(1000);};
-		faderUpdater = {arg theChanger, theChanged;
-			switch(theChanged,
-				\speed, {togFader.value_(theChanger.bipolarSpeed.asInteger.linlin(-512,512, 0, 1023).asInteger).refresh;},
-				\stop, {togFader.value_(512).refresh;}
-			);
-		};
-		newLok.addDependant(faderUpdater);
-		newLok.addDependant(~controller);
-
-		~lok.put(togName, newLok);
-
-
-	};
+	// ["TOG08"].do{arg togName, i;
+	// 	var togFader, togStopButton, faderUpdater;
+	// 	var newLok = VTLokomotiv.new(~coordinator, ~coordinator.getChildDeviceByName(togName.asSymbol).addressLo);
+	// 	togFader = ~togCtrlB.components.at(("fader." ++ (i + 1)).asSymbol);
+	// 	togFader.action = {arg val; newLok.bipolarSpeed_(val.value.linlin(0, 1023, -512, 512).asInteger)};
+	// 	togStopButton = ~togCtrlB.components.at(("button." ++ (i + 9)).asSymbol);
+	// 	togStopButton.action = {arg val; newLok.stop(1000);};
+	// 	faderUpdater = {arg theChanger, theChanged;
+	// 		switch(theChanged,
+	// 			\speed, {togFader.value_(theChanger.bipolarSpeed.asInteger.linlin(-512,512, 0, 1023).asInteger).refresh;},
+	// 			\stop, {togFader.value_(512).refresh;}
+	// 		);
+	// 	};
+	// 	newLok.addDependant(faderUpdater);
+	// 	newLok.addDependant(~controller);
+	//
+	// 	~lok.put(togName, newLok);
+	// };
 	//Wireless LED fader
 
 
