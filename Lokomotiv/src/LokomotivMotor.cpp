@@ -73,8 +73,6 @@ void LokomotivMotor::SetSpeed(speed_t newSpeed)
 	if(newSpeed < kSpeedMin)
 		newSpeed = kSpeedMin;
 	_speed = newSpeed;
-	DebugPrint("speed");
-	DebugPrint(_speed);
 	OCR1B = _speed;
 	if (_speed == 0)
   {

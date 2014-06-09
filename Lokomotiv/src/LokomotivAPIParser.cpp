@@ -113,6 +113,7 @@ void LokomotivAPIParser::_executeCommand()
 					_robot->SetTargetPosition(_decodeIntegerValue(_data));
 					break;
 				case CMD_DISTANCE_FROM_LAST_ADDRESS:
+					_robot->SetDistanceFromLastAddress(_decodeIntegerValue(_data));
 					break;
 				case CMD_PERIPHERAL:
 					_robot->SetPeripheral(_decodeIntegerValue(_data));
@@ -142,6 +143,9 @@ void LokomotivAPIParser::_executeCommand()
 					break;
 				case CMD_END_SPEED:
 					_robot->SetEndSpeed(_decodeIntegerValue(_data));
+					break;
+				case CMD_DISTANCE_POLLING_INTERVAL:
+					_robot->SetDistancePollingInterval(_decodeIntegerValue(_data));
 					break;
 				default:
 					DebugPrint("Unknown command");
@@ -194,6 +198,9 @@ void LokomotivAPIParser::_executeCommand()
 					break;
 				case CMD_END_SPEED:
 					ReturnGetValue(CMD_END_SPEED,_robot->GetEndSpeed());
+					break;
+				case CMD_DISTANCE_POLLING_INTERVAL:
+					ReturnGetValue(CMD_DISTANCE_POLLING_INTERVAL,_robot->GetDistancePollingInterval());
 					break;
 				default:
 					DebugPrint("Unknown command");
