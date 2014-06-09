@@ -7,7 +7,7 @@ const int driverENDIAG = 6;
 const int motorEncoderInterruptIndex = 0;// digital pin 2 on Leonardo implicitly
 
 const long Lokomotiv::_beaconAddressUpdateInterval = 1000;
-	
+long lastDistanceUpdate = 0;
 //IR reader
 const int irReaderReceivePin = 8;
 
@@ -40,6 +40,11 @@ long Lokomotiv::GetDistanceFromLastAddress(){
 	return _encoderCounterAtLastAddress - _speedometer->GetCurrentTicks();
 }
 
+void Lokomotiv::SetDistanceFromLastAddress(long val){
+	_encoderCounterAtLastAddress = _speedometer->GetCurrentTicks();
+}
+
+
 long Lokomotiv::GetPeripheral(long data){return 0;}
 long Lokomotiv::GetState(){return _state;}
 long Lokomotiv::GetMeasuredSpeed(){return _speedometer->GetMeasuredSpeed();};
@@ -48,11 +53,23 @@ double Lokomotiv::GetPidPValue(){return _pidPValue;}
 double Lokomotiv::GetPidIValue(){return _pidIValue;}
 double Lokomotiv::GetPidDValue(){return _pidDValue;}
 //Setters
+void Lokomotiv::SetDistancePollingInterval(long val)
+{
+	if(val == 0)
+	{
+		_distancePollingEnabled = false;
+		_distancePollingInterval = 0;
+	} else {
+		_distancePollingEnabled = true;
+		_distancePollingInterval = max(20, val);
+	}
+}
+long Lokomotiv::GetDistancePollingInterval()
+{
+	return _distancePollingInterval;
+}
 
 void Lokomotiv::SetTargetPosition(long val){_targetPosition = val;}
-void Lokomotiv::SetDistanceFromLastAddress(long val){
-	_distanceFromLastAddress = val;
-}
 
 void Lokomotiv::SetPeripheral(long data)
 {
@@ -100,6 +117,14 @@ void Lokomotiv::Update()
 {
 	_motor->Update();
 	_irReader->Update();
+	if(_distancePollingEnabled)
+	{
+		if((millis() - lastDistanceUpdate) >= _distancePollingInterval)
+		{
+			ReturnGetValue(CMD_DISTANCE_FROM_LAST_ADDRESS, GetDistanceFromLastAddress());
+			lastDistanceUpdate = millis();
+		}
+	}
 }
 
 void Lokomotiv::GotAddr(unsigned char addr)

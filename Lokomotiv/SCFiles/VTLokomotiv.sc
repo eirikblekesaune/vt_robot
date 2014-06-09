@@ -256,7 +256,8 @@ VTLokomotiv {
 			\endSpeed -> 0x0E,
 			\endTransmission -> 0x0F,
 			\peripheralRequest -> 0x10,
-			\motorMode -> 0x11
+			\motorMode -> 0x11,
+			\distancePolling -> 0x12//0 = off, n = polling interval in ms (min.val. 20ms)
 		];
 		setGet = TwoWayIdentityDictionary[
 			\set -> 0x00,

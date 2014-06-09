@@ -24,6 +24,7 @@ public:
 	double GetPidPValue();
 	double GetPidIValue();
 	double GetPidDValue();
+	long GetDistancePollingInterval();
 
 	void SetSpeed(long val) {_motor->SetSpeed(static_cast<speed_t>(val));};
 	void SetEndSpeed(long val) {_motor->SetEndSpeed(static_cast<speed_t>(val));};
@@ -38,6 +39,8 @@ public:
 	void SetPidPValue(double val);
 	void SetPidIValue(double val);
 	void SetPidDValue(double val);
+	void SetDistancePollingInterval(long val);
+
 	void Stop(long val) {_motor->Stop(static_cast<int16_t>(val));};
 	void Init();
 	void Update();
@@ -61,6 +64,8 @@ private:
 	double _pidPValue;
 	double _pidIValue;
 	double _pidDValue;
+	long _distancePollingInterval;
+	bool _distancePollingEnabled;
 
 };
 

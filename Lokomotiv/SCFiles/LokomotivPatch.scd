@@ -14,7 +14,7 @@ SerialPort.devices
 )
 ~lok = ~lok8;
 ~lok = ~lok2;
-~lok.set(\speed, 150)
+~lok.set(\speed, 120)
 ~lok.set(\speed, 0)
 ~lok.set(\direction, 1);//right, position decrements (minus) backward
 ~lok.set(\direction, 0);//left, position increments (pluss) forward
