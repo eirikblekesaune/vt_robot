@@ -39,7 +39,7 @@ fork{
 	~controller = {arg ...args; "changed: %: %".format(args, args[0].perform(args[1].asSymbol)).postln};
 	10.wait;
 	~lok = Dictionary.new;
-	["TOG02", "TOG08"].do{arg togName, i;
+	["TOG08"].do{arg togName, i;
 		var togFader, togStopButton, faderUpdater;
 		var newLok = VTLokomotiv.new(~coordinator, ~coordinator.getChildDeviceByName(togName.asSymbol).addressLo);
 		togFader = ~togCtrlB.components.at(("fader." ++ (i + 1)).asSymbol);
