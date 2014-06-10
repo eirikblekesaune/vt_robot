@@ -129,7 +129,7 @@ void Lokomotiv::Update()
 
 void Lokomotiv::GotAddr(unsigned char addr)
 {
-	//We don't need to update repeating beacon addres more than once a
+	//We don't need to update repeating beacon address more than once a
 	//second.
 	//DebugPrint("Got Address");
 	//DebugPrint(addr);
