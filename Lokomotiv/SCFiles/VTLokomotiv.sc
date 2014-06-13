@@ -46,9 +46,11 @@ VTLokomotiv {
 	}
 
 	speed_{arg val;
-		speed = val.clip(0, 512);
-		this.set(\speed, speed);
-		this.changed(\speed);
+		if(val != speed, {
+			speed = val.clip(0, 512);
+			this.set(\speed, speed);
+			this.changed(\speed);
+		});
 	}
 
 	direction_{arg val;
@@ -257,7 +259,7 @@ VTLokomotiv {
 			\endTransmission -> 0x0F,
 			\peripheralRequest -> 0x10,
 			\motorMode -> 0x11,
-			\distancePolling -> 0x12//0 = off, n = polling interval in ms (min.val. 20ms)
+			\distancePollingInterval -> 0x12//0 = off, n = polling interval in ms (min.val. 20ms)
 		];
 		setGet = TwoWayIdentityDictionary[
 			\set -> 0x00,

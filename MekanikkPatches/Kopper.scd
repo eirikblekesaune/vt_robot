@@ -32,6 +32,11 @@
 OSCFunc({arg msg, time, addr, resp;
 	~kopper.do(_.stop);
 }.inEnvir, '/robot/flying/stop');
+~koppWalkMaxSpeed = 150;
+
+OSCdef('koppWalkMaxSpeed', {arg msg, time, addr, port;
+	"koppWalkMaxSpeed: %".format(msg[1]).postln;
+	~koppWalkMaxSpeed = msg[1];}, '/robot/flying/walkMaxSpeed');
 
 ~koppWalkStart = {
 	[0,1,2,3,5].do({arg koppIndex;
@@ -42,7 +47,7 @@ OSCFunc({arg msg, time, addr, resp;
 		Tdef(taskKey, {
 				var waitTime = rrand(5.0, 20.0);
 				var newPos = rrand(250, 600);
-				var speedRamp = Env([0, rrand(80, 150), 40], [5, rrand(1, 10)]).asPseg.asStream;
+				var speedRamp = Env([0, rrand(80, ~koppWalkMaxSpeed), 40], [5, rrand(1, 10)]).asPseg.asStream;
 				"setting new target kopp %: %".format(koppNum, newPos).postln;
 				"going in % seconds".format(waitTime).postln;
 				waitTime.wait;
