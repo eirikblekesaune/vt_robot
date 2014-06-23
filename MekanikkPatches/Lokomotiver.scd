@@ -35,6 +35,7 @@ fork{
 	~coordinator = XBeeCoordinatorAPIMode(SerialPort('/dev/tty.usbserial-A600ezu2', 115200));
 	~coordinator.start;
 	~coordinator.rxAction_(nil);
+	~coordinator.sendATCommand(\AggregateRoutingNotification, [1]);
 
 	~controller = {arg ...args; "changed: %: %".format(args, args[0].perform(args[1].asSymbol)).postln};
 
@@ -69,7 +70,7 @@ fork{
 						speedUpdateTask = Task.new({
 							loop{
 								newTog.bipolarSpeed_(togFader.value.linlin(0, 1023, -512, 512).asInteger);
-								0.05.wait;
+								0.1.wait;
 							}
 						}).play;
 						SystemClock.sched(0.5, {
@@ -101,7 +102,7 @@ fork{
 				~lok.put(togName.asString, newTog);
 				"~lok now: %".format(~lok).postln;
 			}, {"Will not register as lokomotiv: %, %".format(newChildDevice, togName).postln;});
-			if(~lok.includesKey(togName).not && "^TO$".matchRegexp("TO"), {
+			if(~lok.includesKey(togName).not && "^TO$".matchRegexp(togName), {
 				"Registering led tog 1 (TO)".postln;
 				~ledTog = ~coordinator.getChildDeviceByName('TO');
 				~togLED1 = (
