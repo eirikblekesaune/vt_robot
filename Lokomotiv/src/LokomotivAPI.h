@@ -71,7 +71,6 @@ static void Reply(const char* str)
   SERIAL.println(str);
 }
 
-
 static void ReturnGetValue(command_t command, long value)
 {
   unsigned char data[5];
@@ -160,7 +159,7 @@ static void DebugPrint(float msg)
   SERIAL.write(4);
 }
 
-static void DebugPrint(long msg)
+static void DebugPrint(int32_t msg)
 {
   SERIAL.write(BYTE_COMMAND | SET_MESSAGE | CMD_INFO );
   SERIAL.print(msg);

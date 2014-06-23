@@ -33,7 +33,7 @@ void loop()
 	{
 		parser->parseIncomingByte(SERIAL.read());
 	}
-//	lok->Update();
+	lok->Update();
 //	if(millis() >= (updateInterval + lastTime))
 //	{
 //		lok->Update();

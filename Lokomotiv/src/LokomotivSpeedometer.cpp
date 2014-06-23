@@ -4,8 +4,8 @@
 #include "LokomotivAPI.h"
 #include "LokomotivSpeedometer.h"
 
-volatile uint32_t ticks = 0;
-volatile uint32_t binks = 0;
+volatile int32_t ticks = 0;
+volatile int32_t binks = 0;
 
 void registerForwardSpeedTick()
 {
