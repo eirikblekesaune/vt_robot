@@ -5,7 +5,8 @@
 #include "LokomotivSpeedometer.h"
 
 volatile int32_t ticks = 0;
-volatile int32_t binks = 0;
+volatile int32_t measuredTicks = 0;
+volatile int32_t lastMeasuredTicks = 0;
 
 void registerForwardSpeedTick()
 {
@@ -19,7 +20,8 @@ void registerBackwardSpeedTick()
 
 ISR(TIMER3_COMPA_vect)
 {
-	binks = binks + 1;
+	measuredTicks = ticks - lastMeasuredTicks;
+	lastMeasuredTicks = ticks;
 }
 
 LokomotivSpeedometer::LokomotivSpeedometer() : 
@@ -41,10 +43,12 @@ LokomotivSpeedometer::LokomotivSpeedometer() :
 	sei();
 }
 
+//speed is measured in ticks per 100th millisecond
 long LokomotivSpeedometer::GetMeasuredSpeed()
 {
 	long result;
-	result = ticks;
+	DebugPrint("moll");
+	result = measuredTicks;
 	return result;
 }
 
