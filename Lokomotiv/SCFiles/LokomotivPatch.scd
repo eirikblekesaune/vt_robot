@@ -21,7 +21,7 @@ SerialPort.devices
 
 ~coordinator.sendATComand('NodeDiscover', "TOG08".ascii);
 ~coordinator.childDevices
-~lok.set(\speed, 250);
+~lok.set(\speed, 150);
 ~lok.set(\speed, 0);
 ~lok.set(\direction, 1);//right, position decrements (minus) backward
 ~lok.set(\direction, 0);//left, position increments (pluss) forward
