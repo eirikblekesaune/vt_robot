@@ -7,6 +7,8 @@
 volatile int32_t ticks = 0;
 volatile int32_t measuredTicks = 0;
 volatile int32_t lastMeasuredTicks = 0;
+volatile double measuredSpeed = 0.0;
+volatile double lastMeasuredSpeed = 0.0;
 
 void registerForwardSpeedTick()
 {
@@ -22,6 +24,8 @@ ISR(TIMER3_COMPA_vect)
 {
 	measuredTicks = ticks - lastMeasuredTicks;
 	lastMeasuredTicks = ticks;
+	lastMeasuredSpeed = measuredSpeed;
+	measuredSpeed = (static_cast<double>(measuredTicks) * 0.5) + (lastMeasuredSpeed * 0.5);
 }
 
 LokomotivSpeedometer::LokomotivSpeedometer() : 
@@ -43,15 +47,19 @@ LokomotivSpeedometer::LokomotivSpeedometer() :
 	sei();
 }
 
-//speed is measured in ticks per 100th millisecond
-long LokomotivSpeedometer::GetMeasuredSpeed()
+double LokomotivSpeedometer::GetMeasuredSpeed()
 {
-	long result;
-	DebugPrint("moll");
-	result = measuredTicks;
+	double result;
+	result = measuredSpeed;
 	return result;
 }
 
+double LokomotivSpeedometer::GetMeasuredTicks()
+{
+	long result;
+	result = measuredTicks;
+	return result;
+}
 long LokomotivSpeedometer::GetCurrentTicks()
 {
 	long result;

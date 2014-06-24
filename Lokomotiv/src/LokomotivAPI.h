@@ -25,6 +25,7 @@ enum command_t
 	CMD_PERIPHERAL_REQUEST = 0x10,
 	CMD_MOTOR_MODE = 0x11,
 	CMD_DISTANCE_POLLING_INTERVAL = 0x12,
+	CMD_PID_TARGET_SPEED = 0x13,
   CMD_UNKNOWN
 };
 
@@ -153,6 +154,13 @@ static void DebugPrint(int msg)
 }
 
 static void DebugPrint(float msg)
+{
+  SERIAL.write(BYTE_COMMAND | SET_MESSAGE | CMD_INFO );
+  SERIAL.print(msg);
+  SERIAL.write(4);
+}
+
+static void DebugPrint(double msg)
 {
   SERIAL.write(BYTE_COMMAND | SET_MESSAGE | CMD_INFO );
   SERIAL.print(msg);

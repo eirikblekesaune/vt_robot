@@ -105,6 +105,7 @@ void LokomotivAPIParser::_executeCommand()
 					break;
 				case CMD_SPEED:
 					_robot->SetSpeed(_decodeIntegerValue(_data));
+					_robot->UserChangedSpeed();
 					break;
 				case CMD_DIRECTION:
 					_robot->SetDirection(_decodeIntegerValue(_data));
@@ -144,8 +145,14 @@ void LokomotivAPIParser::_executeCommand()
 				case CMD_END_SPEED:
 					_robot->SetEndSpeed(_decodeIntegerValue(_data));
 					break;
+				case CMD_MOTOR_MODE:
+						_robot->SetMotorMode(_decodeIntegerValue(_data));
+					break;
 				case CMD_DISTANCE_POLLING_INTERVAL:
 					_robot->SetDistancePollingInterval(_decodeIntegerValue(_data));
+					break;
+				case CMD_PID_TARGET_SPEED:
+					_robot->SetPidTargetSpeed(_decodeIntegerValue(_data));
 					break;
 				default:
 					DebugPrint("Unknown command");
@@ -199,8 +206,14 @@ void LokomotivAPIParser::_executeCommand()
 				case CMD_END_SPEED:
 					ReturnGetValue(CMD_END_SPEED,_robot->GetEndSpeed());
 					break;
+				case CMD_MOTOR_MODE:
+					ReturnGetValue(CMD_MOTOR_MODE,_robot->GetMotorMode());
+					break;
 				case CMD_DISTANCE_POLLING_INTERVAL:
 					ReturnGetValue(CMD_DISTANCE_POLLING_INTERVAL,_robot->GetDistancePollingInterval());
+					break;
+				case CMD_PID_TARGET_SPEED:
+					ReturnGetValue(CMD_PID_TARGET_SPEED, _robot->GetPidTargetSpeed());
 					break;
 				default:
 					DebugPrint("Unknown command");

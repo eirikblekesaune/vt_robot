@@ -29,6 +29,7 @@ Lokomotiv::Lokomotiv() :
 	_speedometer = new LokomotivSpeedometer();
 	_motor = new LokomotivMotor(_speedometer);
 	_irReader = new IRReader(irReaderReceivePin, this);
+	_encoderCounterAtLastAddress = _speedometer->GetCurrentTicks();
 }
 
 //Getters
@@ -47,7 +48,7 @@ void Lokomotiv::SetDistanceFromLastAddress(long val){
 
 long Lokomotiv::GetPeripheral(long data){return 0;}
 long Lokomotiv::GetState(){return _state;}
-long Lokomotiv::GetMeasuredSpeed(){return _speedometer->GetMeasuredSpeed();};
+double Lokomotiv::GetMeasuredSpeed(){return _speedometer->GetMeasuredSpeed();};
 long Lokomotiv::GetLastDetectedAddress(){return _lastDetectedAddress;}
 double Lokomotiv::GetPidPValue(){return _pidPValue;}
 double Lokomotiv::GetPidIValue(){return _pidIValue;}
@@ -67,6 +68,16 @@ void Lokomotiv::SetDistancePollingInterval(long val)
 long Lokomotiv::GetDistancePollingInterval()
 {
 	return _distancePollingInterval;
+}
+
+void Lokomotiv::SetMotorMode(long val)
+{
+	_motor->SetMotorMode(static_cast<int>(val));
+}
+
+void Lokomotiv::SetPidTargetSpeed(long val)
+{
+	_motor->SetPidTargetSpeed(static_cast<double>(val));
 }
 
 void Lokomotiv::SetTargetPosition(long val){_targetPosition = val;}
@@ -103,9 +114,9 @@ void Lokomotiv::SetPeripheralRequest(long data)
 
 void Lokomotiv::SetState(long val){_state = val;}
 void Lokomotiv::SetLastDetectedAddress(long val){_lastDetectedAddress = val;}
-void Lokomotiv::SetPidPValue(double val){_pidPValue = val;}
-void Lokomotiv::SetPidIValue(double val){_pidIValue = val;}
-void Lokomotiv::SetPidDValue(double val){_pidDValue = val;}
+void Lokomotiv::SetPidPValue(double val){_motor->SetPidPValue(val);}
+void Lokomotiv::SetPidIValue(double val){_motor->SetPidIValue(val);}
+void Lokomotiv::SetPidDValue(double val){_motor->SetPidDValue(val);}
 
 void Lokomotiv::Init()
 {
@@ -131,8 +142,6 @@ void Lokomotiv::GotAddr(unsigned char addr)
 {
 	//We don't need to update repeating beacon address more than once a
 	//second.
-	//DebugPrint("Got Address");
-	//DebugPrint(addr);
 	long newAddress = static_cast<long>(addr);
 	
 	if(newAddress != _lastDetectedAddress)

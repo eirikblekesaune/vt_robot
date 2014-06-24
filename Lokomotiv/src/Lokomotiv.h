@@ -19,12 +19,14 @@ public:
 	long GetDistanceFromLastAddress();
 	long GetPeripheral(long data);
 	long GetState();
-	long GetMeasuredSpeed();
+	double GetMeasuredSpeed();
 	long GetLastDetectedAddress();
 	double GetPidPValue();
 	double GetPidIValue();
 	double GetPidDValue();
 	long GetDistancePollingInterval();
+	long GetMotorMode() {return static_cast<long>(_motor->GetMotorMode());};
+	long GetPidTargetSpeed() {return static_cast<long>(_motor->GetPidTargetSpeed());};
 
 	void SetSpeed(long val) {_motor->SetSpeed(static_cast<speed_t>(val));};
 	void SetEndSpeed(long val) {_motor->SetEndSpeed(static_cast<speed_t>(val));};
@@ -40,11 +42,14 @@ public:
 	void SetPidIValue(double val);
 	void SetPidDValue(double val);
 	void SetDistancePollingInterval(long val);
+	void SetMotorMode(long val);
+	void SetPidTargetSpeed(long val);
 
 	void Stop(long val) {_motor->Stop(static_cast<int16_t>(val));};
 	void Init();
 	void Update();
 	void GotAddr(unsigned char);
+	void UserChangedSpeed() {_motor->UserChangedSpeed();};
 
 	volatile long _distanceFromLastBeacon;
 private:
