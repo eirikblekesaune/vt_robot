@@ -208,7 +208,7 @@ VTLokomotiv {
 		);
 		//msg = msg.as(Int8Array);
 		this.prSend(msg);
-		"Sending mess: %".format(msg).postln;
+		//"Sending mess: %".format(msg).postln;
 		^msg;
 	}
 
