@@ -76,7 +76,6 @@ void LokomotivMotor::Update()
 			if(_pid->Compute())
 			{
 				SetSpeed(static_cast<long>(_output));
-				DebugPrint(_output);
 			}
 		} else {
 			if((_motorMode == CRUISE_CONTROL_MODE) && ((lastSpeedSetTime + millisBeforePIDEnable) <= millis()))
@@ -85,10 +84,8 @@ void LokomotivMotor::Update()
 				//speeds below 1.0 are considered a stopped motor
 				if(_input > 1.0)
 				{
-					DebugPrint("crusing");
 					_pid->SetMode(AUTOMATIC);
 					SetPidTargetSpeed(_input);
-					DebugPrint(_setpoint);
 				}
 			}
 		}

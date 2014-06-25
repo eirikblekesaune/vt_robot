@@ -38,7 +38,6 @@ SerialPort.devices
 PID: 1.3, 10.3, 0.01 //
 
 (
-~myTog = ~lok["TOG08"];
 w= Window.new;
 ~speedSlider = Slider.new(w,Rect(0, 0, 300, 50));
 ~speedSlider.action_({arg slid;
