@@ -69,14 +69,14 @@ void LokomotivMotor::Update()
 			if(_pid->Compute())
 			{
 				SetSpeed(static_cast<long>(_output));
-				DebugPrint(_output);
+				//DebugPrint(_output);
 			}
 		} else {
 			if((_motorMode == CRUISE_CONTROL_MODE) && ((lastSpeedSetTime + millisBeforePIDEnable) <= millis()))
 			{
 				if(_input > 1.0)//no need to activate pid when motor is not moving
 				{
-					DebugPrint("cruiseON");
+					//DebugPrint("cruiseON");
 					_pid->SetMode(AUTOMATIC);
 					_setpoint = _input;
 				}

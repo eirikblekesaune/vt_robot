@@ -7,25 +7,28 @@
 volatile int32_t ticks = 0;
 volatile int32_t measuredTicks = 0;
 volatile int32_t lastMeasuredTicks = 0;
-volatile double measuredSpeed = 0.0;
-volatile double lastMeasuredSpeed = 0.0;
+volatile int32_t ticksDelta = 1;
+double measuredSpeed = 0.0;
+double lastMeasuredSpeed = 0.0;
 
-void registerForwardSpeedTick()
-{
-	ticks++; 
+//void registerForwardSpeedTick()
+//{
+	//ticks++; 
+//}
+//
+//void registerBackwardSpeedTick()
+//{
+	//ticks--;
+//}
+
+ISR(INT6_vect) {
+	ticks = ticks + ticksDelta;
 }
 
-void registerBackwardSpeedTick()
-{
-	ticks--;
-}
-
-ISR(TIMER3_COMPA_vect)
+ISR(TIMER3_COMPA_vect, ISR_NOBLOCK)
 {
 	measuredTicks = ticks - lastMeasuredTicks;
 	lastMeasuredTicks = ticks;
-	lastMeasuredSpeed = measuredSpeed;
-	measuredSpeed = (static_cast<double>(measuredTicks) * 0.5) + (lastMeasuredSpeed * 0.5);
 }
 
 LokomotivSpeedometer::LokomotivSpeedometer() : 
@@ -33,7 +36,9 @@ LokomotivSpeedometer::LokomotivSpeedometer() :
 {
 	cli();
 	//Interrupt no. 4 (INT.6) will register ticks from the encoder
-	attachInterrupt(_isrNumber, registerForwardSpeedTick, CHANGE);
+	//attachInterrupt(_isrNumber, registerForwardSpeedTick, CHANGE);
+	EICRB = (EICRB & ~((1<<ISC60) | (1<<ISC61))) | (CHANGE << ISC60);
+	EIMSK |= (1<<INT6);
 	//Using timer3 for calculating speed, i.e. ticks per second.
 	//CTC mode with OCR3A as TOP
 	TCCR3A = 0;
@@ -49,9 +54,9 @@ LokomotivSpeedometer::LokomotivSpeedometer() :
 
 double LokomotivSpeedometer::GetMeasuredSpeed()
 {
-	double result;
-	result = measuredSpeed;
-	return result;
+	lastMeasuredSpeed = measuredSpeed;
+	measuredSpeed = (static_cast<double>(measuredTicks) * 0.5) + (lastMeasuredSpeed * 0.5);
+	return measuredSpeed;
 }
 
 double LokomotivSpeedometer::GetMeasuredTicks()
@@ -71,8 +76,10 @@ void LokomotivSpeedometer::DirectionChanged(int newDirection)
 {
 	if(newDirection == 0)
 	{
-		attachInterrupt(_isrNumber, registerForwardSpeedTick, CHANGE);
+		//attachInterrupt(_isrNumber, registerForwardSpeedTick, CHANGE);
+		ticksDelta = 1;
 	} else {
-		attachInterrupt(_isrNumber, registerBackwardSpeedTick, CHANGE);
+		//attachInterrupt(_isrNumber, registerBackwardSpeedTick, CHANGE);
+		ticksDelta = -1;
 	}
 }
