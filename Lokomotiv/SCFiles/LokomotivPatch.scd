@@ -33,6 +33,7 @@ SerialPort.devices
 ~lok.set(\pidTargetSpeed, 8);
 ~lok.get(\pidTargetSpeed);
 ~lok.set(\pidPValue, 1.3);
+~lok.set(\pidIValue, 20.0);
 ~lok.set(\pidIValue, 0.3);
 ~lok.set(\pidDValue, 0.01);
 PID: 1.3, 10.3, 0.01 //

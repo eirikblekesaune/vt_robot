@@ -11,16 +11,6 @@ volatile int32_t ticksDelta = 1;
 double measuredSpeed = 0.0;
 double lastMeasuredSpeed = 0.0;
 
-//void registerForwardSpeedTick()
-//{
-	//ticks++; 
-//}
-//
-//void registerBackwardSpeedTick()
-//{
-	//ticks--;
-//}
-
 ISR(INT6_vect) {
 	ticks = ticks + ticksDelta;
 }
@@ -29,6 +19,8 @@ ISR(TIMER3_COMPA_vect, ISR_NOBLOCK)
 {
 	measuredTicks = ticks - lastMeasuredTicks;
 	lastMeasuredTicks = ticks;
+	lastMeasuredSpeed = measuredSpeed;
+	measuredSpeed = (static_cast<double>(measuredTicks) * 0.5) + (lastMeasuredSpeed * 0.5);
 }
 
 LokomotivSpeedometer::LokomotivSpeedometer() : 
@@ -46,7 +38,6 @@ LokomotivSpeedometer::LokomotivSpeedometer() :
 	//prescaler of 256 - CS3[2:0] 100
 	TCCR3B |= (1<<CS32);
 	OCR3A = 6520;//Gives overflow every 100th millisecond
-
 	//Activate interrupt flag for timer overflow compare match A
 	TIMSK3 |= (1<<OCIE3A);
 	sei();
@@ -54,8 +45,6 @@ LokomotivSpeedometer::LokomotivSpeedometer() :
 
 double LokomotivSpeedometer::GetMeasuredSpeed()
 {
-	lastMeasuredSpeed = measuredSpeed;
-	measuredSpeed = (static_cast<double>(measuredTicks) * 0.5) + (lastMeasuredSpeed * 0.5);
 	return measuredSpeed;
 }
 
@@ -65,6 +54,7 @@ double LokomotivSpeedometer::GetMeasuredTicks()
 	result = measuredTicks;
 	return result;
 }
+
 long LokomotivSpeedometer::GetCurrentTicks()
 {
 	long result;

@@ -10,6 +10,7 @@ unsigned long millisBeforePIDEnable = 500;
 LokomotivMotor::LokomotivMotor(LokomotivSpeedometer* speedometer) :
 	_speedometer(speedometer),
 	_cruiseControlActive(false),
+	_motorMode(MANUAL_MODE),
 	_INA(12),
 	_INB(11),
 	_PWM(10),
@@ -66,19 +67,28 @@ void LokomotivMotor::Update()
 		_input = abs(_speedometer->GetMeasuredSpeed());
 		if(_pid->GetMode())//if mode is automatic
 		{
+			if((abs(_input - _setpoint)) > 10.0)
+			{
+				_pid->SetTunings(1.3, 20.0, 0.01);
+			} else {
+				_pid->SetTunings(1.3, 0.3, 0.01);
+			}
 			if(_pid->Compute())
 			{
 				SetSpeed(static_cast<long>(_output));
-				//DebugPrint(_output);
+				DebugPrint(_output);
 			}
 		} else {
 			if((_motorMode == CRUISE_CONTROL_MODE) && ((lastSpeedSetTime + millisBeforePIDEnable) <= millis()))
 			{
-				if(_input > 1.0)//no need to activate pid when motor is not moving
+				//no need to activate pid when motor is not moving
+				//speeds below 1.0 are considered a stopped motor
+				if(_input > 1.0)
 				{
-					//DebugPrint("cruiseON");
+					DebugPrint("crusing");
 					_pid->SetMode(AUTOMATIC);
-					_setpoint = _input;
+					SetPidTargetSpeed(_input);
+					DebugPrint(_setpoint);
 				}
 			}
 		}
@@ -97,7 +107,7 @@ void LokomotivMotor::SetSpeed(speed_t newSpeed)
   {
     digitalWrite(_INA, LOW);   // Make the motor coast no
     digitalWrite(_INB, LOW);   // matter which direction it is spinning.
-		_setpoint = 0.0;
+		//SetPidTargetSpeed(0.0);
   } else {
     UpdateDirection();
   }
@@ -128,6 +138,7 @@ void LokomotivMotor::SetPidTargetSpeed(double val)
 {
 	_setpoint = val;
 }
+
 void LokomotivMotor::SetMotorMode(int val)
 {
 	//The internal mode for PID is set here.
@@ -135,6 +146,7 @@ void LokomotivMotor::SetMotorMode(int val)
 	if(val == 0)
 	{
 		_motorMode = MANUAL_MODE;
+		_pid->SetMode(MANUAL);
 	} else {
 		_motorMode = CRUISE_CONTROL_MODE;
 	}
