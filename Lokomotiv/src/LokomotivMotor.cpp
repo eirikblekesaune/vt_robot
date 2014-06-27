@@ -76,7 +76,6 @@ void LokomotivMotor::Update()
 			if(_pid->Compute())
 			{
 				SetSpeed(static_cast<long>(_output));
-				DebugPrint("x");
 			}
 		} else {
 			if((_motorMode == CRUISE_CONTROL_MODE) && ((lastSpeedSetTime + millisBeforePIDEnable) <= millis()))
@@ -106,7 +105,6 @@ void LokomotivMotor::SetSpeed(speed_t newSpeed)
     digitalWrite(_INA, LOW);   // Make the motor coast no
     digitalWrite(_INB, LOW);   // matter which direction it is spinning.
 		SetPidTargetSpeed(0.0);
-		DebugPrint("y");
 		_pid->SetMode(MANUAL);
   } else {
     UpdateDirection();
