@@ -65,7 +65,7 @@ w= Window.new;
 
 ~stopButton = Button.new(w, Rect(0, 60, 100, 50));
 ~stopButton.states_([["STOP"]]);
-~stopButton.action_({arg butt; ~myTog.set(\speed, 0); defer{~speedSlider.value_(0.0);}});
+~stopButton.action_({arg butt; ~myTog.set(\stop, 2000); defer{~speedSlider.value_(0.0);}});
 
 ~directionButton = Button.new(w, Rect(100, 60, 100, 50));
 ~directionButton.states_([["LEFT"], ["RIGHT"]]);
