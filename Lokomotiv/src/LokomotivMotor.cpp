@@ -73,6 +73,7 @@ void LokomotivMotor::Update()
 			} else {
 				_pid->SetTunings(1.3, 0.3, 0.01);
 			}
+			_output = _speed;
 			if(_pid->Compute())
 			{
 				SetSpeed(static_cast<long>(_output));
@@ -81,8 +82,7 @@ void LokomotivMotor::Update()
 			if((_motorMode == CRUISE_CONTROL_MODE) && ((lastSpeedSetTime + millisBeforePIDEnable) <= millis()))
 			{
 				//no need to activate pid when motor is not moving
-				//speeds below 1.0 are considered a stopped motor
-				if((_input > 1.0) && (_speed != 0))
+				if(_input > 1.5)
 				{
 					_pid->SetMode(AUTOMATIC);
 					SetPidTargetSpeed(_input);
