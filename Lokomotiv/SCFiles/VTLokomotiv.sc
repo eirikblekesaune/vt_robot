@@ -9,7 +9,6 @@ VTLokomotiv {
 	var <led;
 	var <state;
 	var <xbeeDevice;
-	var <remoteXBeeDeviceAddress;
 	var <mode;
 	var bipolarSpeed;
 
@@ -20,14 +19,13 @@ VTLokomotiv {
 	classvar <byteType;
 	classvar <valueType;
 
-	*new{arg xbeeDevice, remoteXBeeDeviceAddress;
-		^super.new.init(xbeeDevice, remoteXBeeDeviceAddress);
+	*new{arg xbeeDevice;
+		^super.new.init(xbeeDevice);
 	}
 
-	init{arg xbeeDevice_, remoteXBeeDeviceAddress_;
+	init{arg xbeeDevice_;
 		xbeeDevice = xbeeDevice_;
-		remoteXBeeDeviceAddress = remoteXBeeDeviceAddress_;
-		this.device.rxAction_({arg data;
+		xbeeDevice.rxAction_({arg data;
 			//"Parsing incoming lokomotiv data".postln;
 			data.do{arg item; this.prParseByte(item); };
 		});
@@ -37,17 +35,13 @@ VTLokomotiv {
 		this.prResetParser;
 	}
 
-	device{
-		^xbeeDevice.childDevices.at(remoteXBeeDeviceAddress);
-	}
-
 	name{
-		^this.device.name;
+		^xbeeDevice.name;
 	}
 
 	speed_{arg val;
 		if(val != speed, {
-			speed = val.clip(0, 512);
+			speed = val.clip(0, 511);
 			this.set(\speed, speed);
 			this.changed(\speed);
 		});
@@ -236,7 +230,7 @@ VTLokomotiv {
 
 	prSend{arg msg;
 		//msg = msg.asString.ascii.as(Int8Array);
-		this.device.sendTXData(msg);
+		xbeeDevice.sendTXData(msg);
 	}
 
 	*initClass{
