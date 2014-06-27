@@ -69,20 +69,21 @@ void LokomotivMotor::Update()
 		{
 			if((abs(_input - _setpoint)) > 10.0)
 			{
-				_pid->SetTunings(1.3, 20.0, 0.01);
+				_pid->SetTunings(1.3, 5.0, 0.01);
 			} else {
 				_pid->SetTunings(1.3, 0.3, 0.01);
 			}
 			if(_pid->Compute())
 			{
 				SetSpeed(static_cast<long>(_output));
+				DebugPrint("x");
 			}
 		} else {
 			if((_motorMode == CRUISE_CONTROL_MODE) && ((lastSpeedSetTime + millisBeforePIDEnable) <= millis()))
 			{
 				//no need to activate pid when motor is not moving
 				//speeds below 1.0 are considered a stopped motor
-				if(_input > 1.0)
+				if((_input > 1.0) && (_speed != 0))
 				{
 					_pid->SetMode(AUTOMATIC);
 					SetPidTargetSpeed(_input);
@@ -104,7 +105,9 @@ void LokomotivMotor::SetSpeed(speed_t newSpeed)
   {
     digitalWrite(_INA, LOW);   // Make the motor coast no
     digitalWrite(_INB, LOW);   // matter which direction it is spinning.
-		//SetPidTargetSpeed(0.0);
+		SetPidTargetSpeed(0.0);
+		DebugPrint("y");
+		_pid->SetMode(MANUAL);
   } else {
     UpdateDirection();
   }
