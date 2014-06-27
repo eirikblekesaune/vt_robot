@@ -33,11 +33,8 @@
 
 fork{
 	~coordinator = XBeeCoordinatorAPIMode(SerialPort('/dev/tty.usbserial-A600ezu2', 115200));
-	~coordinator.start;
 	~coordinator.rxAction_(nil);
 	~coordinator.sendATCommand(\AggregateRoutingNotification, [1]);
-
-	~controller = {arg ...args; "changed: %: %".format(args, args[0].perform(args[1].asSymbol)).postln};
 
 	~lok = Dictionary.new;
 	~togRegistrationService = {arg theChanger, theChanged, more;
@@ -94,7 +91,6 @@ fork{
 					);
 				};
 				newTog.addDependant(faderUpdater);
-				newTog.addDependant(~controller);
 				OSCdef("lokomotiv%".format(togName).asSymbol, {arg msg, time, addr,port;
 					"Remote lok speed %: %".format(togName, msg[1]).postln;
 					togFader.valueAction_(msg[1].linlin(-1.0, 1.0, 0, 1023).asInteger);
