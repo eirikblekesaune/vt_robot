@@ -45,24 +45,33 @@ fork{
 			var togFader, faderNumber, togStopButton, faderUpdater, togAddress, newChildDevice, newTog, togName;
 			var togFaderMappings, speedUpdateTask, runUpdateTask;
 			togFaderMappings = (
-				TOG02: 1,
-				TOG03: 2,
-				TOG04: 3,
-				TOG06: 4,
-				TOG05: 5,
-				TOG08: 6
+				TOG01: (device: ~togCtrlB, number: 1),
+				TOG02: (device: ~togCtrlB, number: 2),
+				TOG03: (device: ~togCtrlB, number: 3),
+				TOG04: (device: ~togCtrlB, number: 4),
+				TOG05: (device: ~togCtrlB, number: 5),
+				TOG06: (device: ~togCtrlB, number: 6),
+				TOG07: (device: ~togCtrlB, number: 7),
+				TOG08: (device: ~togCtrlB, number: 8),
+				TOG09: (device: ~togCtrlA, number: 1),
+				TOG10: (device: ~togCtrlA, number: 2),
+				TOG11: (device: ~togCtrlA, number: 3),
+				TOG12: (device: ~togCtrlA, number: 4),
+				TOG13: (device: ~togCtrlA, number: 5),
 			);
 			newChildDevice = more;
 			togName = newChildDevice.nodeIdentifier.asString;
 			"GOT new device: %, %".format(newChildDevice, togName).postln;
 			//if this radio module has not been registered before
 			if(~lok.includesKey(togName).not && "^TOG.+".matchRegexp(togName), {
+				var mapping;
 				"Will register".postln;
 				togAddress = newChildDevice.addressLo;
 				newTog = VTLokomotiv.new(~coordinator, togAddress);
 				"Made new lok: newTog".format(newTog).postln;
-				faderNumber = togFaderMappings.at(togName.asSymbol);
-				togFader = ~togCtrlB.components.at(("fader." ++ faderNumber).asSymbol);
+				mapping = togFaderMappings.at(togName.asSymbol);
+				faderNumber = mapping[\number];
+				togFader = mapping[\device].components.at(("fader." ++ faderNumber).asSymbol);
 				"Mapped to fader number: %".format(faderNumber).postln;
 				speedUpdateTask = Task.new({});
 				runUpdateTask = {
@@ -81,7 +90,7 @@ fork{
 					});
 				};
 				togFader.action = {runUpdateTask.value;};
-				togStopButton = ~togCtrlB.components.at(("button." ++ (faderNumber + 8)).asSymbol);
+				togStopButton = mapping[\device].components.at(("button." ++ (faderNumber + 8)).asSymbol);
 				togStopButton.action = {arg val; newTog.stop(1000);};
 				faderUpdater = {arg theChanger, theChanged;
 					switch(theChanged,
