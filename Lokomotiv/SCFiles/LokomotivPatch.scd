@@ -1,19 +1,37 @@
 SerialPort.devices
 (
 ~coordinator = XBeeCoordinatorAPIMode(SerialPort('/dev/tty.usbserial-A600ezu2', 115200));
-//~coordinator = XBeeCoordinatorAPIMode(SerialPort('/dev/tty.usbserial-13X2XBD8', 9600));
-~coordinator.start;
-~coordinator.rxAction_({arg byte; "Coordinator received: \t%\t%\t%".format(byte.asHexString(2), byte, byte.asAscii).postln;});
+//~coordinator.start;
+//~coordinator.rxAction_({arg byte; "Coordinator received: \t%\t%\t%".format(byte.asHexString(2), byte, byte.asAscii).postln;});
 ~coordinator.rxAction_(nil);
+//~coordinator.sendATCommand(\AggregateRoutingNotification, [0]);
+~coordinator.sendATCommand(\AggregateRoutingNotification, [1]);
 ~coordinator.sendATCommand('NodeDiscover');
+~coordinator.zigBeeTransmitStatusAction_({arg data; "status: %".format(data).postln;});
+~controller = SimpleController.new(~coordinator);
+~controller.put(\childDeviceRegistered, {arg theChanged, what, newModule;
+	"Added new module: %".format([theChanged, what, newModule]).postln;
+	~myTog = VTLokomotiv.new(newModule);
+});
+~controller.put(\modemStatus, {arg theChanged, what, status; "Modem status: %".format(status).postln;});
 )
-(
-~myTog = VTLokomotiv.new(~coordinator, ~coordinator.getChildDeviceByName('TOG08').addressLo);
-~controller = {arg ...args; "changed: %: %".format(args, args[0].perform(args[1].asSymbol)).postln};
-~myTog.addDependant(~controller);
-)
-~myTog = ~lok["TOG08"];
-~myTog = ~myTog2;
+~coordinator.addressHi
+~coordinator.addressLo
+~coordinator.networkAddress
+~coordinator.nodeIdentifier
+~myTog.xbeeDevice.addressHi
+~myTog.xbeeDevice.addressLo
+XBeeParser.unpackAddressBytes(~myTog.xbeeDevice.networkAddress, 2);
+
+~coordinator.sendATCommand('SerialNumberLow');
+~myTog.xbeeDevice.sendATCommand(\NodeIdentifier, responseAction: {arg ...args; "NI: %".format(args).postln;});
+~myTog.xbeeDevice.sendATCommand(\ReceivedSignalStrength, responseAction: {arg ...args; "NI: %".format(args).postln;});
+~myTog.xbeeDevice.sendATCommand(\ReceivedSignalStrength)
+
+~myTog.xbeeDevice.rssi
+
+~coordinator.getInitATValuesFromDevice
+
 ~myTog.set(\speed, 130)
 ~myTog.set(\speed, 0)
 ~myTog.set(\direction, 1);//right, position decrements (minus) backward
@@ -38,7 +56,6 @@ SerialPort.devices
 PID: 1.3, 10.3, 0.01 //
 
 (
-~myTog = ~lok["TOG08"];
 w= Window.new;
 ~speedSlider = Slider.new(w,Rect(0, 0, 300, 50));
 ~speedSlider.action_({arg slid;
@@ -48,7 +65,7 @@ w= Window.new;
 
 ~stopButton = Button.new(w, Rect(0, 60, 100, 50));
 ~stopButton.states_([["STOP"]]);
-~stopButton.action_({arg butt; ~myTog.set(\speed, 0); defer{~speedSlider.value_(0.0);}});
+~stopButton.action_({arg butt; ~myTog.set(\stop, 2000); defer{~speedSlider.value_(0.0);}});
 
 ~directionButton = Button.new(w, Rect(100, 60, 100, 50));
 ~directionButton.states_([["LEFT"], ["RIGHT"]]);

@@ -13,7 +13,7 @@ void setup()
 {	
 	//shut down the USB clock, which itnerferes with timer1
 	//PRR1 |= (1<<PRUSB);
-	//Clear timer1 settings
+	//Clear timer1 settings so that we know their settings.
 	TCCR1A = 0x00;
 	TCCR1B = 0x00;
 	
@@ -34,9 +34,4 @@ void loop()
 		parser->parseIncomingByte(SERIAL.read());
 	}
 	lok->Update();
-//	if(millis() >= (updateInterval + lastTime))
-//	{
-//		lok->Update();
-//		lastTime = millis();
-//	}
 }
