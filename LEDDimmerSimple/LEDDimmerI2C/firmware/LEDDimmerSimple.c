@@ -15,7 +15,7 @@ void InitLEDDimmer()
 	TCCR1A = 0b00100000;
 	TCCR1B = 0b00010001;
 	ICR1 = 0x0FFF;
-	OCR1B = 0x0000;
+	OCR1B = 0x00FF;
 }
 
 void SetLEDValue(uint16_t val)
@@ -40,6 +40,10 @@ void FlashLED(uint16_t val)
 		_delay_ms(10);
 	}
 	OCR1B = ledValue;
+}
+
+void UpdateLEDDimmer()
+{
 }
 
 void SetLEDFadeTime(uint16_t val)

@@ -25,7 +25,7 @@ void SetLEDValue(uint16_t val);
 void FlashLED(uint16_t val);
 void SetLEDFadeTime(uint16_t);
 void SetLEDFadeTarget(uint16_t);
-
+void UpdateLEDDimmer();
 uint16_t GetLEDValue();
 uint16_t GetLEDFadeTime();
 uint16_t GetLEDFadeTarget();

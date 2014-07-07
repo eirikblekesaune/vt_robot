@@ -10,7 +10,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include "LEDDimmerSimple.h"
-//#include "LEDDimmer_USI.h"
+#include "LEDDimmer_USI.h"
 
 #define ADDR_PINS PINA
 #define ADDR_PIN_MASK 0x0F
@@ -48,11 +48,13 @@ void doCommand(uint8_t commandKey, uint16_t commandData)
 
 int main(void)
 {
+	cli();
 	//init dip switch pin pullups
 	PORTA |= 0x0F;
 	//set switch pins as inputs
 	InitLEDDimmer();
 	//InitUSI(readTWIAddressPins());
+	SetTWIAddress(2);	
 	
 	sei();
 	while(1)
@@ -65,6 +67,7 @@ int main(void)
 			doCommand(nextCommand, nextCommandData);
 		}
 		asm volatile ("nop");
-		SetTWIAddress(readTWIAddressPins());
+		UpdateLEDDimmer();
+		//SetTWIAddress(readTWIAddressPins());
 	}
 }

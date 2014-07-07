@@ -36,6 +36,7 @@ LokomotivMotor::LokomotivMotor(LokomotivSpeedometer* speedometer) :
 	ICR1 = 0x01FF;
 
 	SetDirection(0);
+	SetSpeed(0);
 
 	//Since we are doing automatic startup of PID we are using conservative 
 	//PID parameters here.

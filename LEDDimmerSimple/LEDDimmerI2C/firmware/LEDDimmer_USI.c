@@ -116,7 +116,7 @@ void FlushTWIBuffers()
 //Start condition interrupt routine
 ISR(USI_STR_vect)
 {
-	OCR1B = 0x0FFF;
+	OCR1B = 0x0000;
 	USIOverflowParserState = USI_OVF_WAITING_FOR_ADDRESS_BYTE;
 	//wait until SCL line goes low to ensure that a full start condition
 	//has been met. Both SDA and SCL must be pulled low for that to happen.
