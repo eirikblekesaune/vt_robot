@@ -33,6 +33,7 @@ VTLokomotiv {
 		currentStringData = String.new(128);
 		currentValueBytes = Array.new(4);
 		this.prResetParser;
+		this.set(\motorMode, 1);
 	}
 
 	name{
@@ -68,8 +69,8 @@ VTLokomotiv {
 		this.changed(\bipolarSpeed);
 	}
 
-	stop{arg val;
-		this.speed_(0);
+	stop{arg val = 1000;
+		this.set(\stop, val);
 		//this.changed(\stop);
 	}
 
@@ -139,7 +140,7 @@ VTLokomotiv {
 	//formats the received command and value bytes according to API
 	prProcessIncomingCommand{arg dataBytes;
 		switch(currentCommand,
-			\speed, {speed = this.class.parseDataBytes(dataBytes); "toget".postln;this.changed(\speed)},
+			\speed, {speed = this.class.parseDataBytes(dataBytes); this.changed(\speed)},
 			\stop, {this.changed(\stopped)},
 			\direction, {direction = this.class.parseDataBytes(dataBytes); this.changed(\direction)},
 			\targetPosition, {targetPosition = this.class.parseDataBytes(dataBytes); this.changed(\targetPosition)},

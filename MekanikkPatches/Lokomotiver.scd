@@ -11,25 +11,25 @@
 	pens.addDependant(midiComp);
 };
 
-//map tog to faders
-7.do{arg i;
-	var fader, tog, button;
-	fader = ~togCtrlA.components.at(("fader." ++ (i + 1)).asSymbol);
-	tog = ~tog.channels[i];
-	fader.addDependant(tog);
-	tog.addDependant(fader);
-
-	button = ~togCtrlA.components.at(("button." ++ (i + 9)).asSymbol);
-	button.action = {arg butt;
-		if(butt.value != 0, {
-			tog.stop;
-			tog.changed(butt, \value);
-		});
-	};
-	tog.stop;
-	fader.valueAction_(512);
-	fader.refresh;
-};
+// //map tog to faders
+// 7.do{arg i;
+// 	var fader, tog, button;
+// 	fader = ~togCtrlA.components.at(("fader." ++ (i + 1)).asSymbol);
+// 	tog = ~tog.channels[i];
+// 	fader.addDependant(tog);
+// 	tog.addDependant(fader);
+//
+// 	button = ~togCtrlA.components.at(("button." ++ (i + 9)).asSymbol);
+// 	button.action = {arg butt;
+// 		if(butt.value != 0, {
+// 			tog.stop;
+// 			tog.changed(butt, \value);
+// 		});
+// 	};
+// 	tog.stop;
+// 	fader.valueAction_(512);
+// 	fader.refresh;
+// };
 
 fork{
 	~coordinator = XBeeCoordinatorAPIMode(SerialPort('/dev/tty.usbserial-A600ezu2', 115200));
@@ -64,7 +64,7 @@ fork{
 				var mapping;
 				"Will register".postln;
 				togAddress = newChildDevice.addressLo;
-				newTog = VTLokomotiv.new(~coordinator, togAddress);
+				newTog = VTLokomotiv.new(newChildDevice);
 				"Made new lok: newTog".format(newTog).postln;
 				mapping = togFaderMappings.at(togName.asSymbol);
 				faderNumber = mapping[\number];
@@ -106,6 +106,10 @@ fork{
 				}, "/robot/lokomotiv/%/bipolarSpeed".format(togName).asSymbol);
 				~lok.put(togName.asString, newTog);
 				"~lok now: %".format(~lok).postln;
+
+				newTog.addDependant({arg theChanged, what, more;
+					"Lok: % % %".format(theChanged.name, what, theChanged.perform(what)).postln;
+				};);
 			}, {"Will not register as lokomotiv: %, %".format(newChildDevice, togName).postln;});
 			if(~lok.includesKey(togName).not && "^TO$".matchRegexp(togName), {
 				"Registering led tog 1 (TO)".postln;
@@ -120,8 +124,8 @@ fork{
 									loop {
 										//~setLEDValue.value(~address, ~networkAddress, ~ledValue);
 										if(~ledValue != ~lastTransmittedValue, {
-											~tog.sendTXData(["ms".ascii, ~ledValue.asInteger, 13, 10].flatten);
 											"sending: % [%]\n".postf(~ledValue, ~tog);
+											~tog.sendTXData(["ms".ascii, ~ledValue.asInteger, 13, 10].flatten);
 											~lastTransmittedValue = ~ledValue;
 										});
 										0.05.wait;

@@ -7,7 +7,7 @@ SerialPort.devices
 //~coordinator.sendATCommand(\AggregateRoutingNotification, [0]);
 ~coordinator.sendATCommand(\AggregateRoutingNotification, [1]);
 ~coordinator.sendATCommand('NodeDiscover');
-~coordinator.zigBeeTransmitStatusAction_({arg data; "status: %".format(data).postln;});
+//~coordinator.zigBeeTransmitStatusAction_({arg data; "status: %".format(data).postln;});
 ~controller = SimpleController.new(~coordinator);
 ~controller.put(\childDeviceRegistered, {arg theChanged, what, newModule;
 	"Added new module: %".format([theChanged, what, newModule]).postln;
