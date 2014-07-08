@@ -14,6 +14,8 @@ VTLokomotiv {
 
 	var parserState, parseRoutine, currentCommand, currentValueBytes;
 	var currentStringData;
+	var dumpInput;
+	var dumpAction;
 	classvar <command;
 	classvar <setGet;
 	classvar <byteType;
@@ -52,6 +54,22 @@ VTLokomotiv {
 		direction = val.clip(0, 1);
 		this.set(\direction, val);
 		this.changed(\direction);
+	}
+
+	dumpInput_{arg bool;
+		var oldBool;
+		oldBool = dumpInput;
+		dumpInput = bool.booleanValue;
+		if(oldBool != dumpInput, {
+			if(dumpInput, {
+				dumpAction = {arg theChanger, theChanged, more;
+					"VTLokomotiv: % %: %".format(theChanger.name, theChanged, theChanger.perform(theChanged)).postln;
+				};
+			});
+			this.addDependant(dumpAction);
+		}, {
+				this.removeDependant(dumpAction);
+		});
 	}
 
 	bipolarSpeed{

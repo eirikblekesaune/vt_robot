@@ -332,7 +332,7 @@ Tdef(\tracking).stop;
 };
 )
 (
-~myTogKey = 'TOG08';
+~myTogKey = 'TOG02';
 ~myTrackingData = ~trackingData[~myTogKey];
 ~myTog = ~lok[~myTogKey.asString];
 ~myFigurPath = ~myTrackingData[\videoOSCPath];
@@ -351,13 +351,42 @@ Tdef(\tracking).stop;
 
 
 
-
+(
 NetAddr.localAddr.sendMsg('/robot/figur02/videoTracking', 0);//boksern TOG06
 NetAddr.localAddr.sendMsg('/robot/figur03/videoTracking', 0);//stanga TOG02
 NetAddr.localAddr.sendMsg('/robot/figur08/videoTracking', 0);//prinsen TOG08
 NetAddr.localAddr.sendMsg('/robot/figur09/videoTracking', 0);//hest TOG07
-
+)
 
 NetAddr.localAddr.sendMsg('/robot/figur02/videoTracking', 1);
 NetAddr.localAddr.sendMsg('/robot/figur02/rightVideoEdge', 1);
 NetAddr.localAddr.sendMsg('/robot/figur02/leftVideoEdge', 1);
+
+
+~speedOffsetRange = 30.0;
+
+~figur['figur2']
+~lok["TOG06"].bipolarSpeed_(160);
+
+//inn
+(
+[["TOG10", -160], ["TOG06", 160], ["TOG02", -200], ["TOG03", 150], ["TOG08", 220], ["TOG07", -230]].do{arg item;
+	~lok[item[0]].bipolarSpeed_(item[1]);
+}
+)
+
+(
+[["TOG10", -160, 0], ["TOG06", 140, 0], ["TOG02", -200, 0], ["TOG03", 150, 0], /*["TOG08", 200, 0],*/ ["TOG07", -230, 0]].do{arg item;
+	fork{
+		item[2].wait;
+		~lok[item[0]].stop(1000);
+	}
+}
+)
+
+//ut
+(
+[["TOG10", -160], ["TOG06", 160], ["TOG02", -200], ["TOG03", 150], ["TOG08", 200], ["TOG07", -230]].do{arg item;
+	~lok[item[0]].bipolarSpeed_(item[1].neg);
+}
+)
