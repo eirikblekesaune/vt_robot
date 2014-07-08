@@ -50,6 +50,8 @@ public:
 	void Update();
 	void GotAddr(unsigned char);
 	void UserChangedSpeed() {_motor->UserChangedSpeed();};
+	void SendDistanceUpdate();
+	void SendDistanceUpdate(long dist);
 
 	volatile long _distanceFromLastBeacon;
 private:
