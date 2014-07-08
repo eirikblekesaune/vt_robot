@@ -185,7 +185,7 @@ fork{
 		\interpolationStepsPerUpdate -> 10, \updateRate -> 0.2, \lastPosition -> 0.0
 	];
 	~trackingData = IdentityDictionary.new;
-	13.do{arg item;
+	~togToFigurMappings.size.do{arg item;
 		var key;
 		key = "TOG%".format( asPaddedString(item + 1) ).asSymbol;
 		~trackingData.put(key, IdentityDictionary.new(parent: ~trackingProto).put(\videoOSCPath,
@@ -199,7 +199,7 @@ fork{
 	~trackingData['TOG07'].putAll(IdentityDictionary[\rightEdge -> 0, \leftEdge -> -12370, \rightVideoEdge -> 323, \leftVideoEdge -> -259]);
 	~trackingData['TOG10'].putAll(IdentityDictionary[\rightEdge -> 0, \leftEdge -> 7101, \rightVideoEdge -> 0.0, \leftVideoEdge -> -821]);
 	//make start/stop video tracking functions
-	13.do{arg i;
+	~togToFigurMappings.size.do{arg i;
 		var number, key, trackingData, lokomotiv, sendPath;
 		number = i + 1;
 		key = "TOG%".format( asPaddedString(i + 1) ).asSymbol;
@@ -241,6 +241,50 @@ fork{
 			// ctrl.remove;
 			lokomotiv.set(\distancePollingInterval, 0);
 		});
+	};
+	//Make responders for start/stop video tracking, calibration left and right
+	~togToFigurMappings.size.do{arg i;
+		var key, figurNumber, trackingData;
+		key = "TOG%".format( asPaddedString(i + 1)).asSymbol;
+		figurNumber = ~togToFigurMappings[key];
+		trackingData = ~trackingData[key];
+		OSCdef("videoTrackingResponder_%".format(key).asSymbol, {arg msg, time, addr, port;
+			var val;
+			val = msg[1].booleanValue;
+			if(val, {
+				"Turning on tracking for % figur number: %".format(key, figurNumber).postln;
+				trackingData[\startVideoTracking].value;
+			}, {
+					"Turning off tracking for % figur number: %".format(key, figurNumber).postln;
+					trackingData[\stopVideoTracking].value;
+			});
+		}, "/robot/figur%/videoTracking".format(figurNumber.asPaddedString).asSymbol);
+		OSCdef("videoTrackingCalibrationRight_%".format(key).asSymbol, {arg msg, time, addr, port;
+			var val, lok;
+			val = msg[1];
+			lok = ~lok[key.asString];
+			//set tog DistanceFromLastAddress to 0
+			lok.set(\distanceFromLastAddress, 0);
+			//store rightVideoEdge in tracking data
+			trackingData.put(\rightVideoEdge, val);
+			//store rightEdge in tracking data as 0
+			trackingData.put(\rightEdge, 0);
+		}, "/robot/figur%/rightVideoEdge".format(figurNumber.asPaddedString).asSymbol);
+		OSCdef("videoTrackingCalibrationLeft_%".format(key).asSymbol, {arg msg, time, addr, port;
+			var val, lok;
+			val = msg[1];
+			lok = ~lok[key.asString];
+			fork{
+				//read distanceFromLastAddress from tog
+				lok.get(\distanceFromLastAddress);
+				//short wait to let the lokomotiv respond
+				0.5.wait;
+				//store that in tracking data as leftEdge
+				trackingData.put(\leftEdge, lok.distanceFromLastAddress);
+				//store videoLeftEdge from argument in trackingdata
+				trackingData.put(\leftVideoEdge, val);
+			}
+		}, "/robot/figur%/leftVideoEdge".format(figurNumber.asPaddedString).asSymbol);
 	};
 	"Lokomotiver ready".postln;
 };

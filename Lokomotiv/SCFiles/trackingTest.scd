@@ -329,10 +329,10 @@ Tdef(\tracking).stop;
 		// ctrl.remove;
 		lokomotiv.set(\distancePollingInterval, 0);
 	});
-}
+};
 )
 (
-~myTogKey = 'TOG07';
+~myTogKey = 'TOG08';
 ~myTrackingData = ~trackingData[~myTogKey];
 ~myTog = ~lok[~myTogKey.asString];
 ~myFigurPath = ~myTrackingData[\videoOSCPath];
@@ -344,6 +344,20 @@ Tdef(\tracking).stop;
 ~video.sendMsg(~myFigurPath, ~myTrackingData[\leftVideoEdge])
 ~myTog.get(\distanceFromLastAddress);
 ~myTog.set(\distanceFromLastAddress, 0)
-
+~myTog.bipolarSpeed_(-171);
+~myTog.bipolarSpeed_(0);
 ~myTog.set(\distancePollingInterval, 200);
 ~myTog.set(\distancePollingInterval, 0);
+
+
+
+
+NetAddr.localAddr.sendMsg('/robot/figur02/videoTracking', 0);//boksern TOG06
+NetAddr.localAddr.sendMsg('/robot/figur03/videoTracking', 0);//stanga TOG02
+NetAddr.localAddr.sendMsg('/robot/figur08/videoTracking', 0);//prinsen TOG08
+NetAddr.localAddr.sendMsg('/robot/figur09/videoTracking', 0);//hest TOG07
+
+
+NetAddr.localAddr.sendMsg('/robot/figur02/videoTracking', 1);
+NetAddr.localAddr.sendMsg('/robot/figur02/rightVideoEdge', 1);
+NetAddr.localAddr.sendMsg('/robot/figur02/leftVideoEdge', 1);
