@@ -8,6 +8,7 @@ const int motorEncoderInterruptIndex = 0;// digital pin 2 on Leonardo implicitly
 
 const long Lokomotiv::_beaconAddressUpdateInterval = 1000;
 long lastDistanceUpdate = 0;
+long lastDistanceUpdateValue = 0;
 //IR reader
 const int irReaderReceivePin = 8;
 
@@ -63,6 +64,7 @@ void Lokomotiv::SetDistancePollingInterval(long val)
 	} else {
 		_distancePollingEnabled = true;
 		_distancePollingInterval = max(20, val);
+		SendDistanceUpdate();
 	}
 }
 long Lokomotiv::GetDistancePollingInterval()
@@ -130,12 +132,26 @@ void Lokomotiv::Update()
 	_irReader->Update();
 	if(_distancePollingEnabled)
 	{
-		if((millis() - lastDistanceUpdate) >= _distancePollingInterval)
+		long dist = GetDistanceFromLastAddress();
+		if(
+				((millis() - lastDistanceUpdate) >= _distancePollingInterval) &&
+				(lastDistanceUpdateValue != dist))
 		{
-			ReturnGetValue(CMD_DISTANCE_FROM_LAST_ADDRESS, GetDistanceFromLastAddress());
-			lastDistanceUpdate = millis();
+			SendDistanceUpdate(dist);
 		}
 	}
+}
+
+void Lokomotiv::SendDistanceUpdate()
+{
+	SendDistanceUpdate(GetDistanceFromLastAddress());
+}
+
+void Lokomotiv::SendDistanceUpdate(long dist)
+{
+	ReturnGetValue(CMD_DISTANCE_FROM_LAST_ADDRESS, dist); 
+	lastDistanceUpdate = millis();
+	lastDistanceUpdateValue = dist; 
 }
 
 void Lokomotiv::GotAddr(unsigned char addr)
