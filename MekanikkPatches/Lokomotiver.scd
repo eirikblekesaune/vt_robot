@@ -35,38 +35,53 @@ fork{
 	~coordinator = XBeeCoordinatorAPIMode(SerialPort('/dev/tty.usbserial-A600ezu2', 115200));
 	~coordinator.rxAction_(nil);
 	~coordinator.sendATCommand(\AggregateRoutingNotification, [1]);
+	~togToFigurMappings = (
+		'TOG01': 7,//nest hoy skjerm
+		'TOG02': 3,//hoy figur, stanga
+		'TOG03': 4,//liten figur
+		'TOG04': 6,//hoy skjerm
+		'TOG05': 12,//linsetog 3
+		'TOG06': 2,//boksern
+		'TOG07': 9,//hesten
+		'TOG08': 8,//prins
+		'TOG09': 11,//linsetog 2
+		'TOG10': 1,//skjevt hode
+		'TOG11': 5,//bred skjerm
+		'TOG12': 0,//tog 1
+		'TOG13': 13//hyletog 4
+	);
 
 	~lok = Dictionary.new;
 	~togRegistrationService = {arg theChanger, theChanged, more;
 		if(theChanged == \childDeviceRegistered, {
 			var togFader, faderNumber, togStopButton, faderUpdater, togAddress, newChildDevice, newTog, togName;
-			var togFaderMappings, speedUpdateTask, runUpdateTask;
-			togFaderMappings = (
-				TOG01: (device: ~togCtrlB, number: 1),
-				TOG02: (device: ~togCtrlB, number: 2),
-				TOG03: (device: ~togCtrlB, number: 3),
-				TOG04: (device: ~togCtrlB, number: 4),
-				TOG05: (device: ~togCtrlB, number: 5),
-				TOG06: (device: ~togCtrlB, number: 6),
-				TOG07: (device: ~togCtrlB, number: 7),
-				TOG08: (device: ~togCtrlB, number: 8),
-				TOG09: (device: ~togCtrlA, number: 1),
-				TOG10: (device: ~togCtrlA, number: 2),
-				TOG11: (device: ~togCtrlA, number: 3),
-				TOG12: (device: ~togCtrlA, number: 4),
-				TOG13: (device: ~togCtrlA, number: 5),
-			);
+			var figurFaderMappings, speedUpdateTask, runUpdateTask;
+			figurFaderMappings = Dictionary[
+				0 -> (device: ~togCtrlB, number: 1),
+				1 -> (device: ~togCtrlB, number: 2),
+				2 -> (device: ~togCtrlB, number: 3),
+				3 -> (device: ~togCtrlB, number: 4),
+				4 -> (device: ~togCtrlB, number: 5),
+				5 -> (device: ~togCtrlB, number: 6),
+				6 -> (device: ~togCtrlB, number: 7),
+				7 -> (device: ~togCtrlB, number: 8),
+				8 -> (device: ~togCtrlA, number: 1),
+				9 -> (device: ~togCtrlA, number: 2),
+				10 -> (device: ~togCtrlA, number: 3),
+				11 -> (device: ~togCtrlA, number: 4),
+				12 -> (device: ~togCtrlA, number: 5),
+				13 -> (device: ~togCtrlA, number: 6)
+			];
 			newChildDevice = more;
 			togName = newChildDevice.nodeIdentifier.asString;
 			"GOT new device: %, %".format(newChildDevice, togName).postln;
 			//if this radio module has not been registered before
 			if(~lok.includesKey(togName).not && "^TOG.+".matchRegexp(togName), {
 				var mapping;
-				"Will register".postln;
 				togAddress = newChildDevice.addressLo;
 				newTog = VTLokomotiv.new(newChildDevice);
 				"Made new lok: newTog".format(newTog).postln;
-				mapping = togFaderMappings.at(togName.asSymbol);
+				mapping = figurFaderMappings.at(~togToFigurMappings[togName.asSymbol]);
 				faderNumber = mapping[\number];
 				togFader = mapping[\device].components.at(("fader." ++ faderNumber).asSymbol);
 				"Mapped to fader number: %".format(faderNumber).postln;
@@ -164,6 +179,68 @@ fork{
 	//Wireless LED fader
 
 	10.wait;
+	~video = NetAddr("1.2.3.44", 1234);
 
+	~trackingProto = IdentityDictionary[
+		\interpolationStepsPerUpdate -> 10, \updateRate -> 0.2, \lastPosition -> 0.0
+	];
+	~trackingData = IdentityDictionary.new;
+	13.do{arg item;
+		var key;
+		key = "TOG%".format( asPaddedString(item + 1) ).asSymbol;
+		~trackingData.put(key, IdentityDictionary.new(parent: ~trackingProto).put(\videoOSCPath,
+			"/video/figur%".format( asPaddedString(~togToFigurMappings[key]) ).asSymbol
+			)
+		);
+	};
+	~trackingData['TOG08'].putAll(IdentityDictionary[\rightEdge -> 0, \leftEdge -> 14647, \rightVideoEdge -> 271.0, \leftVideoEdge -> -295]);
+	~trackingData['TOG02'].putAll(IdentityDictionary[\rightEdge -> 0, \leftEdge -> -7275, \rightVideoEdge -> 30.0, \leftVideoEdge -> -681]);
+	~trackingData['TOG06'].putAll(IdentityDictionary[\rightEdge -> 0, \leftEdge -> 7061, \rightVideoEdge -> 0.0, \leftVideoEdge -> -845]);
+	~trackingData['TOG07'].putAll(IdentityDictionary[\rightEdge -> 0, \leftEdge -> -12370, \rightVideoEdge -> 323, \leftVideoEdge -> -259]);
+	~trackingData['TOG10'].putAll(IdentityDictionary[\rightEdge -> 0, \leftEdge -> 7101, \rightVideoEdge -> 0.0, \leftVideoEdge -> -821]);
+	//make start/stop video tracking functions
+	13.do{arg i;
+		var number, key, trackingData, lokomotiv, sendPath;
+		number = i + 1;
+		key = "TOG%".format( asPaddedString(i + 1) ).asSymbol;
+		trackingData = ~trackingData[key];
+		lokomotiv = ~lok[key.asString];
+		sendPath = trackingData[\videoOSCPath];
+		trackingData.put(\trackingController, SimpleController.new(lokomotiv));
+		trackingData.put(\trackingAction, {
+			var ctrl, waitTime;
+			ctrl = trackingData[\trackingController];
+			waitTime = trackingData[\updateRate] / trackingData[\interpolationStepsPerUpdate];
+			ctrl.put(\distanceFromLastAddress, {arg theChanged, theChanger, more;
+				var val, videoPos, stream, duration;
+				duration = trackingData[\updateRate];
+				val = theChanged.distanceFromLastAddress;
+				videoPos = val.linlin(
+					trackingData[\leftEdge],
+					trackingData[\rightEdge],
+					trackingData[\leftVideoEdge],
+					trackingData[\rightVideoEdge],
+					\none
+				);
+				stream = Env([trackingData[\lastPosition].asFloat, videoPos.asFloat], [duration]).asPseg.asStream;
+				fork{
+					trackingData[\interpolationStepsPerUpdate].do{arg j;
+						~video.sendMsg(sendPath, stream.next);
+						waitTime.wait;
+					}
+				};
+				trackingData[\lastPosition] = videoPos;
+			});
+			lokomotiv.set(\distancePollingInterval, asInteger( trackingData[\updateRate] * 1000 ) );
+		}.inEnvir);
+		//function to start tracking for video
+		trackingData.put(\startVideoTracking, trackingData[\trackingAction]);
+		//function to stop video tracking
+		trackingData.put(\stopVideoTracking, {
+			// var ctrl = trackingData[\trackingController];
+			// ctrl.remove;
+			lokomotiv.set(\distancePollingInterval, 0);
+		});
+	};
 	"Lokomotiver ready".postln;
 };

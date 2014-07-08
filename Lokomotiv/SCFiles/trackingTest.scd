@@ -1,17 +1,3 @@
-NetAddr("1.2.3.44", 1234).sendMsg('/video/tog', 250.0);
-NetAddr("1.2.3.44", 1234).sendMsg('/video/tog', -388.0);
-
-//  250 right max position 3@-82790
-//-388 left edge 3@-66767
-~coordinator.networkAddress;
-~coordinator.sendATCommand(\NetworkAddress);
-(
-~coordinator.sendATCommand(\SerialNumberLow, responseAction: {arg data;
-	XBeeParser.prParseAddressBytes(data['commandData']).postln;
-});
-)
-~coordinator.createSourceRoute();
-//lastAdress not initialized
 
 ~lok["TOG08"].get(\lastDetectedAddress);
 ~lok["TOG08"].set(\lastDetectedAddress, 3);
@@ -234,3 +220,130 @@ Tdef(\tracking).stop;
 };
 )
 ~getVideoPosition.value(1, -155);
+
+
+(
+~rightEdge8 = 0;
+~leftEdge8 = 14951;
+~rightVideoEdge8 = 271;//
+~leftVideoEdge8 = -295;//
+~lastPos8 = 0.0;
+~steps8 = 10;
+~togToVideo8 = {arg theChanger, theChanged, args;
+	if(theChanged == \distanceFromLastAddress, {
+		var val, videoPos, stream, duration;
+		duration = 0.2;
+		val = theChanger.distanceFromLastAddress;
+		videoPos = val.linlin(~leftEdge8, ~rightEdge8, ~leftVideoEdge8, ~rightVideoEdge8, \none);
+		stream = Env([~lastPos8.asFloat, videoPos.asFloat], [duration]).asPseg.asStream;
+		//"pos: % videoPos: %".format(val, videoPos).postln;
+		//~video.sendMsg('/video/tog', videoPos);
+		fork{
+			10.do{arg i;
+				~video.sendMsg('/video/tog08', stream.next);
+				//stream.next.postln;
+				0.02.wait;
+			}
+		};
+		~lastPos8 = videoPos;
+	});
+};
+~lok["TOG05"].addDependant(~togToVideo8);
+)
+~lok["TOG13"].bipolarSpeed_(-150);
+~lok["TOG13"].bipolarSpeed_(0);
+(
+~video = NetAddr("1.2.3.44", 1234);
+~togToFigurMappings = (
+	'TOG01': 7,//nest hoy skjerm
+	'TOG02': 3,//hoy figur, stanga
+	'TOG03': 4,//liten figur
+	'TOG04': 6,//hoy skjerm
+	'TOG05': 12,//linsetog 3
+	'TOG06': 2,//boksern
+	'TOG07': 9,//hesten
+	'TOG08': 8,//prins
+	'TOG09': 11,//linsetog 2
+	'TOG10': 1,//skjevt hode
+	'TOG11': 5,//bred skjerm
+	'TOG12': 0,//tog 1
+	'TOG13': 13//hyletog 4
+);
+~trackingProto = IdentityDictionary[
+	\interpolationStepsPerUpdate -> 10, \updateRate -> 0.2, \lastPosition -> 0.0
+];
+~trackingData = IdentityDictionary.new;
+13.do{arg item;
+	var key;
+	key = "TOG%".format( asPaddedString(item + 1) ).asSymbol;
+	~trackingData.put(key, IdentityDictionary.new(parent: ~trackingProto).put(\videoOSCPath,
+		"/video/figur%".format( asPaddedString(~togToFigurMappings[key]) ).asSymbol
+		)
+	);
+};
+~trackingData['TOG08'].putAll(IdentityDictionary[\rightEdge -> 0, \leftEdge -> 14647, \rightVideoEdge -> 271.0, \leftVideoEdge -> -295]);
+~trackingData['TOG02'].putAll(IdentityDictionary[\rightEdge -> 0, \leftEdge -> -7275, \rightVideoEdge -> 30.0, \leftVideoEdge -> -681]);
+~trackingData['TOG06'].putAll(IdentityDictionary[\rightEdge -> 0, \leftEdge -> 7061, \rightVideoEdge -> 0.0, \leftVideoEdge -> -845]);
+~trackingData['TOG07'].putAll(IdentityDictionary[\rightEdge -> 0, \leftEdge -> -12370, \rightVideoEdge -> 323, \leftVideoEdge -> -259]);
+~trackingData['TOG10'].putAll(IdentityDictionary[\rightEdge -> 0, \leftEdge -> 7101, \rightVideoEdge -> 0.0, \leftVideoEdge -> -821]);
+//make start/stop video tracking functions
+13.do{arg i;
+	var number, key, trackingData, lokomotiv, sendPath;
+	number = i + 1;
+	key = "TOG%".format( asPaddedString(i + 1) ).asSymbol;
+	trackingData = ~trackingData[key];
+	lokomotiv = ~lok[key.asString];
+	sendPath = trackingData[\videoOSCPath];
+	trackingData.put(\trackingController, SimpleController.new(lokomotiv));
+	trackingData.put(\trackingAction, {
+		var ctrl, waitTime;
+		ctrl = trackingData[\trackingController];
+		waitTime = trackingData[\updateRate] / trackingData[\interpolationStepsPerUpdate];
+		ctrl.put(\distanceFromLastAddress, {arg theChanged, theChanger, more;
+			var val, videoPos, stream, duration;
+			duration = trackingData[\updateRate];
+			val = theChanged.distanceFromLastAddress;
+			videoPos = val.linlin(
+				trackingData[\leftEdge],
+				trackingData[\rightEdge],
+				trackingData[\leftVideoEdge],
+				trackingData[\rightVideoEdge],
+				\none
+			);
+			stream = Env([trackingData[\lastPosition].asFloat, videoPos.asFloat], [duration]).asPseg.asStream;
+			fork{
+				trackingData[\interpolationStepsPerUpdate].do{arg j;
+					~video.sendMsg(sendPath, stream.next);
+					waitTime.wait;
+				}
+			};
+			trackingData[\lastPosition] = videoPos;
+		});
+		lokomotiv.set(\distancePollingInterval, asInteger( trackingData[\updateRate] * 1000 ) );
+	}.inEnvir);
+	//function to start tracking for video
+	trackingData.put(\startVideoTracking, trackingData[\trackingAction]);
+	//function to stop video tracking
+	trackingData.put(\stopVideoTracking, {
+		// var ctrl = trackingData[\trackingController];
+		// ctrl.remove;
+		lokomotiv.set(\distancePollingInterval, 0);
+	});
+}
+)
+(
+~myTogKey = 'TOG07';
+~myTrackingData = ~trackingData[~myTogKey];
+~myTog = ~lok[~myTogKey.asString];
+~myFigurPath = ~myTrackingData[\videoOSCPath];
+)
+
+~myTrackingData[\startVideoTracking].value
+~myTrackingData[\stopVideoTracking].value
+~video.sendMsg(~myFigurPath, ~myTrackingData[\rightVideoEdge])
+~video.sendMsg(~myFigurPath, ~myTrackingData[\leftVideoEdge])
+~myTog.get(\distanceFromLastAddress);
+~myTog.set(\distanceFromLastAddress, 0)
+
+~myTog.set(\distancePollingInterval, 200);
+~myTog.set(\distancePollingInterval, 0);

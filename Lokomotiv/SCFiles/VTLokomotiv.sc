@@ -71,7 +71,8 @@ VTLokomotiv {
 
 	stop{arg val = 1000;
 		this.set(\stop, val);
-		//this.changed(\stop);
+		speed = 0;
+		this.changed(\speed);
 	}
 
 	prResetParser{
