@@ -50,8 +50,8 @@ fork{
 		'TOG12': 0,//tog 1
 		'TOG13': 13//hyletog 4
 	);
-
 	~lok = Dictionary.new;
+	~figur = Dictionary.new;
 	~togRegistrationService = {arg theChanger, theChanged, more;
 		if(theChanged == \childDeviceRegistered, {
 			var togFader, faderNumber, togStopButton, faderUpdater, togAddress, newChildDevice, newTog, togName;
@@ -82,6 +82,7 @@ fork{
 				newTog = VTLokomotiv.new(newChildDevice);
 				"Made new lok: newTog".format(newTog).postln;
 				mapping = figurFaderMappings.at(~togToFigurMappings[togName.asSymbol]);
+				~figur.put(~togToFigurMappings[togName.asSymbol], newTog);
 				faderNumber = mapping[\number];
 				togFader = mapping[\device].components.at(("fader." ++ faderNumber).asSymbol);
 				"Mapped to fader number: %".format(faderNumber).postln;
@@ -90,7 +91,11 @@ fork{
 					if(speedUpdateTask.isPlaying.not, {
 						speedUpdateTask = Task.new({
 							loop{
-								newTog.bipolarSpeed_(togFader.value.linlin(0, 1023, -512, 512).asInteger);
+								var newVal;
+								newVal = togFader.value.linlin(0, 1023, -512, 512).asInteger;
+								if(newVal != newTog.bipolarSpeed, {
+									newTog.bipolarSpeed_(newVal);
+								});
 								0.1.wait;
 							}
 						}).play;
@@ -180,9 +185,8 @@ fork{
 
 	10.wait;
 	~video = NetAddr("1.2.3.44", 1234);
-
 	~trackingProto = IdentityDictionary[
-		\interpolationStepsPerUpdate -> 10, \updateRate -> 0.2, \lastPosition -> 0.0
+		\interpolationStepsPerUpdate -> 20, \updateRate -> 0.4, \lastPosition -> 0.0
 	];
 	~trackingData = IdentityDictionary.new;
 	~togToFigurMappings.size.do{arg item;
@@ -193,6 +197,7 @@ fork{
 			)
 		);
 	};
+	~speedOffsetRange = 0.0;
 	~trackingData['TOG08'].putAll(IdentityDictionary[\rightEdge -> 0, \leftEdge -> 14647, \rightVideoEdge -> 271.0, \leftVideoEdge -> -295]);
 	~trackingData['TOG02'].putAll(IdentityDictionary[\rightEdge -> 0, \leftEdge -> -7275, \rightVideoEdge -> 30.0, \leftVideoEdge -> -681]);
 	~trackingData['TOG06'].putAll(IdentityDictionary[\rightEdge -> 0, \leftEdge -> 7061, \rightVideoEdge -> 0.0, \leftVideoEdge -> -845]);
@@ -212,7 +217,7 @@ fork{
 			ctrl = trackingData[\trackingController];
 			waitTime = trackingData[\updateRate] / trackingData[\interpolationStepsPerUpdate];
 			ctrl.put(\distanceFromLastAddress, {arg theChanged, theChanger, more;
-				var val, videoPos, stream, duration;
+				var val, videoPos, stream, duration, speedOffset;
 				duration = trackingData[\updateRate];
 				val = theChanged.distanceFromLastAddress;
 				videoPos = val.linlin(
@@ -223,15 +228,16 @@ fork{
 					\none
 				);
 				stream = Env([trackingData[\lastPosition].asFloat, videoPos.asFloat], [duration]).asPseg.asStream;
+				speedOffset = lokomotiv.bipolarSpeed.linlin(-511, 511, ~speedOffsetRange.neg, ~speedOffsetRange);
 				fork{
 					trackingData[\interpolationStepsPerUpdate].do{arg j;
-						~video.sendMsg(sendPath, stream.next);
+						~video.sendMsg(sendPath, stream.next + speedOffset);
 						waitTime.wait;
 					}
 				};
 				trackingData[\lastPosition] = videoPos;
 			});
-			lokomotiv.set(\distancePollingInterval, asInteger( trackingData[\updateRate] * 1000 ) );
+			lokomotiv.set(\distancePollingInterval, asInteger( trackingData[\updateRate]*1000 ) );
 		}.inEnvir);
 		//function to start tracking for video
 		trackingData.put(\startVideoTracking, trackingData[\trackingAction]);
