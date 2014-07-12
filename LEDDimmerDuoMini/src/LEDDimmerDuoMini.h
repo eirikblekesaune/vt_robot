@@ -11,8 +11,10 @@ enum parserState_t {
 
 enum cmd_t {
 	CLEAR,
-	SET_LED,
-	FLASH_LED,
+	SET_LED_1,
+	FLASH_LED_1,
+	SET_LED_2,
+	FLASH_LED_2,
 	NUM_COMMANDS
 };
 
