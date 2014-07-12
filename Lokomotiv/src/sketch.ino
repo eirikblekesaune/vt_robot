@@ -1,4 +1,4 @@
-#define SERIAL Serial1
+#define SERIAL Serial
 #include "Lokomotiv.h"
 #include "LokomotivAPI.h"
 #include "LokomotivAPIParser.h"

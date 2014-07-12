@@ -2,7 +2,7 @@
 #define LOKOMOTIV_API_H
 #include <Arduino.h>
 //This file contains all global definitions, macros, typedefs, enums etc.
-#define SERIAL Serial1
+#define SERIAL Serial
 static void DebugPrint(const char* msg);
 enum command_t
 {

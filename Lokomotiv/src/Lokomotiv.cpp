@@ -86,32 +86,52 @@ void Lokomotiv::SetTargetPosition(long val){_targetPosition = val;}
 
 void Lokomotiv::SetPeripheral(long data)
 {
-//	int8_t device, command;
-//	uint16_t valueMSB, valueLSB;
-//	device = static_cast<int8_t>((data >> 24) & 0x000000FF);
-//	command = static_cast<int8_t>((data >> 16) & 0x000000FF);
-//	valueMSB = static_cast<uint8_t>((data >> 8) & 0x000000FF);
-//	valueLSB = static_cast<uint8_t>(data & 0x000000FF);
-//	Wire.beginTransmission(device);
-//	Wire.write(command);
-//	Wire.write(valueMSB);
-//	Wire.write(valueLSB);
-//	Wire.endTransmission();
+	int8_t device, command;
+	int result;
+	int8_t valueMSB, valueLSB;
+	device = static_cast<int8_t>((data >> 24) & 0x000000FF);
+	command = static_cast<int8_t>((data >> 16) & 0x000000FF);
+	valueMSB = static_cast<uint8_t>((data >> 8) & 0x000000FF);
+	valueLSB = static_cast<uint8_t>(data & 0x000000FF);
+	Wire.beginTransmission(device);
+	Wire.write(command);
+	Wire.write(valueMSB);
+	Wire.write(valueLSB);
+	result = Wire.endTransmission();
+	if(result > 0)
+	{
+		DebugPrint("TWIerr");
+		DebugPrint(result);
+	}
 }
 
 void Lokomotiv::SetPeripheralRequest(long data)
 {
-//	int8_t device, command;
-//	device = static_cast<int8_t>((data >> 24) & 0x000000FF);
-//	command = static_cast<int8_t>((data >> 16) & 0x000000FF);
-//	Wire.beginTransmission(device);
-//	Wire.write(command);
-//	Wire.endTransmission(false);
-//	Wire.requestFrom(device, 2, true);
-//	while(Wire.available())    // slave may send less than requested
-//  { 
-//    DebugPrint(Wire.read());         // print the character
-//  }
+	int8_t device, command;
+  int numReceived;
+	byte result;
+	device = static_cast<int8_t>((data >> 24) & 0x000000FF);
+	command = static_cast<int8_t>((data >> 16) & 0x000000FF);
+	Wire.beginTransmission(device);
+	Wire.write(command);
+	result = Wire.endTransmission();
+	//expecting cmd byte and 2 value bytes
+	if(result == 0)
+	{
+		numReceived = Wire.requestFrom(device, 3);
+		if(numReceived == 3)
+		{
+			long reply;
+			reply = static_cast<long>(device) << 24;
+			reply |= static_cast<long>(Wire.read()) << 16;
+			reply |= static_cast<long>(Wire.read()) << 8;
+			reply |= static_cast<long>(Wire.read());
+			ReturnGetValue(CMD_PERIPHERAL_REQUEST, reply);
+		}
+	} else {
+		DebugPrint("TWIerr");
+		DebugPrint(result);
+	}
 }
 
 void Lokomotiv::SetState(long val){_state = val;}
@@ -123,7 +143,7 @@ void Lokomotiv::SetPidDValue(double val){_motor->SetPidDValue(val);}
 void Lokomotiv::Init()
 {
 	_irReader->Init();
-	//Wire.begin();
+	Wire.begin();
 }
 
 void Lokomotiv::Update()
