@@ -1,0 +1,20 @@
+#ifndef LED_DIMMER_DUO_MINI_H
+#define LED_DIMMER_DUO_MINI_H
+enum parserState_t {
+	WAITING_FOR_START_BYTE,
+	WAITING_FOR_CMD,
+	WAITING_FOR_HI_BYTE,
+	WAITING_FOR_LO_BYTE,
+	WAITING_FOR_CR,
+	WAITING_FOR_LF
+};
+
+enum cmd_t {
+	CLEAR,
+	SET_LED,
+	FLASH_LED,
+	NUM_COMMANDS
+};
+
+parserState_t parserState = WAITING_FOR_START_BYTE;
+#endif
