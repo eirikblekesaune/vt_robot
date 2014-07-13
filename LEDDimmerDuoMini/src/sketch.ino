@@ -5,7 +5,11 @@
 #define START_BYTE 77
 #define LED_NUM_MASK 0x8000
 #define TWI_ADDRESS 2
+
 cmd_t requestedCommand;
+long lastUpdate = 0;
+long updateInterval = 5;
+
 void parseTWICommand(int numBytes) 
 {
 	cmd_t cmd;
@@ -21,6 +25,7 @@ void parseTWICommand(int numBytes)
 		requestedCommand = static_cast<cmd_t>(Wire.read());
 	} 
 }
+
 void replyToRequest();
 void replyToRequest(cmd_t cmd);
 void replyToRequest(cmd_t cmd)
@@ -30,10 +35,10 @@ void replyToRequest(cmd_t cmd)
 	switch(cmd)
 	{
 		case SET_LED_1:
-			val = OCR1A;
+			val = led[0].value;
 			break;
 		case SET_LED_2:
-			val = OCR1B;
+			val = led[1].value;
 			break;
 	}
 	if(val != -1)
@@ -54,6 +59,14 @@ void replyToRequest()
 
 void setup()
 {
+	for(int i = 0; i < 2; i++)
+	{
+		led[i].value = 0;
+		led[i].targetValue = 0;
+		led[i].delta = 0;
+		led[i].isInterpolating = false;
+		led[i].fadeTime = 250;
+	}
 	Serial.begin(9600);
 	pinMode(9, OUTPUT);
 	pinMode(10, OUTPUT);
@@ -75,6 +88,8 @@ void setLEDValue(int num, int val)
 		val = ICR1;
 	else if(val < 0)
 		val = 0;
+	led_t *myLed = &led[num];
+	myLed->value = val;
 	switch(num)
 	{
 		case 0:
@@ -88,22 +103,82 @@ void setLEDValue(int num, int val)
 
 void flashLED(int num, int val)
 {
-	int tempVal;
+	led_t * myLed = &led[num];
 	switch(num)
 	{
 		case 0:
-			tempVal = OCR1A;
 			OCR1A = LED_FULL;
 			delay(val);
-			OCR1A = tempVal;
+			OCR1A = myLed->value;
 		 	break;
 		case 1:
-			tempVal = OCR1B;
 			OCR1B = LED_FULL;	
 			delay(val);
-			OCR1B = tempVal;
+			OCR1B = myLed->value;
 			break;
 	}
+}
+
+void setLEDFadetime(int num, int val)
+{
+	led[num].fadeTime = val;
+}
+
+void fadeLED(int num, int val)
+{
+	led_t *myLed;
+	int fadeTime, startValue, endValue, delta; 
+	myLed = &led[num];
+	startValue = myLed->value;
+	if(startValue != val)
+	{
+		endValue = val;
+		fadeTime = myLed->fadeTime;
+		if(fadeTime <= updateInterval)
+			fadeTime = updateInterval + 1;
+		int distance;
+		int numSteps;
+		distance = endValue - startValue;
+		numSteps = fadeTime / static_cast<int>(updateInterval);
+		delta = distance / numSteps; 
+		if(distance < 0)
+		{
+			if(delta == 0)
+				delta = -1;
+		} else {
+			if(delta == 0)
+				delta = 1;	
+		}
+		//store values in object
+		myLed->delta = delta;
+		myLed->isInterpolating = true;
+		myLed->targetValue = endValue;
+
+	}
+}
+
+void updateLEDInterpolationValue(int ledNum)
+{
+	led_t *myLed;
+	int nextVal, lastValue, delta, targetValue;
+	uint16_t result;
+	myLed = &led[ledNum];
+	lastValue = myLed->value;
+	delta = myLed->delta;
+	targetValue = myLed->targetValue;
+	nextVal = lastValue + delta;
+	if(delta < 0)
+	{
+		nextVal = max(nextVal, targetValue);
+		if(nextVal == targetValue)
+			myLed->isInterpolating = false;
+	} else if(delta > 0)
+	{
+		nextVal = min(nextVal, targetValue);
+		if(nextVal == targetValue)
+			myLed->isInterpolating = false;
+	}
+	setLEDValue(ledNum, nextVal); 
 }
 
 void doCommand(cmd_t cmd, int val)
@@ -112,19 +187,37 @@ void doCommand(cmd_t cmd, int val)
 	{
 		case CLEAR:
 			setLEDValue(0, 0);
+			led[0].isInterpolating = false;
 			setLEDValue(1, 0);
+			led[1].isInterpolating = false;
 			break;
-		case SET_LED_1:
+		case SET_LED_1://cmd num 1
 			setLEDValue(0, val);
+			//cancel any ongoing interpolation
+			led[0].isInterpolating = false;
 			break;
-		case FLASH_LED_1:
+		case FLASH_LED_1://cmd num 2
 			flashLED(0, val);
 			break;
-		case SET_LED_2:
-			setLEDValue(1, val);
+		case FADETIME_LED_1://cmd num 3
+			setLEDFadetime(0, val);
 			break;
-		case FLASH_LED_2:
+		case FADE_LED_1://cmd num 4
+			fadeLED(0, val);
+			break;
+		case SET_LED_2://cmd num 5
+			setLEDValue(1, val);
+			//cancel any ongoing interpolation
+			led[1].isInterpolating = false;
+			break;
+		case FLASH_LED_2://cmd num 6
 			flashLED(1, val);
+			break;
+		case FADETIME_LED_2://cmd num 7
+			setLEDFadetime(1, val);
+			break;
+		case FADE_LED_2://cmd num 8
+			fadeLED(1, val);
 			break;
 	}
 }
@@ -133,38 +226,49 @@ void loop()
 {
 	static int val;
 	static cmd_t cmd;
-	static uint8_t state;
+	static uint8_t serialParserState;
 	if(Serial.available() > 0)
 	{
 		uint8_t currentByte = Serial.read();
-		switch(state)
+		switch(serialParserState)
 		{
 			case WAITING_FOR_START_BYTE:
 				if(currentByte == START_BYTE)
-					state = WAITING_FOR_CMD;
+					serialParserState = WAITING_FOR_CMD;
 				break;
 			case WAITING_FOR_CMD:
 				cmd = static_cast<cmd_t>(currentByte);
-				state = WAITING_FOR_HI_BYTE;
+				serialParserState = WAITING_FOR_HI_BYTE;
 				break;
 			case WAITING_FOR_HI_BYTE:
 				val = static_cast<int>(currentByte) << 8;
-				state = WAITING_FOR_LO_BYTE; 
+				serialParserState = WAITING_FOR_LO_BYTE; 
 				break;
 			case WAITING_FOR_LO_BYTE:
 				val |= currentByte;
-				state = WAITING_FOR_CR;
+				serialParserState = WAITING_FOR_CR;
 				break;
 			case WAITING_FOR_CR:
 				if(currentByte == 13)
-					state = WAITING_FOR_LF;
+					serialParserState = WAITING_FOR_LF;
 				else 
-					state = WAITING_FOR_START_BYTE;
+					serialParserState = WAITING_FOR_START_BYTE;
 				break;
 			case WAITING_FOR_LF:
 				if(currentByte == 10)
 					doCommand(cmd, val);
-				state = WAITING_FOR_START_BYTE;
+				serialParserState = WAITING_FOR_START_BYTE;
 		}
+	}
+	if(millis() >= (lastUpdate + updateInterval))
+	{
+		for(int i = 0; i < NUM_LEDS; i++)
+		{
+			if(led[i].isInterpolating)
+			{
+				updateLEDInterpolationValue(i);
+			}
+		}
+		lastUpdate = millis();
 	}
 }

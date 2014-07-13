@@ -13,10 +13,31 @@ enum cmd_t {
 	CLEAR,
 	SET_LED_1,
 	FLASH_LED_1,
+	FADETIME_LED_1,
+	FADE_LED_1,
 	SET_LED_2,
 	FLASH_LED_2,
+	FADETIME_LED_2,
+	FADE_LED_2,
 	NUM_COMMANDS
 };
+
+enum ledState_t {
+	LED_READY,
+	LED_INTERPOLATING
+};
+
+struct led_t {
+	int value;
+	int targetValue;
+	int delta;
+	bool isInterpolating;
+	int fadeTime;
+};
+
+#define NUM_LEDS 2
+
+led_t led[NUM_LEDS];
 
 parserState_t parserState = WAITING_FOR_START_BYTE;
 #endif
