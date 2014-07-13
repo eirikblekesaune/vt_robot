@@ -5,7 +5,7 @@
 //const int driverINB = 11;
 const int driverENDIAG = 6;
 const int motorEncoderInterruptIndex = 0;// digital pin 2 on Leonardo implicitly
-
+const int twiStartingAddress = 0x08; //all VT TWI modules have the same starting address
 const long Lokomotiv::_beaconAddressUpdateInterval = 1000;
 long lastDistanceUpdate = 0;
 long lastDistanceUpdateValue = 0;
@@ -93,7 +93,7 @@ void Lokomotiv::SetPeripheral(long data)
 	command = static_cast<int8_t>((data >> 16) & 0x000000FF);
 	valueMSB = static_cast<uint8_t>((data >> 8) & 0x000000FF);
 	valueLSB = static_cast<uint8_t>(data & 0x000000FF);
-	Wire.beginTransmission(device);
+	Wire.beginTransmission(device + twiStartingAddress);
 	Wire.write(command);
 	Wire.write(valueMSB);
 	Wire.write(valueLSB);

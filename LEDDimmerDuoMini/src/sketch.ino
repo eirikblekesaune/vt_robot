@@ -4,7 +4,7 @@
 #define LED_FULL 0x07FF
 #define START_BYTE 77
 #define LED_NUM_MASK 0x8000
-#define TWI_ADDRESS 2
+uint8_t twiAddress;
 
 cmd_t requestedCommand;
 long lastUpdate = 0;
@@ -77,7 +77,19 @@ void setup()
 	OCR1A = 0x0000;
 	OCR1B = 0x0000;
 	interrupts();
-	Wire.begin(TWI_ADDRESS);
+	//Read twi address pins
+	pinMode(5, INPUT_PULLUP);
+	pinMode(6, INPUT_PULLUP);
+	pinMode(7, INPUT_PULLUP);
+	pinMode(8, INPUT_PULLUP);
+	twiAddress = digitalRead(5); 
+	twiAddress |= digitalRead(6) << 1;
+	twiAddress |= digitalRead(7) << 2;
+	twiAddress |= digitalRead(8) << 3;
+	twiAddress = (~twiAddress) & 0x0F;
+	//starting address for TWI addresses are 0x80
+	twiAddress += 8;
+	Wire.begin(twiAddress);
 	Wire.onReceive(parseTWICommand);
 	Wire.onRequest(replyToRequest);
 }
