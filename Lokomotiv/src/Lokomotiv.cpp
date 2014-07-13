@@ -111,6 +111,7 @@ void Lokomotiv::SetPeripheralRequest(long data)
   int numReceived;
 	byte result;
 	device = static_cast<int8_t>((data >> 24) & 0x000000FF);
+	device += twiStartingAddress;
 	command = static_cast<int8_t>((data >> 16) & 0x000000FF);
 	Wire.beginTransmission(device);
 	Wire.write(command);

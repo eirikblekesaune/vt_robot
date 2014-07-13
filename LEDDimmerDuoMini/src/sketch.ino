@@ -37,8 +37,14 @@ void replyToRequest(cmd_t cmd)
 		case SET_LED_1:
 			val = led[0].value;
 			break;
+		case FADETIME_LED_1:
+			val = led[0].fadeTime;
+			break;
 		case SET_LED_2:
 			val = led[1].value;
+			break;
+		case FADETIME_LED_2:
+			val = led[1].fadeTime;
 			break;
 	}
 	if(val != -1)
