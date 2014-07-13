@@ -1,5 +1,6 @@
 #ifndef LED_DIMMER_DUO_MINI_H
 #define LED_DIMMER_DUO_MINI_H
+//#include "LEDLookup.h"
 enum parserState_t {
 	WAITING_FOR_START_BYTE,
 	WAITING_FOR_CMD,
