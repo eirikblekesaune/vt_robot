@@ -33,7 +33,7 @@ p.putAll([77, 0x01, 0x80 | 0x00, 0x00, 13, 10]);
 p.putAll([77, 0x01, 0x08, 0x1F, 13, 10]);
 
 //led 2
-p.putAll([77, 0x06, 0x00, 0xF5, 13, 10]);
+p.putAll([77, 0x06, 0x00, 0x05, 13, 10]);
 
 //set TWI leo comm
 q.putAll([77, 2, 0x02, 0x80 | 0x01, 0xFF, 13, 10]);
@@ -61,3 +61,14 @@ a.set(\peripheralRequest, (1 << 24) | (5 << 16));
 (2r11001011).bitNot.bitAnd(2r00001111).asBinaryString
 
 
+(
+//only serial
+p = SerialPort('/dev/tty.usbserial-FTCVPEA5', 9600, crtscts: true);
+f = fork{
+	loop{
+		var byte = p.read;
+		"Mini: byte: %, ascii: %".format(byte, byte.asAscii).postln;
+	}
+};
+)
+p.putAll([77, 0x06, 0x00, 0x05, 13, 10]);
