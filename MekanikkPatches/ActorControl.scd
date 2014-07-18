@@ -45,3 +45,4 @@ try{
     "Actor conrol ready".postln;
 }{"Error starting actor control patch".error.postln;};
 
+"~/vt_robot/MekanikkPatches/Tallerkener.scd".standardizePath.load;
