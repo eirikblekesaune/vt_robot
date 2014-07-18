@@ -70,13 +70,13 @@ fork{
 
 	~trackingDataStore = Dictionary[
 		1 -> IdentityDictionary[\rightEdge -> -5582],
-		2 -> IdentityDictionary[\rightEdge -> 6221],
-		3 -> IdentityDictionary[\rightEdge -> -7101],
+		2 -> IdentityDictionary[\rightEdge -> 6080],
+		3 -> IdentityDictionary[\rightEdge -> -7036],
 		5 -> IdentityDictionary[\rightEdge -> -7190],
-		6 -> IdentityDictionary[\rightEdge -> -10802],
-		7 -> IdentityDictionary[\rightEdge -> -10862],
-		8 -> IdentityDictionary[\rightEdge -> -13883],
-		9 -> IdentityDictionary[\rightEdge -> 11759]
+		6 -> IdentityDictionary[\rightEdge -> -10600],
+		7 -> IdentityDictionary[\rightEdge -> -11548],
+		8 -> IdentityDictionary[\rightEdge -> 16065],
+		9 -> IdentityDictionary[\rightEdge -> 9048]
 	];
 
 	~video = NetAddr("1.2.3.44", 1234);
@@ -304,6 +304,8 @@ fork{
 		});
 	};
 	~coordinator.addDependant(~togRegistrationService);
+	~togCtrlA.components['button.20'].action_({"NodeDiscovery".postln;~coordinator.sendATCommand('NodeDiscover');});
+	~togCtrlB.components['button.20'].action_({"NodeDiscovery".postln;~coordinator.sendATCommand('NodeDiscover');});
 	~coordinator.sendATCommand('NodeDiscover');
 	"Lokomotiver ready".postln;
 };

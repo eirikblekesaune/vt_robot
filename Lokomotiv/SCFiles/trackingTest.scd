@@ -15,11 +15,11 @@ var num = 7;
 ~myTrackingData[\stopVideoTracking].value
 ~video.sendMsg(~myFigurPath, ~myTrackingData[\rightVideoEdge])
 ~video.sendMsg(~myFigurPath, ~myTrackingData[\leftVideoEdge])
-~myTog.get(\distanceFromLastAddress);
+~myTog.get(\distanceFromLastAddress);//1330
 ~myTog.set(\distanceFromLastAddress, 0);//3. shift + enter på denne linja. Dette setter telleverk til null -> Gå til Lokomotiver.scd
 ~myTog.bipolarSpeed_( -200 );
 ~myTog.bipolarSpeed_( 0 );
-~myTrackingData[\rightEdge] = -10862;//NB store this!!!
+~myTrackingData[\rightEdge] = -7091;//NB store this!!!
 ~speedOffsetRange = 0.0;
 
 ~myTog.get(\speed);
