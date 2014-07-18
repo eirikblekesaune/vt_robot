@@ -70,5 +70,15 @@ f = fork{
 		"Mini: byte: %, ascii: %".format(byte, byte.asAscii).postln;
 	}
 };
+OSCdef(\flashLed2, {"flash".postln;p.putAll([77, 0x06, 0x00, 0x01, 13, 10]);}, '/led.1/flash');
+OSCdef(\setLed2, {arg msg, addr, time, port;
+    var valHi, valLo;
+    valHi = (msg[1] >> 8).bitAnd(0xFF);
+    valLo = (msg[1]).bitAnd(0xFF);
+    "led1 set: %".format(msg[1]).postln;
+    p.putAll([77, 0x05, valHi, valLo, 13, 10]);
+},'/led.1/value')
 )
-p.putAll([77, 0x06, 0x00, 0x05, 13, 10]);
+p.putAll([77, 0x06, 0x00, 0x0F, 13, 10]);
+p.putAll([77, 0x05, 0x07, 0xFF, 13, 10]);
+p.putAll([77, 0x05, 0x00, 0x00, 13, 10]);
