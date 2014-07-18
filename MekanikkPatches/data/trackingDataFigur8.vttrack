@@ -1,0 +1,20 @@
+var o, p;
+o = [
+	IdentityDictionary.prNew,  Array.prNew(32)
+];
+p = [
+	// IdentityDictionary
+	0, [ array: o[1],  size: 4,  
+		proto: nil,  parent: nil,  
+		know: false ],  
+	// Array
+	1, [ 'leftVideoEdge',  -295,  nil,  nil,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  'rightEdge',  0,  
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  'leftEdge',  14647,  
+		'rightVideoEdge',  271.000000,  nil,  nil ]
+];
+prUnarchive(o,p);

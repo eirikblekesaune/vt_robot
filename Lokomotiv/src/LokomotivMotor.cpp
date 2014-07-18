@@ -83,7 +83,8 @@ void LokomotivMotor::Update()
 			if((_motorMode == CRUISE_CONTROL_MODE) && ((lastSpeedSetTime + millisBeforePIDEnable) <= millis()))
 			{
 				//no need to activate pid when motor is not moving
-				if(_input > 1.5)
+				//if(_input > 1.5)
+				if(_speed != 0)
 				{
 					_pid->SetMode(AUTOMATIC);
 					SetPidTargetSpeed(_input);
