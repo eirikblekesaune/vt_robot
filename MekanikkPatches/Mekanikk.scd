@@ -22,7 +22,7 @@ MIDIIn.connectAll;
 	);
 });
 try{ "~/vt_robot/MekanikkPatches/Lokomotiver.scd".standardizePath.load; } {"Error in Lokotiver".postln;};
-"~/vt_robot/MekanikkPatches/Tallerkener.scd".standardizePath.load;
+//"~/vt_robot/MekanikkPatches/Tallerkener.scd".standardizePath.load;
 "~/vt_robot/MekanikkPatches/HvitFugl.scd".standardizePath.load;
 "~/vt_robot/MekanikkPatches/Lys.scd".standardizePath.load;
 "~/vt_robot/MekanikkPatches/Pinner.scd".standardizePath.load;

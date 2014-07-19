@@ -1,7 +1,7 @@
 VTLokomotiv {
 	var <pid;
-	var <speed;
-	var <direction;
+	var <speed = 0;
+	var <direction = 0;
 	var <targetPosition;
 	var <lastDetectedAddress;
 	var <measuredSpeed;
@@ -168,7 +168,7 @@ VTLokomotiv {
 				this.changed(\distanceFromLastAddress)},
 			\led, {led = this.class.parseDataBytes(dataBytes); this.changed(\led); },
 			\state, {state = this.class.parseDataBytes(dataBytes); this.changed(\state);},
-			\info, {"INFO: %".format(dataBytes).postln;},
+			\info, {"INFO[%]: %".format(this.name, dataBytes).postln;},
 			\measuredSpeed, {measuredSpeed = this.class.parseDataBytes(dataBytes); this.changed(\measuredSpeed);},
 			\lastDetectedAddress, {lastDetectedAddress = this.class.parseDataBytes(dataBytes); this.changed(\lastDetectedAddress);},
 			\pidPValue, {pid.put('P', this.class.parseDataBytes(dataBytes)); this.changed(\pid);},
