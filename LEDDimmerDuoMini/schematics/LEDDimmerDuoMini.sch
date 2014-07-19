@@ -5338,6 +5338,8 @@ Source: http://download.siliconexpert.com/pdfs/2005/02/24/Semi_Ap/2/VSH/Resistor
 <part name="GND4" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="R3" library="eagle-ltspice" deviceset="R" device=""/>
 <part name="R4" library="eagle-ltspice" deviceset="R" device=""/>
+<part name="JP3" library="pinhead" deviceset="PINHD-1X12" device=""/>
+<part name="JP4" library="pinhead" deviceset="PINHD-1X12" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -5351,7 +5353,7 @@ Source: http://download.siliconexpert.com/pdfs/2005/02/24/Semi_Ap/2/VSH/Resistor
 <instance part="SUPPLY4" gate="G$1" x="139.7" y="58.42" rot="R270"/>
 <instance part="GND6" gate="1" x="121.92" y="124.46" rot="R90"/>
 <instance part="SUPPLY3" gate="G$1" x="127" y="119.38" rot="R270"/>
-<instance part="JP1" gate="G$1" x="73.66" y="114.3" rot="MR0"/>
+<instance part="JP1" gate="G$1" x="58.42" y="114.3" rot="MR0"/>
 <instance part="JP2" gate="G$1" x="101.6" y="114.3"/>
 <instance part="TWI_PORT" gate="-1" x="99.06" y="83.82" smashed="yes">
 <attribute name="NAME" x="101.6" y="83.058" size="1.524" layer="95"/>
@@ -5376,6 +5378,8 @@ Source: http://download.siliconexpert.com/pdfs/2005/02/24/Semi_Ap/2/VSH/Resistor
 <instance part="GND4" gate="1" x="134.62" y="-38.1"/>
 <instance part="R3" gate="G$1" x="73.66" y="5.08"/>
 <instance part="R4" gate="G$1" x="116.84" y="5.08"/>
+<instance part="JP3" gate="G$1" x="91.44" y="114.3"/>
+<instance part="JP4" gate="G$1" x="68.58" y="114.3" rot="MR0"/>
 </instances>
 <busses>
 </busses>
@@ -5398,6 +5402,9 @@ Source: http://download.siliconexpert.com/pdfs/2005/02/24/Semi_Ap/2/VSH/Resistor
 <pinref part="JP2" gate="G$1" pin="2"/>
 <pinref part="GND6" gate="1" pin="GND"/>
 <wire x1="99.06" y1="124.46" x2="119.38" y2="124.46" width="0.1524" layer="91"/>
+<pinref part="JP3" gate="G$1" pin="2"/>
+<wire x1="88.9" y1="124.46" x2="99.06" y2="124.46" width="0.1524" layer="91"/>
+<junction x="99.06" y="124.46"/>
 </segment>
 <segment>
 <pinref part="TWI_PORT" gate="-1" pin="S"/>
@@ -5445,20 +5452,24 @@ Source: http://download.siliconexpert.com/pdfs/2005/02/24/Semi_Ap/2/VSH/Resistor
 </net>
 <net name="INB" class="0">
 <segment>
-<wire x1="73.66" y1="111.76" x2="76.2" y2="111.76" width="0.1524" layer="91"/>
-<label x="63.5" y="111.76" size="1.016" layer="95" rot="MR0" xref="yes"/>
+<wire x1="58.42" y1="111.76" x2="60.96" y2="111.76" width="0.1524" layer="91"/>
+<label x="48.26" y="111.76" size="1.016" layer="95" rot="MR0" xref="yes"/>
 <pinref part="JP1" gate="G$1" pin="7"/>
-<wire x1="76.2" y1="111.76" x2="63.5" y2="111.76" width="0.1524" layer="91"/>
-<junction x="76.2" y="111.76"/>
+<wire x1="60.96" y1="111.76" x2="48.26" y2="111.76" width="0.1524" layer="91"/>
+<junction x="60.96" y="111.76"/>
+<pinref part="JP4" gate="G$1" pin="7"/>
+<wire x1="71.12" y1="111.76" x2="60.96" y2="111.76" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="PWM1" class="0">
 <segment>
-<wire x1="73.66" y1="99.06" x2="76.2" y2="99.06" width="0.1524" layer="91"/>
-<label x="63.5" y="99.06" size="1.016" layer="95" rot="MR0" xref="yes"/>
+<wire x1="58.42" y1="99.06" x2="60.96" y2="99.06" width="0.1524" layer="91"/>
+<label x="48.26" y="99.06" size="1.016" layer="95" rot="MR0" xref="yes"/>
 <pinref part="JP1" gate="G$1" pin="12"/>
-<wire x1="76.2" y1="99.06" x2="63.5" y2="99.06" width="0.1524" layer="91"/>
-<junction x="76.2" y="99.06"/>
+<wire x1="60.96" y1="99.06" x2="48.26" y2="99.06" width="0.1524" layer="91"/>
+<junction x="60.96" y="99.06"/>
+<pinref part="JP4" gate="G$1" pin="12"/>
+<wire x1="71.12" y1="99.06" x2="60.96" y2="99.06" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="Q1" gate="G$1" pin="G"/>
@@ -5476,11 +5487,13 @@ Source: http://download.siliconexpert.com/pdfs/2005/02/24/Semi_Ap/2/VSH/Resistor
 </net>
 <net name="INA" class="0">
 <segment>
-<wire x1="73.66" y1="109.22" x2="76.2" y2="109.22" width="0.1524" layer="91"/>
-<label x="63.5" y="109.22" size="1.016" layer="95" rot="MR0" xref="yes"/>
+<wire x1="58.42" y1="109.22" x2="60.96" y2="109.22" width="0.1524" layer="91"/>
+<label x="48.26" y="109.22" size="1.016" layer="95" rot="MR0" xref="yes"/>
 <pinref part="JP1" gate="G$1" pin="8"/>
-<wire x1="76.2" y1="109.22" x2="63.5" y2="109.22" width="0.1524" layer="91"/>
-<junction x="76.2" y="109.22"/>
+<wire x1="60.96" y1="109.22" x2="48.26" y2="109.22" width="0.1524" layer="91"/>
+<junction x="60.96" y="109.22"/>
+<pinref part="JP4" gate="G$1" pin="8"/>
+<wire x1="71.12" y1="109.22" x2="60.96" y2="109.22" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="5V" class="0">
@@ -5488,6 +5501,9 @@ Source: http://download.siliconexpert.com/pdfs/2005/02/24/Semi_Ap/2/VSH/Resistor
 <pinref part="SUPPLY3" gate="G$1" pin="5V"/>
 <pinref part="JP2" gate="G$1" pin="4"/>
 <wire x1="127" y1="119.38" x2="99.06" y2="119.38" width="0.1524" layer="91"/>
+<pinref part="JP3" gate="G$1" pin="4"/>
+<wire x1="88.9" y1="119.38" x2="99.06" y2="119.38" width="0.1524" layer="91"/>
+<junction x="99.06" y="119.38"/>
 </segment>
 <segment>
 <pinref part="IC1" gate="A1" pin="VO"/>
@@ -5512,34 +5528,44 @@ Source: http://download.siliconexpert.com/pdfs/2005/02/24/Semi_Ap/2/VSH/Resistor
 </net>
 <net name="RX" class="0">
 <segment>
-<wire x1="73.66" y1="124.46" x2="76.2" y2="124.46" width="0.1524" layer="91"/>
-<wire x1="76.2" y1="124.46" x2="60.96" y2="124.46" width="0.1524" layer="91"/>
-<wire x1="60.96" y1="124.46" x2="60.96" y2="132.08" width="0.1524" layer="91"/>
-<label x="60.96" y="132.08" size="1.016" layer="95" rot="R90" xref="yes"/>
+<wire x1="58.42" y1="124.46" x2="60.96" y2="124.46" width="0.1524" layer="91"/>
+<wire x1="60.96" y1="124.46" x2="45.72" y2="124.46" width="0.1524" layer="91"/>
+<wire x1="45.72" y1="124.46" x2="45.72" y2="132.08" width="0.1524" layer="91"/>
+<label x="45.72" y="132.08" size="1.016" layer="95" rot="R90" xref="yes"/>
 <pinref part="JP1" gate="G$1" pin="2"/>
-<junction x="76.2" y="124.46"/>
+<junction x="60.96" y="124.46"/>
+<pinref part="JP4" gate="G$1" pin="2"/>
+<wire x1="71.12" y1="124.46" x2="60.96" y2="124.46" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="TX" class="0">
 <segment>
-<wire x1="73.66" y1="127" x2="76.2" y2="127" width="0.1524" layer="91"/>
-<wire x1="76.2" y1="127" x2="66.04" y2="127" width="0.1524" layer="91"/>
-<wire x1="66.04" y1="127" x2="66.04" y2="132.08" width="0.1524" layer="91"/>
-<label x="66.04" y="132.08" size="1.016" layer="95" rot="R90" xref="yes"/>
+<wire x1="58.42" y1="127" x2="60.96" y2="127" width="0.1524" layer="91"/>
+<wire x1="60.96" y1="127" x2="50.8" y2="127" width="0.1524" layer="91"/>
+<wire x1="50.8" y1="127" x2="50.8" y2="132.08" width="0.1524" layer="91"/>
+<label x="50.8" y="132.08" size="1.016" layer="95" rot="R90" xref="yes"/>
 <pinref part="JP1" gate="G$1" pin="1"/>
-<junction x="76.2" y="127"/>
+<junction x="60.96" y="127"/>
+<pinref part="JP4" gate="G$1" pin="1"/>
+<wire x1="71.12" y1="127" x2="60.96" y2="127" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$10" class="0">
 <segment>
 <pinref part="JP1" gate="G$1" pin="11"/>
-<wire x1="76.2" y1="101.6" x2="73.66" y2="101.6" width="0.1524" layer="91"/>
+<wire x1="60.96" y1="101.6" x2="58.42" y2="101.6" width="0.1524" layer="91"/>
+<pinref part="JP4" gate="G$1" pin="11"/>
+<wire x1="71.12" y1="101.6" x2="60.96" y2="101.6" width="0.1524" layer="91"/>
+<junction x="60.96" y="101.6"/>
 </segment>
 </net>
 <net name="N$11" class="0">
 <segment>
 <pinref part="JP1" gate="G$1" pin="10"/>
-<wire x1="76.2" y1="104.14" x2="73.66" y2="104.14" width="0.1524" layer="91"/>
+<wire x1="60.96" y1="104.14" x2="58.42" y2="104.14" width="0.1524" layer="91"/>
+<pinref part="JP4" gate="G$1" pin="10"/>
+<wire x1="71.12" y1="104.14" x2="60.96" y2="104.14" width="0.1524" layer="91"/>
+<junction x="60.96" y="104.14"/>
 </segment>
 </net>
 <net name="N$2" class="0">
@@ -5561,6 +5587,9 @@ Source: http://download.siliconexpert.com/pdfs/2005/02/24/Semi_Ap/2/VSH/Resistor
 <pinref part="JP2" gate="G$1" pin="12"/>
 <wire x1="99.06" y1="99.06" x2="114.3" y2="99.06" width="0.1524" layer="91"/>
 <label x="114.3" y="99.06" size="1.016" layer="95" xref="yes"/>
+<pinref part="JP3" gate="G$1" pin="12"/>
+<wire x1="88.9" y1="99.06" x2="99.06" y2="99.06" width="0.1524" layer="91"/>
+<junction x="99.06" y="99.06"/>
 </segment>
 <segment>
 <pinref part="R4" gate="G$1" pin="1"/>
@@ -5598,6 +5627,104 @@ Source: http://download.siliconexpert.com/pdfs/2005/02/24/Semi_Ap/2/VSH/Resistor
 <pinref part="T2" gate="G1" pin="E"/>
 <wire x1="121.92" y1="-2.54" x2="121.92" y2="5.08" width="0.1524" layer="91"/>
 <junction x="121.92" y="5.08"/>
+</segment>
+</net>
+<net name="N$6" class="0">
+<segment>
+<pinref part="JP4" gate="G$1" pin="3"/>
+<pinref part="JP1" gate="G$1" pin="3"/>
+<wire x1="71.12" y1="121.92" x2="60.96" y2="121.92" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$8" class="0">
+<segment>
+<pinref part="JP4" gate="G$1" pin="4"/>
+<pinref part="JP1" gate="G$1" pin="4"/>
+<wire x1="71.12" y1="119.38" x2="60.96" y2="119.38" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$9" class="0">
+<segment>
+<pinref part="JP4" gate="G$1" pin="5"/>
+<pinref part="JP1" gate="G$1" pin="5"/>
+<wire x1="71.12" y1="116.84" x2="60.96" y2="116.84" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$12" class="0">
+<segment>
+<pinref part="JP4" gate="G$1" pin="6"/>
+<pinref part="JP1" gate="G$1" pin="6"/>
+<wire x1="71.12" y1="114.3" x2="60.96" y2="114.3" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$13" class="0">
+<segment>
+<pinref part="JP4" gate="G$1" pin="9"/>
+<pinref part="JP1" gate="G$1" pin="9"/>
+<wire x1="71.12" y1="106.68" x2="60.96" y2="106.68" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$15" class="0">
+<segment>
+<pinref part="JP3" gate="G$1" pin="1"/>
+<pinref part="JP2" gate="G$1" pin="1"/>
+<wire x1="88.9" y1="127" x2="99.06" y2="127" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$17" class="0">
+<segment>
+<pinref part="JP2" gate="G$1" pin="3"/>
+<pinref part="JP3" gate="G$1" pin="3"/>
+<wire x1="99.06" y1="121.92" x2="88.9" y2="121.92" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$19" class="0">
+<segment>
+<pinref part="JP3" gate="G$1" pin="5"/>
+<pinref part="JP2" gate="G$1" pin="5"/>
+<wire x1="88.9" y1="116.84" x2="99.06" y2="116.84" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$20" class="0">
+<segment>
+<pinref part="JP3" gate="G$1" pin="6"/>
+<pinref part="JP2" gate="G$1" pin="6"/>
+<wire x1="88.9" y1="114.3" x2="99.06" y2="114.3" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$21" class="0">
+<segment>
+<pinref part="JP3" gate="G$1" pin="7"/>
+<pinref part="JP2" gate="G$1" pin="7"/>
+<wire x1="88.9" y1="111.76" x2="99.06" y2="111.76" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$22" class="0">
+<segment>
+<pinref part="JP3" gate="G$1" pin="8"/>
+<pinref part="JP2" gate="G$1" pin="8"/>
+<wire x1="88.9" y1="109.22" x2="99.06" y2="109.22" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$23" class="0">
+<segment>
+<pinref part="JP3" gate="G$1" pin="9"/>
+<pinref part="JP2" gate="G$1" pin="9"/>
+<wire x1="88.9" y1="106.68" x2="99.06" y2="106.68" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$24" class="0">
+<segment>
+<pinref part="JP3" gate="G$1" pin="10"/>
+<pinref part="JP2" gate="G$1" pin="10"/>
+<wire x1="88.9" y1="104.14" x2="99.06" y2="104.14" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$25" class="0">
+<segment>
+<pinref part="JP3" gate="G$1" pin="11"/>
+<pinref part="JP2" gate="G$1" pin="11"/>
+<wire x1="88.9" y1="101.6" x2="99.06" y2="101.6" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
