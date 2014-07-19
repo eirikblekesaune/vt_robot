@@ -220,8 +220,6 @@ void LokomotivAPIParser::_executeCommand()
 					DebugPrint(_currentCommand);
       }
       break;
-    default:
-      DEBUG_PRINT("SetGet fault");
   }
   
   _currentCommand = CMD_UNKNOWN;

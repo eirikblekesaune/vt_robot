@@ -40,7 +40,6 @@ private:
 	LokomotivSpeedometer* _speedometer;
 	PID *_pid;
 	int _motorMode;
-	bool _cruiseControlActive;
 	double _setpoint;
 	double _input;
 	double _output;
