@@ -4,17 +4,17 @@ o = [
 ];
 p = [
 	// IdentityDictionary
-	0, [ array: o[1],  size: 4,  
+	0, [ array: o[1],  size: 1,  
 		proto: nil,  parent: nil,  
 		know: false ],  
 	// Array
-	1, [ 'leftVideoEdge',  -259,  nil,  nil,  
+	1, [ nil,  nil,  nil,  nil,  
 		nil,  nil,  nil,  nil,  
 		nil,  nil,  nil,  nil,  
 		nil,  nil,  nil,  nil,  
-		nil,  nil,  'rightEdge',  0,  
+		nil,  nil,  'rightEdge',  -269,  
 		nil,  nil,  nil,  nil,  
-		nil,  nil,  'leftEdge',  -12370,  
-		'rightVideoEdge',  323,  nil,  nil ]
+		nil,  nil,  nil,  nil,  
+		nil,  nil,  nil,  nil ]
 ];
 prUnarchive(o,p);

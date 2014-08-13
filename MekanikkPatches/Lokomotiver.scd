@@ -60,32 +60,151 @@ fork{
 		4 -> (device: ~togCtrlB, number: 5),
 		11 -> (device: ~togCtrlB, number: 6),
 		12 -> (device: ~togCtrlB, number: 7),
-		13 -> (device: ~togCtrlB, number: 8),
+		13 -> (device: ~togCtrlA, number: 6),
 		8 -> (device: ~togCtrlA, number: 1),
 		9 -> (device: ~togCtrlA, number: 2),
 		5 -> (device: ~togCtrlA, number: 3),
 		6 -> (device: ~togCtrlA, number: 4),
 		7 -> (device: ~togCtrlA, number: 5)
 	];
-
-	~trackingDataStore = Dictionary[
-		1 -> IdentityDictionary[\rightEdge -> -5582],
-		2 -> IdentityDictionary[\rightEdge -> 6080],
-		3 -> IdentityDictionary[\rightEdge -> -7036],
-		5 -> IdentityDictionary[\rightEdge -> -7190],
-		6 -> IdentityDictionary[\rightEdge -> -10600],
-		7 -> IdentityDictionary[\rightEdge -> -11548],
-		8 -> IdentityDictionary[\rightEdge -> 16065],
-		9 -> IdentityDictionary[\rightEdge -> 9048]
+	~beaconAddresses = Dictionary[
+		8 -> 3,//figur 8 - 3
+		5 -> 10, //figur 5 - 10
+		6 -> 12,
+		7 -> 13,
+		3 -> 21,
 	];
+	~announceStation = false;
+	~trackingDataStore = Dictionary.new;
+	{
+		var path, data;
+		data = IdentityDictionary.new;
+		path = PathName("~/vt_robot/MekanikkPatches/data/".standardizePath);
+		path.filesDo{arg file;
+			if(matchRegexp("trackingDataFigur\\d+\\.vttrack", file.fileName), {
+				var figurData, figurNumber;
+				figurData = IdentityDictionary.readArchive(file.fullPath);
+				figurNumber = findRegexp(file.fileName, "(\\d+)")[1][1].asInteger;
+				data.put(figurNumber, figurData);
+			});
+		};
+		~trackingDataStore = data;
+	}.value;
+	// ~trackingDataStore = Dictionary[
+	// 	1 -> IdentityDictionary[\rightEdge -> -5582],
+	// 	2 -> IdentityDictionary[\rightEdge -> 6080],
+	// 	3 -> IdentityDictionary[\rightEdge -> -6778],
+	// 	5 -> IdentityDictionary[\rightEdge -> -6849],
+	// 	6 -> IdentityDictionary[\rightEdge -> -10820],
+	// 	7 -> IdentityDictionary[\rightEdge -> -9899],
+	// 	8 -> IdentityDictionary[\rightEdge -> -15183],
+	// 	9 -> IdentityDictionary[\rightEdge -> 9048]
+	// ];
+	//////////////////////////////////////////////////////
+	//Lokomotiv GUI
+	//////////////////////////////////////////////////////
+	{
+		var makeFigurView = {arg figurNumber, parent;
+			var view, height, width, result;
+			var pKnob, iKnob, dKnob, offsetKnob, rightEdgeView, rightEdgeText;
+			var speedCtrlView, speedSlider;
+			height = 100; width = 800;
+			//"Making with this: % % %".format(figurNumber, parent, ~trackingData).postln;
+			view = FlowView.new(parent, Point(width, height));
+			StaticText(view, Point(50, height)).string_("Figur\n%".format(figurNumber)).font_(Font("Menlo", 16, true));
+			rightEdgeView = FlowView(view, Point(100, height)).background_(Color.grey.alpha_(0.5));
+			Button(rightEdgeView, Point(80, rightEdgeView.bounds.height * 0.45))
+			.states_([["Calibrate\nright"]])
+			.action_({NetAddr.localAddr.sendMsg("/robot/figur%/calibrateRight".format(figurNumber.asPaddedString).asSymbol);});
+			rightEdgeText = StaticText(rightEdgeView, Point(80, rightEdgeView.bounds.height * 0.45)).string_("0").align_(\center);
+			pKnob = EZKnob(view, Point(50, height), "P", [0.01, 10.0, \exp].asSpec, {arg it; ~trackingData[figurNumber].put(\pVal, it.value)}.inEnvir, 1.0);
+			iKnob = EZKnob(view, Point(50, height), "I", [0.01, 10.0, \exp].asSpec, {arg it; ~trackingData[figurNumber].put(\iVal, it.value)}.inEnvir, 1.0);
+			dKnob = EZKnob(view, Point(50, height), "D", [0.01, 10.0, \exp].asSpec, {arg it; ~trackingData[figurNumber].put(\dVal, it.value)}.inEnvir, 1.0);
+			offsetKnob = EZKnob(
+				view, Point(50, height), "offset", [-15.0, 15.0].asSpec,
+				{arg it; ~trackingData[figurNumber].put(\speedOffsetDirectionMultiplier, it.value)}.inEnvir, 0.0);
+			Button(view, Point(100, height))
+			.states_([["Store\noffset\ndata"]])
+			.action_({NetAddr.localAddr.sendMsg("/robot/figur%/storeTrackingOffsetData".format(figurNumber.asPaddedString).asSymbol);});
+			speedCtrlView = FlowView.new(view, Point(200, height));
+			speedSlider = EZSlider(speedCtrlView, Point(195, speedCtrlView.bounds.height * 0.75), "bipolarSpeed", [-511, 511].asSpec, {arg it;
+				~figur[figurNumber].bipolarSpeed_(it.value.asInteger);
+				"figur: % speed to set: %".format(~figur[figurNumber], it.value.asInteger).postln;
+			}.inEnvir, 0, layout: \line2);
+			Button(speedCtrlView, Point(195, speedCtrlView.bounds.height * 0.20)).states_([["stop"]]).action_({~figur[figurNumber].stop}.inEnvir);
+			~trackingData.addDependant({arg theChanger, what, more;
+				{
+					if(what == figurNumber, {
+						pKnob.value_(theChanger[figurNumber][\pVal]);
+						iKnob.value_(theChanger[figurNumber][\iVal]);
+						dKnob.value_(theChanger[figurNumber][\dVal]);
+						offsetKnob.value_(theChanger[figurNumber][\speedOffsetDirectionMultiplier]);
+						rightEdgeText.string_(theChanger[figurNumber][\rightEdge]);
+						view.refresh;
+					});
+				}.defer;
+			});
+			view.enabled_(~figur[figurNumber].notNil);
+			if(view.enabled, {
+				view.background_(Color.green.alpha_(1.0));
+				}, {
+					view.background_(Color.red.alpha_(1.0));
+			});
+			result = IdentityDictionary[\view -> view, \speedSlider -> speedSlider];
+			result;
+		}.inEnvir;
+		~lokomotivWin = Window.new("Figurkalibrering", Rect(400, 0, 700, 800), scroll: true);
+		~lokomotivWinViews = Dictionary.new;
+		~lokomotivWin.addFlowLayout(2@5, 2@5);
+		~togToFigurMappings.values.sort.do({arg figurNumber;
+			var myButt;
+			figurNumber = figurNumber.asInteger;
+			~lokomotivWinViews.put(figurNumber, makeFigurView.value(figurNumber, ~lokomotivWin));
+		});
+		~lokomotivWin.view.decorator.nextLine;
+		Button(~lokomotivWin, 350@50)
+		.states_([["Station annoucing OFF"],["Station annoucing ON"]])
+		.action_({arg butt;
+			~announceStation = butt.value.booleanValue;
+		});
+		~lokomotivWin.alwaysOnTop_(true);
+		~lokomotivWin.onClose_({0.exit;});
+		~lokomotivWin.front;
+	}.defer;
+
+
 
 	~video = NetAddr("1.2.3.44", 1234);
 	~trackingParent = IdentityDictionary[
-		\interpolationStepsPerUpdate -> 20, \updateRate -> 0.4, \lastPosition -> 0.0
+		\interpolationStepsPerUpdate -> 20, \updateRate -> 0.4, \lastPosition -> 0.0,
+		\pVal -> 1.0, \iVal -> 1.0, \dVal -> 1.0, \speedOffsetDirectionMultiplier -> 0.0
 	];
-	~speedOffsetRange = 0.0;
 	//build tracking data dictionary
 	~trackingData = Dictionary.new;
+	~storeFigurTrackingData = {arg figurNumber, keysToStore;
+		var allKeysToStore, dataToStore, storePath;
+		storePath = "~/vt_robot/MekanikkPatches/data/trackingDataFigur%.vttrack".format(figurNumber).standardizePath;
+		allKeysToStore = #[\rightEdge, \pVal, \iVal, \dVal, \speedOffsetDirectionMultiplier];
+		if(keysToStore.isNil, {
+			keysToStore = allKeysToStore;
+		});
+
+		if(storePath.pathMatch.isEmpty,
+			{
+				dataToStore = IdentityDictionary.new;
+			},
+			{
+				dataToStore = IdentityDictionary.readArchive(storePath);
+			}
+		);
+
+		keysToStore.do({arg key;
+			dataToStore.put(key, ~trackingData[figurNumber].at(key));
+		});
+		//store that in tracking data as rightEdge
+		dataToStore.writeArchive(storePath);
+		"Tracking data stored, keys: %".format(keysToStore).postln;
+	}.inEnvir;
 	~togRegistrationService = {arg theChanger, theChanged, more;
 		if(theChanged == \childDeviceRegistered, {
 			var togFader, faderNumber, togStopButton, faderUpdater, togAddress, newChildDevice;
@@ -143,7 +262,7 @@ fork{
 				OSCdef("figur%_BipolarSpeedResponder".format(nodeID.asString).asSymbol, {arg msg, time, addr,port;
 					"Remote figur speed %: %".format(nodeID, msg[1]).postln;
 					togFader.valueAction_(msg[1].linlin(-1.0, 1.0, 0, 1023).asInteger);
-				}, "/robot/figur/%/bipolarSpeed".format(nodeID).asSymbol);
+				}, "/robot/figur.%/bipolarSpeed".format(figurNumber).asSymbol);
 				~figur.put(figurNumber, newLokomotiv);
 				"~figur now: %".format(~figur).postln;
 				newLokomotiv.addDependant({arg theChanged, what, more;
@@ -167,38 +286,68 @@ fork{
 				//running state of tracking, false by default
 				trackingData.put(\trackingIsRunning, false);
 				trackingData.put(\trackingController, SimpleController.new(newLokomotiv));
+				trackingData.put(\lastTrackingSpeed, 0.0);
 				trackingData.put(\trackingAction, {
 					var ctrl, waitTime;
 					"TRacking action, test if running: %".format(trackingData[\trackingIsRunning]).postln;
 					if(trackingData[\trackingIsRunning].not, {
-						ctrl = trackingData[\trackingController];
-						waitTime = trackingData[\updateRate] / trackingData[\interpolationStepsPerUpdate];
-						ctrl.put(\distanceFromLastAddress, {arg theChanged, theChanger, more;
-							var val, videoPos, stream, duration, speedOffset;
-							"Calculateing: %".format(trackingData).postln;
-							duration = trackingData[\updateRate];
-							val = theChanged.distanceFromLastAddress;
-							videoPos = val.linlin(
-								0.0,//, trackingData[\leftEdge],
-								trackingData[\rightEdge],
-								0.0,//trackingData[\leftVideoEdge],
-								1.0,//trackingData[\rightVideoEdge],
-								\none
-							);
-							stream = Env([trackingData[\lastPosition].asFloat, videoPos.asFloat], [duration]).asPseg.asStream;
-
-							fork{
-								speedOffset = newLokomotiv.bipolarSpeed.linlin(-511, 511, ~speedOffsetRange.neg, ~speedOffsetRange);
-								trackingData[\interpolationStepsPerUpdate].do{arg j;
-									~video.sendMsg(sendPath, stream.next + speedOffset);
-									waitTime.wait;
-								}
-							};
-							trackingData[\lastPosition] = videoPos;
-						});
-						"Setting polling: %".format(trackingData[\updateRate]).postln;
-						newLokomotiv.set(\distancePollingInterval, asInteger( trackingData[\updateRate]*1000 ) );
-						trackingData[\trackingIsRunning] = true;
+						if(trackingData[\rightEdge].notNil, {
+							ctrl = trackingData[\trackingController];
+							waitTime = trackingData[\updateRate] / trackingData[\interpolationStepsPerUpdate];
+							ctrl.put(\speed, {arg theChanged, theChanger, more;
+								if(theChanged.speed == 0, {
+									"Stopping routine: %".format(trackingData[\interpolationRoutine]).postln;
+									trackingData[\interpolationRoutine].stop;
+								});
+							});
+							ctrl.put(\trackingData, {arg theChanged, theChanger, more;
+								var val, duration, speedOffset;
+								var pSpeed, iSpeed, dSpeed;
+								//"Calculateing: %".format(trackingData).postln;
+								duration = trackingData[\updateRate];
+								val = theChanged.trackingPosition;
+								pSpeed = theChanged.trackingSpeed;
+								iSpeed = ((pSpeed + trackingData[\lastTrackingSpeed]) * 0.5);
+								dSpeed = pSpeed - trackingData[\lastTrackingSpeed];
+								trackingData.put(\lastTrackingSpeed, theChanged.trackingSpeed);
+								speedOffset = (pSpeed * trackingData[\pVal]) + (iSpeed * trackingData[\iVal]) + (dSpeed * trackingData[\dVal]);
+								speedOffset = speedOffset * (trackingData[\speedOffsetDirectionMultiplier] * (theChanged.speed / 512).squared);
+								//"speedOffset: %, [%] [%] [%]".format(speedOffset, pSpeed, iSpeed, dSpeed).postln;
+								if(true, {
+									var stream;
+									if(theChanged.speed != 0, {
+										val = val + speedOffset;
+									});
+									stream = Env(
+										[trackingData[\lastPosition].asFloat, val.asFloat],
+										[duration]
+									).asPseg.asStream;
+									trackingData.put(\interpolationRoutine, fork{
+										var streamVal, videoPos, offsetCorrection;
+										trackingData[\interpolationStepsPerUpdate].do{arg j;
+											streamVal = stream.next;
+											videoPos = streamVal.linlin(0.0,trackingData[\rightEdge],0.0,1.0,\none);
+											~video.sendMsg(sendPath, videoPos);
+											trackingData[\lastPosition] = streamVal;
+											waitTime.wait;
+										}
+									});
+									},
+									{
+										"Setting as speed 0".postln;
+										~video.sendMsg(sendPath, val.linlin(0.0,trackingData[\rightEdge],0.0,1.0,\none););
+										trackingData[\lastPosition] = val;
+									}
+								);
+							});
+							"Setting polling: %".format(trackingData[\updateRate]).postln;
+							newLokomotiv.set(\trackingPollingInterval, asInteger( trackingData[\updateRate]*1000 ) );
+							trackingData[\trackingIsRunning] = true;
+							},
+							{
+								"Can't start tracking! Figur % not calibrated!!".warn;
+							}
+						);
 						},
 						{
 							"Tracking for figur% already running".format(figurNumber.asPaddedString).postln;
@@ -212,9 +361,17 @@ fork{
 				trackingData.put(\stopVideoTracking, {
 					// var ctrl = trackingData[\trackingController];
 					// ctrl.remove;
-					newLokomotiv.set(\distancePollingInterval, 0);
+					newLokomotiv.set(\trackingPollingInterval, 0);
 					trackingData[\trackingIsRunning] = false;
 				});
+				~trackingData.changed(figurNumber);
+
+				//TODO:
+				//listen to address updates from IRBeacons along the tracks. Update the tracking data accordingly.
+				//When new address is detected
+				////then: find the position for that address in addressData
+				////store that number (trackingPosition) in the figur variable trackingPosition
+				//Use the tracking position to calculate the values that we send to video
 
 				///////////////////////////////////////
 				//Make OSC responders for tracking
@@ -232,31 +389,66 @@ fork{
 					});
 				}, "/robot/figur%/videoTracking".format(figurNumber.asPaddedString).asSymbol);
 				OSCdef("videoTrackingCalibrationRight_%".format(figurNumber).asSymbol, {arg msg, time, addr, port;
-					var val, dataToStore;
+					var val;
 					val = msg[1].asString.asFloat;
-					"Calibrating right video edge: figur% %".format(figurNumber.asPaddedString, val).postln;
+					"Calibrating right edge: figur% %".format(figurNumber.asPaddedString, val).postln;
 					fork{
+						var dataToStore;
 						//read distanceFromLastAddress from tog
 						newLokomotiv.get(\distanceFromLastAddress);
+						newLokomotiv.get(\trackingData);
 						//short wait to let the lokomotiv respond
 						0.5.wait;
-						//store that in tracking data as rightEdge
+						trackingData.put(\rightEdge, newLokomotiv.trackingPosition);
+						~storeFigurTrackingData.value(figurNumber, [\rightEdge]);
+						~trackingData.changed(figurNumber);
 						"Calibrating right edge done".postln;
-						dataToStore = IdentityDictionary.new;
-						[\rightEdge].do{arg item;
-							dataToStore.put(item, trackingData[item]);
-						};
-						dataToStore.writeArchive(
-							"~/vt_robot/MekanikkPatches/data/trackingDataFigur%.vttrack".format(figurNumber).standardizePath
-						);
 					};
 				}.inEnvir, "/robot/figur%/calibrateRight".format(figurNumber.asPaddedString).asSymbol);
-				OSCdef("videoTrackingCalibrationLeft_%".format(figurNumber).asSymbol, {arg msg, time, addr, port;
-					var val, dataToStore;
-					val = msg[1].asString.asFloat;
-					"Setting figur% counter to 0".format(figurNumber.asPaddedString).postln;
-					newLokomotiv.set(\distanceFromLastAddress, 0);
-				}.inEnvir, "/robot/figur%/calibrateLeft".format(figurNumber.asPaddedString).asSymbol);
+				OSCdef("storeVideoOffsetTracking_%".format(figurNumber).asSymbol, {arg msg, time,addr,port;
+					~storeFigurTrackingData.value(figurNumber, [\pVal, \iVal, \dVal, \speedOffsetDirectionMultiplier]);
+					~trackingData.changed(figurNumber);
+				}.inEnvir, "/robot/figur%/storeTrackingOffsetData".format(figurNumber.asPaddedString).asSymbol);
+
+				{
+					var beaconCtrl = SimpleController.new(newLokomotiv);
+					beaconCtrl.put(\lastDetectedAddress, {arg theChanger, theChanged, more;
+						if(~announceStation, {
+							"Announcing".postln;
+							Speech.setSpeechVoice(0, 2);
+							Speech.setSpeechVolume(0, 2);
+							"Figur % at station".format(figurNumber).speak;
+						});
+						// "\nSetting figur % to 0!!!\n".format(figurNumber).postln;
+						// theChanger.set(\distanceFromLastAddress, 0);
+
+					});
+				}.value;
+
+				//Connect figur to GUI
+				SimpleController.new(newLokomotiv).put(\bipolarSpeed, {arg theChanger, what;
+					//"Updating slider: %".format(theChanger.bipolarSpeed.asInteger).postln;
+					{
+						~lokomotivWinViews[figurNumber][\speedSlider].value_(theChanger.bipolarSpeed.asInteger);
+					}.defer;
+				}.inEnvir);
+				SimpleController.new(newLokomotiv).put(\online, {arg theChanger, what;
+					{
+						var backColor;
+						~lokomotivWinViews[figurNumber][\view].enabled_(theChanger.online);
+						if(theChanger.online, {
+							backColor = Color.green.alpha_(1.0);
+							}, {
+								backColor = Color.red.alpha_(1.0);
+						});
+						~lokomotivWinViews[figurNumber][\view].background_(backColor);
+						~lokomotivWinViews[figurNumber][\view].refresh;
+					}.defer;
+				}.inEnvir);
+
+				//Enable the gui view
+				{~lokomotivWinViews[figurNumber][\view].background_(Color.green.alpha_(1.0)).enabled_(true).refresh;}.defer;
+
 			}, {"Will not register as figur: %, %".format(newChildDevice, nodeID).postln;});
 			if(~lok.includesKey(nodeID).not && "^TO$".matchRegexp(nodeID.asString), {
 				"Registering led tog 1 (TO)".postln;
@@ -301,11 +493,264 @@ fork{
 				);
 				~togCtrlA.components.at('fader.8').action = {arg comp; ~togLED1.setLEDValue(comp.value.linlin(0, 1023, 0, 250).asInteger)};
 			});
+
+			//Temprary hack for creating LED control for tog.1
+			if(~lok.includesKey(nodeID) && ("TOG12" == nodeID.asString), {
+				"Registering led tog 1 (TOG12)".postln;
+				//~lok.put(nodeID, newChildDevice);
+				~ledTog = ~figur[0];
+				~togLED1A = (
+					tog: ~ledTog,
+					theTask: Task.new({}),
+					runUpdateTask: {arg ev;
+						ev.use{
+							if(~theTask.isPlaying.not, {
+								~theTask = Task.new({
+									loop {
+										//~setLEDValue.value(~address, ~networkAddress, ~ledValue);
+										if(~ledValue != ~lastTransmittedValue, {
+											"sending: % [%]\n".postf(~ledValue, ~tog);
+											//~tog.sendTXData(["ms".ascii, ~ledValue.asInteger, 13, 10].flatten);
+											~tog.set(\peripheral, (0x00 << 24) | (0x08 << 16) | (~ledValue.clip(0, 0x7FF).asInteger));//(0x05 << 16)
+											~lastTransmittedValue = ~ledValue;
+										});
+										0.05.wait;
+									};
+								}.inEnvir).play;
+								SystemClock.sched(0.5, {
+									if(~theTask.isPlaying, {
+										~stopUpdateTask.value(currentEnvironment);
+									});
+								}.inEnvir);
+							});
+						}
+					},
+					stopUpdateTask: {arg ev;
+						ev.use{
+							~theTask.stop;
+						}
+					},
+					lookup: ([0] ++ (350..0x07FF)).resamp0(1024),
+					ledValue: 0,
+					lastTransmittedValue: 0,
+					setLEDValue: {arg ev, val;
+						var lookupIndex;
+						lookupIndex = val.clip(0, 0x07FF).linlin(0, 0x07FF, 0, ev[\lookup].size);
+						ev[\ledValue] = ev[\lookup][lookupIndex].asInteger;
+						ev[\runUpdateTask].value(ev);
+					}
+				);
+				~togCtrlB.components.at('fader.8').action = {arg comp; ~togLED1A.setLEDValue(comp.value.linlin(0, 1023, 0, 0x07FF).asInteger)};
+				//tog.1 led 2
+				~togLED1B = (
+					tog: ~ledTog,
+					theTask: Task.new({}),
+					runUpdateTask: {arg ev;
+						ev.use{
+							if(~theTask.isPlaying.not, {
+								~theTask = Task.new({
+									loop {
+										//~setLEDValue.value(~address, ~networkAddress, ~ledValue);
+										if(~ledValue != ~lastTransmittedValue, {
+											"sending: % [%]\n".postf(~ledValue, ~tog);
+											//~tog.sendTXData(["ms".ascii, ~ledValue.asInteger, 13, 10].flatten);
+											~tog.set(\peripheral, (0x00 << 24) | (0x04 << 16) | (~ledValue.clip(0, 0x7FF).asInteger));//(0x05 << 16)
+											~lastTransmittedValue = ~ledValue;
+										});
+										0.05.wait;
+									};
+								}.inEnvir).play;
+								SystemClock.sched(0.5, {
+									if(~theTask.isPlaying, {
+										~stopUpdateTask.value(currentEnvironment);
+									});
+								}.inEnvir);
+							});
+						}
+					},
+					stopUpdateTask: {arg ev;
+						ev.use{
+							~theTask.stop;
+						}
+					},
+					lookup: ([0] ++ (350..0x07FF)).resamp0(1024),
+					ledValue: 0,
+					lastTransmittedValue: 0,
+					setLEDValue: {arg ev, val;
+						var lookupIndex;
+						lookupIndex = val.clip(0, 0x07FF).linlin(0, 0x07FF, 0, ev[\lookup].size);
+						ev[\ledValue] = ev[\lookup][lookupIndex].asInteger;
+						ev[\runUpdateTask].value(ev);
+					}
+				);
+				~togCtrlB.components.at('rotaryA.1').action = {arg comp; ~togLED1B.setLEDValue(comp.value.linlin(0, 127, 0, 0x07FF).asInteger)};
+			});
+			////////////////////////////////////////////////////
+			//Temprary hack for creating LED control for tog.2
+			////////////////////////////////////////////////////
+			if(~lok.includesKey(nodeID) && ("TOG09" == nodeID.asString), {
+				"Registering led tog 2 (TOG09)".postln;
+				//~lok.put(nodeID, newChildDevice);
+				~ledTog = ~figur[11];
+				~togLED2 = (
+					tog: ~ledTog,
+					theTask: Task.new({}),
+					runUpdateTask: {arg ev;
+						ev.use{
+							if(~theTask.isPlaying.not, {
+								~theTask = Task.new({
+									loop {
+										//~setLEDValue.value(~address, ~networkAddress, ~ledValue);
+										if(~ledValue != ~lastTransmittedValue, {
+											"sending: % [%]\n".postf(~ledValue, ~tog);
+											//~tog.sendTXData(["ms".ascii, ~ledValue.asInteger, 13, 10].flatten);
+											~tog.set(\peripheral, (0x00 << 24) | (0x08 << 16) | (~ledValue.clip(0, 0x7FF).asInteger));//(0x05 << 16)
+											~lastTransmittedValue = ~ledValue;
+										});
+										0.05.wait;
+									};
+								}.inEnvir).play;
+								SystemClock.sched(0.5, {
+									if(~theTask.isPlaying, {
+										~stopUpdateTask.value(currentEnvironment);
+									});
+								}.inEnvir);
+							});
+						}
+					},
+					stopUpdateTask: {arg ev;
+						ev.use{
+							~theTask.stop;
+						}
+					},
+					lookup: ([0] ++ (350..0x07FF)).resamp0(1024),
+					ledValue: 0,
+					lastTransmittedValue: 0,
+					setLEDValue: {arg ev, val;
+						var lookupIndex;
+						lookupIndex = val.clip(0, 0x07FF).linlin(0, 0x07FF, 0, ev[\lookup].size);
+						ev[\ledValue] = ev[\lookup][lookupIndex].asInteger;
+						ev[\runUpdateTask].value(ev);
+					}
+				);
+				~togCtrlB.components.at('rotaryA.6').action = {arg comp; ~togLED2.setLEDValue(comp.value.linlin(0, 127, 0, 0x07FF).asInteger)};
+			});
+			//Temprary hack for creating LED control for tog.3
+			if(~lok.includesKey(nodeID) && ("TOG05" == nodeID.asString), {
+				"Registering led tog 3 (TOG05)".postln;
+				//~lok.put(nodeID, newChildDevice);
+				~ledTog = ~figur[12];
+				~togLED3 = (
+					tog: ~ledTog,
+					theTask: Task.new({}),
+					runUpdateTask: {arg ev;
+						ev.use{
+							if(~theTask.isPlaying.not, {
+								~theTask = Task.new({
+									loop {
+										//~setLEDValue.value(~address, ~networkAddress, ~ledValue);
+										if(~ledValue != ~lastTransmittedValue, {
+											"sending: % [%]\n".postf(~ledValue, ~tog);
+											//~tog.sendTXData(["ms".ascii, ~ledValue.asInteger, 13, 10].flatten);
+											~tog.set(\peripheral, (0x00 << 24) | (0x04 << 16) | (~ledValue.clip(0, 0x7FF).asInteger));//(0x05 << 16)
+											~lastTransmittedValue = ~ledValue;
+										});
+										0.05.wait;
+									};
+								}.inEnvir).play;
+								SystemClock.sched(0.5, {
+									if(~theTask.isPlaying, {
+										~stopUpdateTask.value(currentEnvironment);
+									});
+								}.inEnvir);
+							});
+						}
+					},
+					stopUpdateTask: {arg ev;
+						ev.use{
+							~theTask.stop;
+						}
+					},
+					lookup: ([0] ++ (350..0x07FF)).resamp0(1024),
+					ledValue: 0,
+					lastTransmittedValue: 0,
+					setLEDValue: {arg ev, val;
+						var lookupIndex;
+						lookupIndex = val.clip(0, 0x07FF).linlin(0, 0x07FF, 0, ev[\lookup].size);
+						ev[\ledValue] = ev[\lookup][lookupIndex].asInteger;
+						ev[\runUpdateTask].value(ev);
+					}
+				);
+				~togCtrlB.components.at('rotaryA.7').action = {arg comp; ~togLED3.setLEDValue(comp.value.linlin(0, 127, 0, 0x07FF).asInteger)};
+			});
+			//Temprary hack for creating LED control for tog.4
+			if(~lok.includesKey(nodeID) && ("TOG13" == nodeID.asString), {
+				"Registering led tog 4 (TOG13)".postln;
+				//~lok.put(nodeID, newChildDevice);
+				~ledTog = ~figur[13];
+				~togLED4 = (
+					tog: ~ledTog,
+					theTask: Task.new({}),
+					runUpdateTask: {arg ev;
+						ev.use{
+							if(~theTask.isPlaying.not, {
+								~theTask = Task.new({
+									loop {
+										//~setLEDValue.value(~address, ~networkAddress, ~ledValue);
+										if(~ledValue != ~lastTransmittedValue, {
+											"sending yog4 led: % [%]\n".postf(~ledValue, ~tog);
+											//~tog.sendTXData(["ms".ascii, ~ledValue.asInteger, 13, 10].flatten);
+											~tog.set(\peripheral, (0x00 << 24) | (0x08 << 16) | (~ledValue.clip(0, 0x7FF).asInteger));//(0x05 << 16)
+											~lastTransmittedValue = ~ledValue;
+										});
+										0.05.wait;
+									};
+								}.inEnvir).play;
+								SystemClock.sched(0.5, {
+									if(~theTask.isPlaying, {
+										~stopUpdateTask.value(currentEnvironment);
+									});
+								}.inEnvir);
+							});
+						}
+					},
+					stopUpdateTask: {arg ev;
+						ev.use{
+							~theTask.stop;
+						}
+					},
+					lookup: ([0] ++ (350..0x07FF)).resamp0(1024),
+					ledValue: 0,
+					lastTransmittedValue: 0,
+					setLEDValue: {arg ev, val;
+						var lookupIndex;
+						lookupIndex = val.clip(0, 0x07FF).linlin(0, 0x07FF, 0, ev[\lookup].size);
+						ev[\ledValue] = ev[\lookup][lookupIndex].asInteger;
+						ev[\runUpdateTask].value(ev);
+					}
+				);
+				~togCtrlA.components.at('rotaryA.6').action = {arg comp; ~togLED4.setLEDValue(comp.value.linlin(0, 127, 0, 0x07FF).asInteger)};
+			});
 		});
 	};
 	~coordinator.addDependant(~togRegistrationService);
 	~togCtrlA.components['button.20'].action_({"NodeDiscovery".postln;~coordinator.sendATCommand('NodeDiscover');});
 	~togCtrlB.components['button.20'].action_({"NodeDiscovery".postln;~coordinator.sendATCommand('NodeDiscover');});
+	~togCtrlB.components['button.19'].action_({"Global figur stop".postln;
+		//~figur.keysValuesDo({arg key, val; val.speed_(0)});
+		[0,1,2,3,4,11,12].do{arg item;
+			~figur[item].bipolarSpeed_(0);
+		}
+
+	});
+	~togCtrlA.components['button.19'].action_({"Global figur stop".postln;
+		[13,8,9,5,6,7].do{arg item;
+			~figur[item].bipolarSpeed_(0);
+		};
+	});
+
 	~coordinator.sendATCommand('NodeDiscover');
+
+
 	"Lokomotiver ready".postln;
 };
