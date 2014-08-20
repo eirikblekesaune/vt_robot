@@ -4,13 +4,11 @@ const int LokomotivMotor::kSpeedMin = 0;
 const int LokomotivMotor::kSpeedStop = LokomotivMotor::kSpeedMin;
 const int LokomotivMotor::kSpeedMax = 511;
 const long LokomotivMotor::kSpeedUpdateInterval = 50;
-unsigned long lastSpeedSetTime;
-unsigned long millisBeforePIDEnable = 500;
+unsigned long lastSpeedSetTime = 0;
+unsigned long millisBeforePIDEnable = 1000;
 
 LokomotivMotor::LokomotivMotor(LokomotivSpeedometer* speedometer) :
 	_speedometer(speedometer),
-	_cruiseControlActive(false),
-	_motorMode(MANUAL_MODE),
 	_INA(12),
 	_INB(11),
 	_PWM(10),
@@ -37,7 +35,6 @@ LokomotivMotor::LokomotivMotor(LokomotivSpeedometer* speedometer) :
 
 	SetDirection(0);
 	SetSpeed(0);
-
 	//Since we are doing automatic startup of PID we are using conservative 
 	//PID parameters here.
 	_pid = new PID(&_input, &_output,&_setpoint, 1.3, 0.3, 0.01, DIRECT);
@@ -46,7 +43,8 @@ LokomotivMotor::LokomotivMotor(LokomotivSpeedometer* speedometer) :
 		 	static_cast<double>(LokomotivMotor::kSpeedMax)
 		);
 	_pid->SetSampleTime(100);
-	_pid->SetMode(DIRECT);
+	_pid->SetMode(MANUAL);
+	SetMotorMode(CRUISE_CONTROL_MODE);
 }
 
 void LokomotivMotor::Update()
@@ -68,26 +66,32 @@ void LokomotivMotor::Update()
 		_input = abs(_speedometer->GetMeasuredSpeed());
 		if(_pid->GetMode())//if mode is automatic
 		{
+			//dynamic pid tuning
 			if((abs(_input - _setpoint)) > 10.0)
 			{
 				_pid->SetTunings(1.3, 5.0, 0.01);
 			} else {
 				_pid->SetTunings(1.3, 0.3, 0.01);
 			}
-			_output = _speed;
 			if(_pid->Compute())
 			{
-				SetSpeed(static_cast<long>(_output));
+				long newSpeed;
+				newSpeed = static_cast<long>(_output);
+				//DebugPrint(_output);
+				SetSpeed(newSpeed);
 			}
 		} else {
 			if((_motorMode == CRUISE_CONTROL_MODE) && ((lastSpeedSetTime + millisBeforePIDEnable) <= millis()))
 			{
 				//no need to activate pid when motor is not moving
-				//if(_input > 1.5)
-				if(_speed != 0)
+				if((_speed != 0) && (_input > 1.5))
 				{
-					_pid->SetMode(AUTOMATIC);
 					SetPidTargetSpeed(_input);
+					//DebugPrint("PID activated");
+					//DebugPrint(_input);
+					_output = _speed;
+					_pid->SetMode(AUTOMATIC);
+					_pid->Compute();
 				}
 			}
 		}

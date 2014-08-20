@@ -182,14 +182,4 @@ static void DebugPrint(uint32_t msg)
 }
 
 
-#define DEBUG
-#ifdef DEBUG 
-#define DEBUG_PRINT(x) DebugPrint(x)
-#define DEBUG_NL
-#else
-#define DEBUG_PRINT(x)
-#define DEBUG_NL
-#endif
-
-
 #endif
