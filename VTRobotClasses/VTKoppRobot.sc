@@ -49,7 +49,10 @@ VTKoppRobotMotor{
 
 	speed_{arg val, sync = true;
 		speed = specs.at(\speed).constrain(val);
+		"Is this the speed?".postln;
+		this.changed(\speed);
 		if(sync, { this.prInvalidateParameter(\speed, speed)});
+
 	}
 
 	direction_{arg newDir, sync = true;
@@ -360,6 +363,7 @@ VTKoppRobot {
 	var updateTask, <>updateInterval = 1.0;//update is when values are requested from the robot
 	var semaphore;
 	var <>stateChangeAction;
+	var soundCueController, soundCueKey, soundModuleKey, soundModulePath;
 
 	*new{arg path;
 		^super.new.init(path);
@@ -406,6 +410,9 @@ VTKoppRobot {
 	}
 
 	sendMsg{arg setGet, command, val;
+		if(setGet == \set, {
+			this.changed(command, val);
+		});
 		parser.sendMsg(setGet, command, val);
 	}
 
@@ -419,6 +426,32 @@ VTKoppRobot {
 
 	requestValuesFromRobot{arg which;//a list of keys to be updated
 		motor.requestValuesFromRobot(which);
+	}
+
+	attachSound{arg cueKey, modKey, soundCue;
+		var jsonCue, lydserver;
+		lydserver = NetAddr("1.2.3.57", 57120);
+		soundCueKey = cueKey;
+		soundModuleKey = modKey;
+		soundModulePath = "/%/source/%".format(cueKey, modKey).asSymbol;
+		"The sound module path now: %".format(soundModulePath).postln;
+		jsonCue = ().put(cueKey, ().put(\source, ().put(modKey, soundCue)));
+		jsonCue = JSON.stringify(jsonCue);
+		lydserver.sendMsg('/cue/json', jsonCue);
+		soundCueController = SimpleController.new(this);
+		soundCueController.put(\speed, {arg theChanger, what, more;
+			var val;
+			"Speed reaction".postln;
+			val = motor.specs[\speed].unmap(more).postln;
+			lydserver.sendMsg("%/controlValue".format(soundModulePath).asSymbol, val);
+		});
+	}
+
+	detachSound{
+		"Detaching sound from kopp: %".format(soundModulePath).postln;
+		soundCueController.remove(\speed);
+		soundCueController = nil;
+		NetAddr("1.2.3.57", 57120).sendMsg('/cue/module/free', soundModulePath);
 	}
 
 	update{arg theChanged, theChanger, key, value;

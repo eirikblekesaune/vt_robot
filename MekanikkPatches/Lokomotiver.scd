@@ -1,15 +1,15 @@
-
-~tog = VTMonsterBox("/dev/tty.usbserial-FT3EET3MB");
-~pens = VTPenseBox("/dev/tty.usbserial-FT3EET3MA");
+var trackingMonitorWindow = Window.new;
+//~tog = VTMonsterBox("/dev/tty.usbserial-FT3EET3MB");
+//~pens = VTPenseBox("/dev/tty.usbserial-FT3EET3MA");
 
 //map pens buttons
-8.do{arg i;
-	var midiComp, pens;
-	midiComp = ~togCtrlA.components.at(("button." ++ (i + 1)).asSymbol);
-	pens = ~pens.penses[i];
-	midiComp.addDependant(pens);
-	pens.addDependant(midiComp);
-};
+// 8.do{arg i;
+// 	var midiComp, pens;
+// 	midiComp = ~togCtrlA.components.at(("button." ++ (i + 1)).asSymbol);
+// 	pens = ~pens.penses[i];
+// 	midiComp.addDependant(pens);
+// 	pens.addDependant(midiComp);
+// };
 
 // //map tog to faders
 // 7.do{arg i;
@@ -90,6 +90,7 @@ fork{
 		};
 		~trackingDataStore = data;
 	}.value;
+	~figurSoundData = Dictionary.new;
 	// ~trackingDataStore = Dictionary[
 	// 	1 -> IdentityDictionary[\rightEdge -> -5582],
 	// 	2 -> IdentityDictionary[\rightEdge -> 6080],
@@ -108,10 +109,69 @@ fork{
 			var view, height, width, result;
 			var pKnob, iKnob, dKnob, offsetKnob, rightEdgeView, rightEdgeText;
 			var speedCtrlView, speedSlider;
+			var makeMonitorWindow, monitorController;
+			var margin = 2@2, gap = 2@2;
+			makeMonitorWindow = {
+				var width = 600, height = 400;
+				var monitorFigur, speedPlotter, positionPlotter;
+				var speedLabel, positionLabel, setPlotterValue;
+				monitorFigur = ~figur[figurNumber];
+				if(trackingMonitorWindow.notNil and: {trackingMonitorWindow.visible.notNil},{
+					"Already exisiting monit window".postln;
+					trackingMonitorWindow.close;
+				});
+				trackingMonitorWindow = Window("Peep show: (Figur %)".format(figurNumber), Rect(100, 100, width, height));
+				trackingMonitorWindow.onClose_({
+					"On close".postln;
+					monitorController.remove(\trackingData);
+					monitorController = nil;
+				});
+				trackingMonitorWindow.addFlowLayout(margin, gap);
+				StaticText(trackingMonitorWindow, 150@30).string_("Speed:");
+				speedLabel = StaticText(trackingMonitorWindow, 150@30).string_("none");
+				trackingMonitorWindow.view.decorator.nextLine;
+				speedPlotter = MultiSliderView.new(trackingMonitorWindow, Point(width, 150) - (margin * 2));
+				StaticText(trackingMonitorWindow, 150@30).string_("Position:");
+				positionLabel = StaticText(trackingMonitorWindow, 150@30).string_("none");
+				trackingMonitorWindow.view.decorator.nextLine;
+				positionPlotter = MultiSliderView.new(trackingMonitorWindow, Point(width, 150) - (margin * 2));
+				[speedPlotter, positionPlotter].do{arg item;
+					var dataSize = width;
+					item.size = dataSize;
+					item.thumbSize_(1.0);
+					item.value_(0.5 ! dataSize);
+					item.reference_(0.5 ! dataSize);
+					item.isFilled_(true);
+					item.editable_(false);
+				};
+				monitorController = SimpleController.new(monitorFigur);
+				setPlotterValue = {arg val, plotter, label, spec;
+					var newVal;
+					"Setting plotter: %".format([val, plotter, plotter.value]).postln;
+					newVal = plotter.value;
+					newVal.pop;
+					newVal = newVal.addFirst(spec.unmap(val));
+					plotter.value = newVal;
+					label.string = val.asString;
+				};
+				monitorController.put(\trackingData, {arg theChanger, theChanged, more;
+					var speed, position;
+					#position, speed = theChanger.trackingData;
+					{
+						setPlotterValue.value(speed, speedPlotter, speedLabel, [-100.0, 100.0].asSpec);
+						setPlotterValue.value(position, positionPlotter, positionLabel, [-20000.0, 20000.0].asSpec);
+					}.defer;
+				});
+				trackingMonitorWindow.front;
+			}.inEnvir;
+
 			height = 100; width = 800;
 			//"Making with this: % % %".format(figurNumber, parent, ~trackingData).postln;
 			view = FlowView.new(parent, Point(width, height));
-			StaticText(view, Point(50, height)).string_("Figur\n%".format(figurNumber)).font_(Font("Menlo", 16, true));
+			StaticText(view, Point(50, (height / 2) - 4)).string_("Figur\n%".format(figurNumber)).font_(Font("Menlo", 16, true));
+			Button(view, Point(50, (height / 2) - 4)).states_([["monitor"]]).action_({
+				makeMonitorWindow.value;
+			});
 			rightEdgeView = FlowView(view, Point(100, height)).background_(Color.grey.alpha_(0.5));
 			Button(rightEdgeView, Point(80, rightEdgeView.bounds.height * 0.45))
 			.states_([["Calibrate\nright"]])
@@ -409,6 +469,51 @@ fork{
 					~storeFigurTrackingData.value(figurNumber, [\pVal, \iVal, \dVal, \speedOffsetDirectionMultiplier]);
 					~trackingData.changed(figurNumber);
 				}.inEnvir, "/robot/figur%/storeTrackingOffsetData".format(figurNumber.asPaddedString).asSymbol);
+
+				/////////////////////////////////////////////////////////
+				//Sound attachment responders
+				/////////////////////////////////////////////////////////
+				~figurSoundData.put(figurNumber, ());
+				OSCdef("attachSoundFigur%".format(figurNumber).asSymbol, {arg msg, time, addr, port;
+					var soundCue, soundCueKey, soundModuleKey, lydserver;
+					var soundModulePath;
+					"Attaching sound to figur %\n\t:[%]%".format(figurNumber,msg[1].class,msg[1]).postln;
+					lydserver = NetAddr("1.2.3.57", 57120);
+					soundCue = Dictionary.newFrom(msg[1].asString.parseYAML);
+					soundCue.put(\name, \bufferplayer);
+					soundCue = ().put(
+						"figur%".format(figurNumber.asPaddedString),
+						().put(
+							\source,
+							('figurSound': soundCue)
+						)
+					);
+					soundModulePath = "/figur%/source/figurSound".format(figurNumber.asPaddedString);
+					lydserver.sendMsg('/cue/json', JSON.stringify(soundCue));
+					if(~figurSoundData[figurNumber][\soundController].isNil, {
+						~figurSoundData.at(figurNumber).put(
+							'soundController',
+							SimpleController.new(~figur[figurNumber]).put(\bipolarSpeed, {arg theChanged, what;
+								lydserver.sendMsg(
+									"%/controlValue".format(soundModulePath).asSymbol,
+									theChanged.bipolarSpeed.abs.linlin(0.0, 512, 0.0, 1.0);
+								);
+							});
+						);
+					});
+
+				}.inEnvir, "/robot/figur%/attachSound".format(figurNumber.asPaddedString).asSymbol);
+				OSCdef("detachSoundFigur%".format(figurNumber).asSymbol, {arg msg, time, addr, port;
+					var soundCuePath;
+					"Detaching sound from figur %".format(figurNumber).postln;
+					soundCuePath = "/figur%/source/figurSound".format(figurNumber.asPaddedString).asSymbol;
+					NetAddr("1.2.3.57", 57120).sendMsg('/cue/module/free', soundCuePath);
+					~figurSoundData[figurNumber].removeAt('soundController').remove(\bipolarSpeed);
+				}.inEnvir, "/robot/figur%/detachSound".format(figurNumber.asPaddedString).asSymbol);
+
+				////////////////////////////////////////////////////////////
+				///Announcement
+				////////////////////////////////////////////////////////////
 
 				{
 					var beaconCtrl = SimpleController.new(newLokomotiv);
@@ -731,26 +836,26 @@ fork{
 				);
 				~togCtrlA.components.at('rotaryA.6').action = {arg comp; ~togLED4.setLEDValue(comp.value.linlin(0, 127, 0, 0x07FF).asInteger)};
 			});
-		});
+	});
+};
+~coordinator.addDependant(~togRegistrationService);
+~togCtrlA.components['button.20'].action_({"NodeDiscovery".postln;~coordinator.sendATCommand('NodeDiscover');});
+~togCtrlB.components['button.20'].action_({"NodeDiscovery".postln;~coordinator.sendATCommand('NodeDiscover');});
+~togCtrlB.components['button.19'].action_({"Global figur stop".postln;
+	//~figur.keysValuesDo({arg key, val; val.speed_(0)});
+	[0,1,2,3,4,11,12].do{arg item;
+		~figur[item].bipolarSpeed_(0);
+	}
+
+});
+~togCtrlA.components['button.19'].action_({"Global figur stop".postln;
+	[13,8,9,5,6,7].do{arg item;
+		~figur[item].bipolarSpeed_(0);
 	};
-	~coordinator.addDependant(~togRegistrationService);
-	~togCtrlA.components['button.20'].action_({"NodeDiscovery".postln;~coordinator.sendATCommand('NodeDiscover');});
-	~togCtrlB.components['button.20'].action_({"NodeDiscovery".postln;~coordinator.sendATCommand('NodeDiscover');});
-	~togCtrlB.components['button.19'].action_({"Global figur stop".postln;
-		//~figur.keysValuesDo({arg key, val; val.speed_(0)});
-		[0,1,2,3,4,11,12].do{arg item;
-			~figur[item].bipolarSpeed_(0);
-		}
+});
 
-	});
-	~togCtrlA.components['button.19'].action_({"Global figur stop".postln;
-		[13,8,9,5,6,7].do{arg item;
-			~figur[item].bipolarSpeed_(0);
-		};
-	});
-
-	~coordinator.sendATCommand('NodeDiscover');
+~coordinator.sendATCommand('NodeDiscover');
 
 
-	"Lokomotiver ready".postln;
+"Lokomotiver ready".postln;
 };
