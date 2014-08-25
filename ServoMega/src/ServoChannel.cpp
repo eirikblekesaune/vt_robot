@@ -1,4 +1,4 @@
-#include "ServoCity.h"
+#include "ServoChannel.h"
 
 ServoChannel::ServoChannel(int8_t pinNumber) :
 		_position(90),
@@ -16,6 +16,11 @@ ServoChannel::ServoChannel(int8_t pinNumber) :
 		newServo->attach(pinNumber);
 		_servo = newServo;
 		_lastPositionUpdateTime = 0;
+}
+
+void ServoChannel::GoToPosition(int16_t target)
+{
+	GoToPosition(target, _duration);
 }
 
 void ServoChannel::GoToPosition(int16_t target, int32_t duration)
@@ -55,7 +60,6 @@ void ServoChannel::Update()
 {
 	if(_isInterpolating)
 	{
-		Serial.print("I");
 		if((_lastPositionUpdateTime + kUpdateInterval) < millis())
 		{
 			if(_hasReachedEndPosition())

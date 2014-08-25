@@ -1,0 +1,50 @@
+#ifndef SERVO_CHANNEL_MAPPINGS_H
+#define SERVO_CHANNEL_MAPPINGS_H
+#define NUM_CHANNELS 44
+static const int8_t channelToPinNumberMappings[NUM_CHANNELS] = {
+  2,//channel 1
+ 	3,//channel 2
+ 	4,//channel 3
+ 	5,//channel 4
+ 	6,//channel 5
+ 	7,//channel 6
+ 	8,//channel 7
+ 	9,//channel 8
+ 	10,//channel 9
+ 	11,//channel 10
+ 	12,//channel 11
+ 	13,//channel 12
+ 	22,//channel 13
+ 	23,//channel 14
+ 	24,//channel 15
+ 	25,//channel 16
+ 	26,//channel 17
+ 	27,//channel 18
+ 	28,//channel 19
+ 	29,//channel 20
+ 	30,//channel 21
+ 	31,//channel 22
+ 	32,//channel 23
+ 	33,//channel 24
+ 	34,//channel 25
+ 	35,//channel 26
+ 	36,//channel 27
+ 	37,//channel 28
+ 	38,//channel 29
+ 	39,//channel 30
+ 	40,//channel 31
+ 	41,//channel 32
+ 	42,//channel 33
+ 	43,//channel 34
+ 	44,//channel 35
+ 	45,//channel 36
+ 	46,//channel 37
+ 	47,//channel 38
+ 	48,//channel 39
+ 	49,//channel 40
+ 	50,//channel 41
+ 	51,//channel 42
+ 	52,//channel 43
+ 	53//channel 44
+};
+#endif
