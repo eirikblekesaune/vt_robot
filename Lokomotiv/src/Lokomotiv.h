@@ -24,9 +24,10 @@ public:
 	double GetPidPValue();
 	double GetPidIValue();
 	double GetPidDValue();
-	long GetDistancePollingInterval();
+	long GetTrackingPollingInterval();
 	long GetMotorMode() {return static_cast<long>(_motor->GetMotorMode());};
 	long GetPidTargetSpeed() {return static_cast<long>(_motor->GetPidTargetSpeed());};
+	long GetTrackingData();
 
 	void SetSpeed(long val) {_motor->SetSpeed(static_cast<speed_t>(val));};
 	void SetEndSpeed(long val) {_motor->SetEndSpeed(static_cast<speed_t>(val));};
@@ -41,19 +42,17 @@ public:
 	void SetPidPValue(double val);
 	void SetPidIValue(double val);
 	void SetPidDValue(double val);
-	void SetDistancePollingInterval(long val);
+	void SetTrackingPollingInterval(long val);
 	void SetMotorMode(long val);
 	void SetPidTargetSpeed(long val);
 
 	void Stop(long val) {_motor->Stop(static_cast<int16_t>(val));};
 	void Init();
 	void Update();
-	void GotAddr(unsigned char);
+	void GotAddr(long val);
 	void UserChangedSpeed() {_motor->UserChangedSpeed();};
-	void SendDistanceUpdate();
-	void SendDistanceUpdate(long dist);
+	void SendTrackingData();
 
-	volatile long _distanceFromLastBeacon;
 private:
 	LokomotivMotor *_motor;
 	IRReader *_irReader;
@@ -71,8 +70,8 @@ private:
 	double _pidPValue;
 	double _pidIValue;
 	double _pidDValue;
-	long _distancePollingInterval;
-	bool _distancePollingEnabled;
+	long _trackingPollingInterval;
+	bool _trackingPollingEnabled;
 
 };
 

@@ -118,15 +118,15 @@ int main(void)
 			input = ~(PINA);
 			address = (unsigned long)(input);
 
-			sendNECByte(leadSequence[0]);
-			_delay_ms(50);
-			sendNECByte(leadSequence[1]);
-			_delay_ms(50);
-			sendNECByte(leadSequence[2]);
-			_delay_ms(50);
+			//sendNECByte(leadSequence[0]);
+			//_delay_ms(50);
+//			sendNECByte(leadSequence[1]);
+//			_delay_ms(50);
+//			sendNECByte(leadSequence[2]);
+//			_delay_ms(50);
 			sendNECByte(address | magicNumber);
 			//read address bytes again
-			_delay_ms(100);
+			_delay_ms(50);
     }
 }
 
