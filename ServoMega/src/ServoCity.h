@@ -9,6 +9,7 @@ public:
 	ServoCity();
 	void parseByte(uint8_t);
 	static const uint8_t kHeaderByte;
+	void Update();
 private:
 	enum{
 		CMD_SET_POSITION,

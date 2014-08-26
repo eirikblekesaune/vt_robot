@@ -6,7 +6,7 @@ ServoCity *city;
 
 void setup()
 {
-	parser = new ServoCity();
+	city = new ServoCity();
 	Serial.begin(9600);	
 }
 

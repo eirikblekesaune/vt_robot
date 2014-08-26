@@ -3,14 +3,21 @@ const uint8_t ServoCity::kHeaderByte = 0xAA;
 #define CR 13
 #define NL 10
 
-ServoCity::ServoCity(ServoChannel *channels) :
-	_state(STATE_WAIT_HEADER),
+ServoCity::ServoCity() :
+	_state(STATE_WAIT_HEADER)
 {
 	for(int i = 0; i < NUM_CHANNELS; i++)
 	{
-		channels[i] = new ServoChannel(channelToPinNumberMappings[i]);
+		_channels[i] = new ServoChannel(channelToPinNumberMappings[i]);
 	}
-	
+}
+
+void ServoCity::Update()
+{
+	for(int i = 0; i < NUM_CHANNELS; i++)
+	{
+		_channels[i]->Update();
+	}
 }
 
 void ServoCity::parseByte(uint8_t newByte)
