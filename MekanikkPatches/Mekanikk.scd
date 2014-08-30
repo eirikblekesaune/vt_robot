@@ -1,4 +1,7 @@
 //#!/Applications/SuperCollider/SuperCollider.app/Contents/Resources/sclang
+///CMD + a  - > select all
+///CMD + ENTER -> run code
+
 MIDIClient.init;
 MIDIIn.connectAll;
 //MIDIFunc.trace(false)
@@ -22,10 +25,24 @@ MIDIIn.connectAll;
 	);
 });
 try{ "~/vt_robot/MekanikkPatches/Lokomotiver.scd".standardizePath.load; } {"Error in Lokotiver".postln;};
-//"~/vt_robot/MekanikkPatches/Tallerkener.scd".standardizePath.load;
-// "~/vt_robot/MekanikkPatches/HvitFugl.scd".standardizePath.load;
-// "~/vt_robot/MekanikkPatches/Lys.scd".standardizePath.load;
+"~/vt_robot/MekanikkPatches/HvitFugl.scd".standardizePath.load;
+"~/vt_robot/MekanikkPatches/Lys.scd".standardizePath.load;
 "~/vt_robot/MekanikkPatches/Pinner.scd".standardizePath.load;
-// "~/vt_robot/MekanikkPatches/Kopper.scd".standardizePath.load;
-// "~/vt_robot/MekanikkPatches/Fugl.scd".standardizePath.load;
-// "~/vt_robot/MekanikkPatches/Kranser.scd".standardizePath.load;
+//"~/vt_robot/MekanikkPatches/Kopper.scd".standardizePath.load;
+"~/vt_robot/MekanikkPatches/Fugl.scd".standardizePath.load;
+"~/vt_robot/MekanikkPatches/Kranser.scd".standardizePath.load;
+
+//////////////////////////////////////////////////
+//Send OSC to penser
+//////////////////////////////////////////////////
+
+8.do{arg i;
+	var number;
+	number = i + 1;
+	[~togCtrlA, ~togCtrlB].do{arg ctrl;
+		ctrl.components["button.%".format(number).asSymbol].action_({arg comp;
+			var val = comp.value.booleanValue.asInteger;
+			NetAddr("1.2.3.75", 57120).sendMsg("/robot/pens.%/position".format(number).asSymbol, val);
+		});
+	};
+};

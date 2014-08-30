@@ -1,7 +1,8 @@
 ~kransMonster = VTMonsterBox("/dev/tty.usbserial-FT3EET44A");
 ~kranser = Dictionary[
 	1 -> ~kransMonster.channels[2],
-	2 -> ~kransMonster.channels[0]
+	2 -> ~kransMonster.channels[0],
+	3 -> ~kransMonster.channels[3]
 ];
 
 ~setKransSpeed = {arg kransNumber, speed;
@@ -42,3 +43,22 @@ OSCdef('kransResponer1', {arg msg, time, addr, port;
 OSCdef('kransResponer2', {arg msg, time, addr, port;
 	~setKransSpeed.value(2, msg[1].linlin(-1.0, 1.0, -512, 512).asInteger);
 },'/robot/krans.2/bipolarSpeed');
+//
+~kransFader3 = ~togCtrlA.components.at('rotaryA.8');
+~kransStopButton3 = ~togCtrlA.components.at('rotaryButtonA.8');
+~kransFader3.action = {arg ctrlComp;
+	var val;
+	val = ctrlComp.value.linlin(0, 127, -512, 512);
+	"Krans 3 - bipolarSpeed: %".format(val).postln;
+	~setKransSpeed.value(3, val);
+};
+~kransStopButton3.action = {arg ctrlComp;
+	"Krans stopp".postln;
+	~setKransSpeed.value(3, 0);
+	~kransFader3.value_(64).refresh;
+};
+
+OSCdef('kransResponer3', {arg msg, time, addr, port;
+	~setKransSpeed.value(2, msg[1].linlin(-1.0, 1.0, -512, 512).asInteger);
+},'/robot/krans.3/bipolarSpeed');
+
