@@ -8,6 +8,7 @@ volatile int32_t ticks = 0;
 volatile int32_t measuredTicks = 0;
 volatile int32_t lastMeasuredTicks = 0;
 volatile int32_t ticksDelta = 1;
+volatile int32_t rawSpeed = 0;
 double measuredSpeed = 0.0;
 double lastMeasuredSpeed = 0.0;
 
@@ -20,6 +21,7 @@ ISR(TIMER3_COMPA_vect, ISR_NOBLOCK)
 	measuredTicks = ticks - lastMeasuredTicks;
 	lastMeasuredTicks = ticks;
 	lastMeasuredSpeed = measuredSpeed;
+	rawSpeed = measuredSpeed;
 	measuredSpeed = (static_cast<double>(measuredTicks) * 0.5) + (lastMeasuredSpeed * 0.5);
 }
 
@@ -46,6 +48,11 @@ LokomotivSpeedometer::LokomotivSpeedometer() :
 double LokomotivSpeedometer::GetMeasuredSpeed()
 {
 	return measuredSpeed;
+}
+
+long LokomotivSpeedometer::GetRawSpeed()
+{
+	return rawSpeed;
 }
 
 double LokomotivSpeedometer::GetMeasuredTicks()

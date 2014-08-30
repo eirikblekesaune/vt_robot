@@ -7,8 +7,8 @@ const int driverENDIAG = 6;
 const int motorEncoderInterruptIndex = 0;// digital pin 2 on Leonardo implicitly
 const int twiStartingAddress = 0x08; //all VT TWI modules have the same starting address
 const long Lokomotiv::_beaconAddressUpdateInterval = 1000;
-long lastDistanceUpdate = 0;
-long lastDistanceUpdateValue = 0;
+long lastTrackingUpdate = 0;
+long lastTrackingDistanceUpdateValue = 0;
 //IR reader
 const int irReaderReceivePin = 8;
 
@@ -25,12 +25,20 @@ Lokomotiv::Lokomotiv() :
 	_lastDetectedAddress(0),
 	_pidPValue(0),
 	_pidIValue(0),
-	_pidDValue(0)
+	_pidDValue(0),
+	_trackingPollingEnabled(false),
+	_trackingPollingInterval(0)
 {
 	_speedometer = new LokomotivSpeedometer();
 	_motor = new LokomotivMotor(_speedometer);
 	_irReader = new IRReader(irReaderReceivePin, this);
 	_encoderCounterAtLastAddress = _speedometer->GetCurrentTicks();
+}
+
+void Lokomotiv::Init()
+{
+	_irReader->Init();
+	Wire.begin();
 }
 
 //Getters
@@ -55,21 +63,29 @@ double Lokomotiv::GetPidPValue(){return _pidPValue;}
 double Lokomotiv::GetPidIValue(){return _pidIValue;}
 double Lokomotiv::GetPidDValue(){return _pidDValue;}
 //Setters
-void Lokomotiv::SetDistancePollingInterval(long val)
+void Lokomotiv::SetTrackingPollingInterval(long val)
 {
 	if(val == 0)
 	{
-		_distancePollingEnabled = false;
-		_distancePollingInterval = 0;
+		_trackingPollingEnabled = false;
+		_trackingPollingInterval = 0;
 	} else {
-		_distancePollingEnabled = true;
-		_distancePollingInterval = max(20, val);
-		SendDistanceUpdate();
+		_trackingPollingEnabled = true;
+		_trackingPollingInterval = max(20, val);
+		SendTrackingData();
 	}
 }
-long Lokomotiv::GetDistancePollingInterval()
+long Lokomotiv::GetTrackingPollingInterval()
 {
-	return _distancePollingInterval;
+	return _trackingPollingInterval;
+}
+
+long Lokomotiv::GetTrackingData()
+{
+	int32_t result;
+	result = static_cast<int32_t>(_speedometer->GetMeasuredSpeed() * 100.0) << 16;
+	result = (result & 0xFFFF0000) | (0x0000FFFF & GetDistanceFromLastAddress());
+	return result;
 }
 
 void Lokomotiv::SetMotorMode(long val)
@@ -141,62 +157,40 @@ void Lokomotiv::SetPidPValue(double val){_motor->SetPidPValue(val);}
 void Lokomotiv::SetPidIValue(double val){_motor->SetPidIValue(val);}
 void Lokomotiv::SetPidDValue(double val){_motor->SetPidDValue(val);}
 
-void Lokomotiv::Init()
-{
-	_irReader->Init();
-	Wire.begin();
-}
 
 void Lokomotiv::Update()
 {
 	_motor->Update();
 	_irReader->Update();
-	if(_distancePollingEnabled)
+	if(_trackingPollingEnabled)
 	{
 		long dist = GetDistanceFromLastAddress();
 		if(
-				((millis() - lastDistanceUpdate) >= _distancePollingInterval) &&
-				(lastDistanceUpdateValue != dist))
+				((millis() - lastTrackingUpdate) >= _trackingPollingInterval) &&
+				(lastTrackingDistanceUpdateValue != dist)
+				)
 		{
-			SendDistanceUpdate(dist);
+			SendTrackingData();
 		}
 	}
 }
 
-void Lokomotiv::SendDistanceUpdate()
+void Lokomotiv::SendTrackingData()
 {
-	SendDistanceUpdate(GetDistanceFromLastAddress());
+	ReturnGetValue(CMD_TRACKING_DATA, GetTrackingData()); 
+	lastTrackingDistanceUpdateValue = GetDistanceFromLastAddress(); 
+	lastTrackingUpdate = millis();
 }
 
-void Lokomotiv::SendDistanceUpdate(long dist)
-{
-	ReturnGetValue(CMD_DISTANCE_FROM_LAST_ADDRESS, dist); 
-	lastDistanceUpdate = millis();
-	lastDistanceUpdateValue = dist; 
-}
-
-void Lokomotiv::GotAddr(unsigned char addr)
+void Lokomotiv::GotAddr(long addr)
 {
 	//We don't need to update repeating beacon address more than once a
 	//second.
-	long newAddress = static_cast<long>(addr);
-	
-	if(newAddress != _lastDetectedAddress)
-	{
-		_encoderCounterAtLastAddress = _speedometer->GetCurrentTicks();
-		_lastDetectedAddress = newAddress;
-		//Serial.print("New address:"); Serial.println(addr);
-		ReturnGetValue(CMD_LAST_DETECTED_ADDRESS, GetLastDetectedAddress());
-		_lastDetectedAddress = addr;
-		_lastDetectedAddressUpdate = millis();
-	}
-
+	_encoderCounterAtLastAddress = _speedometer->GetCurrentTicks();
+	SetLastDetectedAddress(addr);
 	if((_lastDetectedAddressUpdate + _beaconAddressUpdateInterval) < millis())
 	{
-		//Serial.print("Addr update:"); Serial.println(_lastDetectedAddress);
-	//	Serial.print("Addr update:"); Serial.println(addr);
 		ReturnGetValue(CMD_LAST_DETECTED_ADDRESS, GetLastDetectedAddress());
 		_lastDetectedAddressUpdate = millis();
 	}
-	_distanceFromLastBeacon = 0;
 }
