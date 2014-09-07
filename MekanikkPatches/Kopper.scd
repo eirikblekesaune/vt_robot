@@ -7,7 +7,7 @@
 	VTKoppRobot("/dev/tty.usbserial-FT5QT6VKB") //14 OK koblet til kopp nr 3
 ];
 
-[0, 1, 2, 3, 5].do{arg i;
+[0, 1, 2, 3, 4, 5].do{arg i;
 	OSCFunc({arg msg, time, addr, resp;
 		var dir;
 		dir = msg[1].isNegative.not.asInt;
@@ -19,12 +19,12 @@
 		~kopper[i].stop;
 	}.inEnvir, ("/robot/flying." ++ (i + 1) ++ "/stop").asSymbol);
 };
-[0, 1, 2, 3, 5].do{arg i;
+[0, 1, 2, 3, 4, 5].do{arg i;
 	OSCFunc({arg msg, time, addr, resp;
 		~kopper[i].sendMsg(\set, \goToParkingPosition, 0);
 	}.inEnvir, ("/robot/flying." ++ (i + 1) ++ "/goToParkingPosition").asSymbol);
 };
-[0, 1, 2, 3, 5].do{arg i;
+[0, 1, 2, 3, 4, 5].do{arg i;
 	OSCFunc({arg msg, time, addr, resp;
 		~kopper[i].sendMsg(\set, \targetPosition, msg[1]);
 	}.inEnvir, ("/robot/flying." ++ (i + 1) ++ "/targetPosition").asSymbol);
@@ -39,7 +39,7 @@ OSCdef('koppWalkMaxSpeed', {arg msg, time, addr, port;
 	~koppWalkMaxSpeed = msg[1];}, '/robot/flying/walkMaxSpeed');
 
 ~koppWalkStart = {
-	[0,1,2,3,5].do({arg koppIndex;
+	[0,1,2,3,4,5].do({arg koppIndex;
 	var koppNum = koppIndex + 1;
 	var doNextTarget = {
 		var taskKey = "koppWalk%".format(koppNum).asSymbol;

@@ -327,6 +327,7 @@ fork{
 					"Remote figur speed %: %".format(nodeID, msg[1]).postln;
 					togFader.valueAction_(msg[1].linlin(-1.0, 1.0, 0, 1023).asInteger);
 				}, "/robot/figur.%/bipolarSpeed".format(figurNumber).asSymbol);
+
 				~figur.put(figurNumber, newLokomotiv);
 				"~figur now: %".format(~figur).postln;
 				newLokomotiv.addDependant({arg theChanged, what, more;
