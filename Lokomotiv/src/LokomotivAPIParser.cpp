@@ -148,8 +148,8 @@ void LokomotivAPIParser::_executeCommand()
 				case CMD_MOTOR_MODE:
 						_robot->SetMotorMode(_decodeIntegerValue(_data));
 					break;
-				case CMD_DISTANCE_POLLING_INTERVAL:
-					_robot->SetDistancePollingInterval(_decodeIntegerValue(_data));
+				case CMD_TRACKING_POLLING_INTERVAL:
+					_robot->SetTrackingPollingInterval(_decodeIntegerValue(_data));
 					break;
 				case CMD_PID_TARGET_SPEED:
 					_robot->SetPidTargetSpeed(_decodeIntegerValue(_data));
@@ -209,19 +209,20 @@ void LokomotivAPIParser::_executeCommand()
 				case CMD_MOTOR_MODE:
 					ReturnGetValue(CMD_MOTOR_MODE,_robot->GetMotorMode());
 					break;
-				case CMD_DISTANCE_POLLING_INTERVAL:
-					ReturnGetValue(CMD_DISTANCE_POLLING_INTERVAL,_robot->GetDistancePollingInterval());
+				case CMD_TRACKING_POLLING_INTERVAL:
+					ReturnGetValue(CMD_TRACKING_POLLING_INTERVAL,_robot->GetTrackingPollingInterval());
 					break;
 				case CMD_PID_TARGET_SPEED:
 					ReturnGetValue(CMD_PID_TARGET_SPEED, _robot->GetPidTargetSpeed());
+					break;
+				case CMD_TRACKING_DATA:
+					ReturnGetValue(CMD_TRACKING_DATA, _robot->GetTrackingData());
 					break;
 				default:
 					DebugPrint("Unknown command");
 					DebugPrint(_currentCommand);
       }
       break;
-    default:
-      DEBUG_PRINT("SetGet fault");
   }
   
   _currentCommand = CMD_UNKNOWN;

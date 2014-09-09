@@ -4,17 +4,17 @@ o = [
 ];
 p = [
 	// IdentityDictionary
-	0, [ array: o[1],  size: 3,  
+	0, [ array: o[1],  size: 5,  
 		proto: nil,  parent: nil,  
 		know: false ],  
 	// Array
-	1, [ 'leftVideoEdge',  -121.500000,  nil,  nil,  
+	1, [ nil,  nil,  nil,  nil,  
+		nil,  nil,  'iVal',  1.000000,  
 		nil,  nil,  nil,  nil,  
 		nil,  nil,  nil,  nil,  
-		nil,  nil,  nil,  nil,  
-		nil,  nil,  'rightEdge',  0,  
-		nil,  nil,  nil,  nil,  
-		nil,  nil,  'rightVideoEdge',  374.000000,  
+		'pVal',  1.000000,  'rightEdge',  -10463,  
+		nil,  nil,  'speedOffsetDirectionMultiplier',  -11.319859,  
+		'dVal',  1.000000,  nil,  nil,  
 		nil,  nil,  nil,  nil ]
 ];
 prUnarchive(o,p);

@@ -1,4 +1,4 @@
-~lanbox = SerialPort.new("/dev/tty.usbmodem471", 38400, crtscts: true);
+~lanbox = SerialPort.new("/dev/tty.usbmodem621", 38400, crtscts: true);
 ~lysResponders = 256.collect({arg i;
 	var num = i + 1;
 	OSCFunc({arg msg, time, addr, port;

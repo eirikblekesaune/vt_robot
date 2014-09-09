@@ -24,8 +24,9 @@ enum command_t
 	CMD_END_TRANSMISSION = 0x0F,
 	CMD_PERIPHERAL_REQUEST = 0x10,
 	CMD_MOTOR_MODE = 0x11,
-	CMD_DISTANCE_POLLING_INTERVAL = 0x12,
+	CMD_TRACKING_POLLING_INTERVAL = 0x12,
 	CMD_PID_TARGET_SPEED = 0x13,
+	CMD_TRACKING_DATA = 0x14,
   CMD_UNKNOWN
 };
 
@@ -180,16 +181,6 @@ static void DebugPrint(uint32_t msg)
   SERIAL.print(msg);
   SERIAL.write(4);
 }
-
-
-#define DEBUG
-#ifdef DEBUG 
-#define DEBUG_PRINT(x) DebugPrint(x)
-#define DEBUG_NL
-#else
-#define DEBUG_PRINT(x)
-#define DEBUG_NL
-#endif
 
 
 #endif

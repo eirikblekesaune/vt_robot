@@ -11,17 +11,22 @@ SerialPort.devices
 ~controller = SimpleController.new(~coordinator);
 ~controller.put(\childDeviceRegistered, {arg theChanged, what, newModule;
 	"Added new module: %".format([theChanged, what, newModule]).postln;
-	~myTog = VTLokomotiv.new(newModule);
-	~controller = {arg theChanged, what, more;
-		"Lok: % % %".format(theChanged.name, what, theChanged.perform(what)).postln;
-	};
-	~myTog.addDependant(~controller);
+	if(newModule.nodeIdentifier == 'TOG09', {
+		"Found it".postln;
+		~myTog = VTLokomotiv.new(newModule);
+		~controller = {arg theChanged, what, more;
+			"Lok: % % %".format(theChanged.name, what, theChanged.perform(what)).postln;
+		};
+		~myTog.addDependant(~controller);
+	});
 });
 ~controller.put(\modemStatus, {arg theChanged, what, status; "Modem status: %".format(status).postln;});
 )
-
 //get speed test
 ~myTog.get(\speed);
+
+~myTog.set(\peripheral, (0x00 << 24) | (0x01 << 16) | (0x07FF))
+~myTog.set(\peripheral, (0x00 << 24) | (0x01 << 16) | (0x0000))
 
 (
 //speed test

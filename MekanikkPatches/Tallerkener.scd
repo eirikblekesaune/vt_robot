@@ -8,7 +8,7 @@
             var bytes;
             ~speed = speed.clip(-1.0, 1.0);
             bytes = ~formatMsgBytes.value(env, ~speed);
-            ~port.putAll(bytes);
+			~port.putAll(bytes);
             "Tallerken % speed: %".format(~speed).postln;
             env.changed(\speed);
         };

@@ -9,6 +9,7 @@ public:
 	double GetMeasuredSpeed(); 
 	double GetMeasuredTicks(); 
 	long GetCurrentTicks();
+	long GetRawSpeed();
 	void DirectionChanged(int newDirection);
 private:
 	long _measuredSpeed;

@@ -11,11 +11,15 @@ VTLokomotiv {
 	var <xbeeDevice;
 	var <mode;
 	var bipolarSpeed;
+	var <trackingPosition;
+	var <trackingSpeed;
+	var lastSpeedChange;
 
 	var parserState, parseRoutine, currentCommand, currentValueBytes;
 	var currentStringData;
 	var dumpInput;
 	var dumpAction;
+	var autoStopRoutine;
 	classvar <command;
 	classvar <setGet;
 	classvar <byteType;
@@ -34,9 +38,26 @@ VTLokomotiv {
 		pid = (P: 0.0, I: 0.0, D: 0.0);
 		currentStringData = String.new(128);
 		currentValueBytes = Array.new(4);
+		autoStopRoutine = Routine({
+			loop{
+				if(speed != 0 and: {(Main.elapsedTime - lastSpeedChange) > 120.0}, {
+					"AUTOSTOPPED: %".format(this.name).postln;
+					this.speed_(0);
+				});
+				1.0.wait;
+			};
+		}).play;
+		//Propagate online status from router
+		SimpleController(xbeeDevice).put(\online, {
+			this.changed(\online);
+		});
 		this.prResetParser;
 		this.set(\motorMode, 1);
+		this.get(\direction);
+		this.get(\speed);
 	}
+
+	online{^xbeeDevice.online;}
 
 	name{
 		^xbeeDevice.nodeIdentifier;
@@ -46,6 +67,7 @@ VTLokomotiv {
 		if(val != speed, {
 			speed = val.clip(0, 511);
 			this.set(\speed, speed);
+			lastSpeedChange = Main.elapsedTime;
 			this.changed(\speed);
 		});
 	}
@@ -88,9 +110,10 @@ VTLokomotiv {
 	}
 
 	stop{arg val = 1000;
-		this.set(\stop, val);
-		speed = 0;
-		this.changed(\speed);
+		//this.set(\stop, val);
+		//speed = 0;
+		//this.changed(\stop);
+		this.bipolarSpeed_(0);
 	}
 
 	prResetParser{
@@ -104,7 +127,7 @@ VTLokomotiv {
 				if(byte.bitAnd(0xC0) == 0x80, //check if it is command byte of 'set' type
 					{
 						//"Got command byte: %".format(this.class.command.getID(byte.bitAnd(0x0F))).postln;
-						currentCommand = this.class.command.getID(byte.bitAnd(0x0F));//only read 4 low bits
+						currentCommand = this.class.command.getID(byte.bitAnd(0x1F));//only read 5 low bits
 						if(currentCommand == \info,
 							{ parserState = \waitingForStringByte; },
 							{ parserState = \waitingForValueByte; });
@@ -156,9 +179,34 @@ VTLokomotiv {
 		^result;
 	}
 
+	trackingData{
+		^[trackingPosition, trackingSpeed];
+	}
+
 	//formats the received command and value bytes according to API
 	prProcessIncomingCommand{arg dataBytes;
+		var newData;
 		switch(currentCommand,
+			\trackingData, {
+				//special function for parsing tracking data. High two words are speed, lo two words are pos
+				//check if negative sign is set
+				//0.002 is the reciprocal for fixed point packing factor on Arduino
+				newData = this.class.parseDataBytes(dataBytes);
+				// dataBytes.collect({arg it; it.asBinaryString}).postln;
+				// newData.asBinaryString(32).postln;
+				if(newData.bitAnd(0x80000000).booleanValue, {
+					trackingSpeed = (newData >> 16).bitOr(0xFFFF0000) * 0.01;
+				}, {
+						trackingSpeed = (newData >> 16) * 0.01;
+				});
+				//check if negative sign is set
+				if(newData.bitAnd(0x00008000).booleanValue, {
+					trackingPosition = newData.bitOr(0xFFFF0000);
+				}, {
+						trackingPosition = newData.bitAnd(0x0000FFFF);
+				});
+				this.changed(\trackingData);
+			},
 			\speed, {speed = this.class.parseDataBytes(dataBytes); this.changed(\speed)},
 			\stop, {this.changed(\stopped)},
 			\direction, {direction = this.class.parseDataBytes(dataBytes); this.changed(\direction)},
@@ -273,8 +321,9 @@ VTLokomotiv {
 			\endTransmission -> 0x0F,
 			\peripheralRequest -> 0x10,
 			\motorMode -> 0x11,
-			\distancePollingInterval -> 0x12,//0 = off, n = polling interval in ms (min.val. 20ms)
-			\pidTargetSpeed -> 0x13
+			\trackingPollingInterval -> 0x12,//0 = off, n = polling interval in ms (min.val. 20ms)
+			\pidTargetSpeed -> 0x13,
+			\trackingData -> 0x14
 		];
 		setGet = TwoWayIdentityDictionary[
 			\set -> 0x00,

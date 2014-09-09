@@ -27,6 +27,9 @@ VTPinneRobot {
 				updateInterval.wait;
 			}
 		}).play;
+		this.sendMsg(\right, \get, \direction);
+		this.sendMsg(\left, \get, \direction);
+		this.sendMsg(\rotation, \get, \direction);
 	}
 
 	connect{arg path;
@@ -120,9 +123,11 @@ VTPinneRobotMotor{
 			stopTime: ControlSpec(0, 5000, step:1, default:0),
 			goToTargetPosition: ControlSpec(0, 5000, \lin, 1, default: 1000)
 		);
-		needsRefresh = IdentitySet.new;
+		needsRefresh = OrderedIdentitySet.new;
+		//needsRefresh.add(\direction);
 		needsUpdate = IdentitySet.newFrom(specs.keys);
 		outputCache = IdentityDictionary.new;
+
 	}
 
 	prInvalidateParameter{arg key, val;
@@ -136,12 +141,38 @@ VTPinneRobotMotor{
 		if(sync, { this.prInvalidateParameter(\speed, speed)});
 	}
 
+	bipolarSpeed{
+		if(direction == 0, {^speed;}, {^speed.neg});
+	}
+
+	bipolarSpeed_{arg val;
+		if(val.isNegative, {
+			this.direction_(\down);
+		});
+		if(val.isPositive, {
+			this.direction_(\up);
+		});
+		this.speed_(val.abs);
+		this.changed(\bipolarSpeed);
+	}
+
+	stop{
+		//this.set(\stop, val);
+		//speed = 0;
+		//this.changed(\stop);
+		this.bipolarSpeed_(0);
+	}
+
 	direction_{arg newDir, sync = true;
-		if(directionEnum.at(newDir).isNil,
-			{"Not a recognized direction".error.postln; ^this;}
+		if(newDir.isKindOf(SimpleNumber),
+			{
+				direction = directionEnum.getID(newDir.clip(0, 1));
+			},
+			{
+				direction = directionEnum.at(newDir);
+			}
 		);
-		direction = newDir;
-		if(sync, { this.prInvalidateParameter(\direction, directionEnum.at(direction))});
+		if(sync, { this.prInvalidateParameter(\direction, direction)});
 	}
 
 	targetPosition_{arg val, sync = true;
@@ -164,17 +195,25 @@ VTPinneRobotMotor{
 		if(sync, { this.prInvalidateParameter(\maxPosition, maxPosition)});
 	}
 
-	stop{arg val = 0, sync = true;
-		stopTime = specs.at(\stopTime).constrain(val);
-		if(sync, { this.prInvalidateParameter(\stop, stopTime.asInteger)});
+	goToPosition_{arg val, speed;
+		"Going to position".postln;
+		this.targetPosition_(val);
+		this.speed_(speed);
 	}
+
+	// stop{arg val = 0, sync = true;
+	// 	stopTime = specs.at(\stopTime).constrain(val);
+	// 	if(sync, { this.prInvalidateParameter(\stop, stopTime.asInteger)});
+	// }
 
 	goToParkingPosition{
 		this.prInvalidateParameter(\goToParkingPosition, 0);
+		direction = \up;//this is dangerous
 	}
 
 	goToParkingPosition_{//temp hack
 		this.prInvalidateParameter(\goToParkingPosition, 0);
+		direction = \up;//this is dangerous
 	}
 
 	goToTargetPosition{arg duration;
@@ -248,8 +287,20 @@ VTPinneRotationMotor : VTPinneRobotMotor {
 	}
 
 	init{arg robot_, address_;
+		direction = \right;
 		super.init(robot_, address_);
 		directionEnum = TwoWayIdentityDictionary[\right -> 0, \left -> 1];
+	}
+
+	bipolarSpeed_{arg val;
+		if(val.isNegative and: {direction != \right}, {
+			this.direction_(\right);
+		});
+		if(val.isPositive and: {direction != \left}, {
+			this.direction_(\left);
+		});
+		this.speed_(val.abs);
+		this.changed(\bipolarSpeed);
 	}
 }
 
