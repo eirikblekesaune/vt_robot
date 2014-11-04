@@ -1,4 +1,4 @@
-~hvitFuglPort = SerialPort('/dev/tty.usbserial-FT5QT6W2B', 9600, crtscts:true);
+~hvitFuglPort = SerialPort('/dev/tty.usbserial-FT3OMYM8B', 9600, crtscts:true);
 
 ~setHvitFuglLiftSpeed = {arg val;
 	~hvitFuglPort.putAll([1, val.linlin(0.0, 1.0, 0, 254).asInteger, 13, 10]);
