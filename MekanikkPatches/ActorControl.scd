@@ -55,3 +55,5 @@ try{
 
 "~/vt_robot/MekanikkPatches/Tallerkener.scd".standardizePath.load;
 "~/vt_robot/MekanikkPatches/Penser.scd".standardizePath.load;
+"~/vt_robot/MekanikkPatches/AliControl.scd".standardizePath.load;
+"~/vt_robot/MekanikkPatches/HvitFugl.scd".standardizePath.load;
