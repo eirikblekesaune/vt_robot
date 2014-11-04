@@ -140,7 +140,7 @@ fork{
 				monitorController = SimpleController.new(monitorFigur);
 				setPlotterValue = {arg val, plotter, label, spec;
 					var newVal;
-					"Setting plotter: %".format([val, plotter, plotter.value]).postln;
+					// "Setting plotter: %".format([val, plotter, plotter.value]).postln;
 					newVal = plotter.value;
 					newVal.pop;
 					newVal = newVal.addFirst(spec.unmap(val));
@@ -186,7 +186,7 @@ fork{
 			offsetKnob = EZKnob(
 				view, Point(50, height), "offset", [-15.0, 15.0].asSpec,
 				{arg it; ~trackingData[figurNumber].put(\speedOffsetDirectionMultiplier, it.value)}.inEnvir, 0.0);
-			Button(view, Point(100, height))
+			Button(view, Point(50, height))
 			.states_([["Store\noffset\ndata"]])
 			.action_({NetAddr.localAddr.sendMsg("/robot/figur%/storeTrackingOffsetData".format(figurNumber.asPaddedString).asSymbol);});
 			speedCtrlView = FlowView.new(view, Point(200, height));
@@ -373,7 +373,7 @@ fork{
 							ctrl.put(\trackingData, {arg theChanged, theChanger, more;
 								var val, duration, speedOffset;
 								var pSpeed, iSpeed, dSpeed;
-								"Calculating: %".format(trackingData).postln;
+								// "Calculating: %".format(trackingData).postln;
 								duration = trackingData[\updateRate];
 								val = theChanged.trackingPosition;
 								pSpeed = theChanged.trackingSpeed;
@@ -698,6 +698,47 @@ fork{
 					}
 				);
 				~togCtrlB.components.at('rotaryA.1').action = {arg comp; ~togLED1B.setLEDValue(comp.value.linlin(0, 127, 0, 0x07FF).asInteger)};
+				//tog 1 led micro 3
+				~togLED1C = (
+					tog: ~ledTog,
+					theTask: Task.new({}),
+					runUpdateTask: {arg ev;
+						ev.use{
+							if(~theTask.isPlaying.not, {
+								~theTask = Task.new({
+									loop {
+										//~setLEDValue.value(~address, ~networkAddress, ~ledValue);
+										if(~ledValue != ~lastTransmittedValue, {
+											"sending: % [%]\n".postf(~ledValue, ~tog);
+											//~tog.sendTXData(["ms".ascii, ~ledValue.asInteger, 13, 10].flatten);
+											~tog.set(\peripheral, (0x00 << 24) | (0x09 << 16) | (~ledValue.clip(0, 255).asInteger));//(0x05 << 16)
+											~lastTransmittedValue = ~ledValue;
+										});
+										0.05.wait;
+									};
+								}.inEnvir).play;
+								SystemClock.sched(0.5, {
+									if(~theTask.isPlaying, {
+										~stopUpdateTask.value(currentEnvironment);
+									});
+								}.inEnvir);
+							});
+						}
+					},
+					stopUpdateTask: {arg ev;
+						ev.use{
+							~theTask.stop;
+						}
+					},
+					ledValue: 0,
+					lastTransmittedValue: 0,
+					setLEDValue: {arg ev, val;
+						ev[\ledValue] = val.clip(0, 255);
+						ev[\runUpdateTask].value(ev);
+					}
+				);
+				//~togCtrlB.components.at('rotaryA.2').action = {arg comp; ~togLED1C.setLEDValue(comp.value.linlin(0, 127, 0, 250).asInteger)};
+				~togCtrlA.components.at('rotaryA.7').action = {arg comp; ~togLED1C.setLEDValue(comp.value.linlin(0, 127, 0, 250).asInteger)};
 			});
 			////////////////////////////////////////////////////
 			//Temprary hack for creating LED control for tog.2
@@ -747,7 +788,50 @@ fork{
 						ev[\runUpdateTask].value(ev);
 					}
 				);
+				~togLED2B = (
+					tog: ~ledTog,
+					theTask: Task.new({}),
+					runUpdateTask: {arg ev;
+						ev.use{
+							if(~theTask.isPlaying.not, {
+								~theTask = Task.new({
+									loop {
+										//~setLEDValue.value(~address, ~networkAddress, ~ledValue);
+										if(~ledValue != ~lastTransmittedValue, {
+											"sending: % [%]\n".postf(~ledValue, ~tog);
+											//~tog.sendTXData(["ms".ascii, ~ledValue.asInteger, 13, 10].flatten);
+											~tog.set(\peripheral, (0x00 << 24) | (0x04 << 16) | (~ledValue.clip(0, 0x7FF).asInteger));//(0x05 << 16)
+
+											~lastTransmittedValue = ~ledValue;
+										});
+										0.05.wait;
+									};
+								}.inEnvir).play;
+								SystemClock.sched(0.5, {
+									if(~theTask.isPlaying, {
+										~stopUpdateTask.value(currentEnvironment);
+									});
+								}.inEnvir);
+							});
+						}
+					},
+					stopUpdateTask: {arg ev;
+						ev.use{
+							~theTask.stop;
+						}
+					},
+					lookup: ([0] ++ (350..0x07FF)).resamp0(1024),
+					ledValue: 0,
+					lastTransmittedValue: 0,
+					setLEDValue: {arg ev, val;
+						var lookupIndex;
+						lookupIndex = val.clip(0, 0x07FF).linlin(0, 0x07FF, 0, ev[\lookup].size);
+						ev[\ledValue] = ev[\lookup][lookupIndex].asInteger;
+						ev[\runUpdateTask].value(ev);
+					}
+				);
 				~togCtrlB.components.at('rotaryA.6').action = {arg comp; ~togLED2.setLEDValue(comp.value.linlin(0, 127, 0, 0x07FF).asInteger)};
+				~togCtrlB.components.at('rotaryA.5').action = {arg comp; ~togLED2B.setLEDValue(comp.value.linlin(0, 127, 0, 0x07FF).asInteger)};
 			});
 			//Temprary hack for creating LED control for tog.3
 			if(~lok.includesKey(nodeID) && ("TOG05" == nodeID.asString), {

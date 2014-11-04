@@ -11,15 +11,16 @@
 	}, ("/light/dmx." ++ (i + 1)).asSymbol);
 });
 
-6.do{arg i;
+[16,20,13,14,15].do{arg ledChannel, i;
 	var midiComp, dmx;
-	midiComp = ~togCtrlA.components.at((("rotaryA.") ++ (i + 1)).asSymbol);
+	var rotaryNumber = #[1,2,3,4,5][i];
+	midiComp = ~togCtrlA.components.at(("rotaryA.%".format(rotaryNumber).asSymbol));
 	midiComp.postln;
 	midiComp.action_({arg comp;
 		var val, commandString;
 		val = comp.value.linlin(0, 127, 0, 255).asInteger.asHexString(2);
-		commandString = ("*C901" ++ (i + 13).asHexString(2) ++ val ++ "#").ascii;
+		commandString = ("*C901" ++ ledChannel.asHexString(2) ++ val ++ "#").ascii;
 		~lanbox.putAll(commandString);
-		"dmx % : %\n".postf((i + 13), val);
+		"dmx % : %\n".postf(ledChannel, val);
 	}.inEnvir);
 };

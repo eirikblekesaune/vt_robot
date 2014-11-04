@@ -49,7 +49,7 @@ VTKoppRobotMotor{
 
 	speed_{arg val, sync = true;
 		speed = specs.at(\speed).constrain(val);
-		"Is this the speed?".postln;
+		//"Is this the speed?".postln;
 		this.changed(\speed);
 		if(sync, { this.prInvalidateParameter(\speed, speed)});
 
@@ -338,7 +338,7 @@ VTKoppRobotParser{
 	}
 
 	disconnect{
-		if(serialPort.notNil, { serialPort.close; });
+ 		if(serialPort.notNil, { serialPort.close; });
 	}
 
 	connected{//should ping robot device instead
@@ -375,10 +375,10 @@ VTKoppRobot {
 		if(this.connected.not, {"KoppRobot is offline".warn});
 		refreshTask = Task({
 			loop{
-				this.refresh;
 				refreshInterval.wait;
+				this.refresh;
 			}
-		}).play;
+		});
 		updateTask = Task({
 			loop{//this doesnt work
 				this.requestValuesFromRobot([\currentPosition]);
