@@ -3,27 +3,45 @@
 ~parseServoCityState = \waitHeader;
 ~parseServoCityData = nil;
 ~parseServoCityDebug = {arg byte;
-	switch(byte,
-		\waitHeader, {(byte == 0x04).if({~parseServoCityState = \waitString;})},
+	switch(~parseServoCityState,
+		\waitHeader, {(byte == 4).if({
+			~parseServoCityState = \waitString;
+		})},
 		\waitString, {
-			var char = char.asAscii;
-			if(char.isAlphaNum or: {char == Char.space},
+			if(byte != 13,
 				{~parseServoCityData = ~parseServoCityData.add(byte);},
-				{~parseServoCityState = \waitCR;}
+				{~parseServoCityState = \waitNL;}
 			)
 		},
-		\waitCR, {(byte == 13).if(
-			{~parseServoCityState = \waitNL;},
-			{~parseServoCityState = \waitHeader;})
-		},
 		\waitNL, {(byte == 10).if(
-			{String.newFrom(~parseServoCityData.collect(_.asAscii)).postln;},
-			{~parseServoCityState = \waitHeader;});
+			{
+				"ServoDebug: %".format(String.newFrom(~parseServoCityData.collect(_.asAscii))).postln;
+				~parseServoCityData = nil;
+			},
+			{
+				~parseServoCityState = \waitHeader;
+			});
 			~parseServoCityState = \waitHeader;
 		}
 	);
-};
+}.inEnvir;
 Tdef(\servoCityReader, {
-	loop{ ~servoCity.read.postln; }
+	loop{ ~parseServoCityDebug.value(~servoCity.read); }
 }.inEnvir).play;
+)
+
+
+~servoCity.putAll([0xAA, 0x00, 1, 0, 0, 13, 10]);
+
+~servoCity.putAll([0xAA, 0x02, 1, 10, 0, 13, 10]);
+
+~servoCity.putAll([0xAA, 0x01, 1, 30, 0, 13, 10]);
+~servoCity.putAll([0xAA, 0x01, 1, 0, 0, 13, 10]);
+
+(
+var min, max;
+min = 800;
+max = 2500;
+~servoCity.putAll([0xAA, 0x04, 1] ++ [(min >> 8).bitAnd(0xFF), min.bitAnd(0xFF)] ++ [ 13, 10] );
+~servoCity.putAll([0xAA, 0x05, 1] ++ [(max >> 8).bitAnd(0xFF), max.bitAnd(0xFF)] ++ [ 13, 10] );
 )

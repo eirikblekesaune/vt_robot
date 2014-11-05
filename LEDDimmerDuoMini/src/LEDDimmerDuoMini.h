@@ -20,6 +20,7 @@ enum cmd_t {
 	FLASH_LED_2,
 	FADETIME_LED_2,
 	FADE_LED_2,
+	SET_MICRO_LED,
 	NUM_COMMANDS
 };
 

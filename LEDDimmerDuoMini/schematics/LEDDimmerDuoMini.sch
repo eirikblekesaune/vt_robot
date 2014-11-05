@@ -5521,6 +5521,9 @@ http://www.fairchildsemi.com/ds/LM/LM7805.pdf</description>
 <wire x1="121.92" y1="-12.7" x2="121.92" y2="-30.48" width="0.1524" layer="91"/>
 <wire x1="121.92" y1="-30.48" x2="134.62" y2="-30.48" width="0.1524" layer="91"/>
 <junction x="134.62" y="-30.48"/>
+<wire x1="134.62" y1="-30.48" x2="147.32" y2="-30.48" width="0.1524" layer="91"/>
+<pinref part="X2" gate="-2" pin="S"/>
+<wire x1="147.32" y1="-30.48" x2="147.32" y2="17.78" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="+12V" class="0">

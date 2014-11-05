@@ -88,6 +88,7 @@ void setup()
 	pinMode(6, INPUT_PULLUP);
 	pinMode(7, INPUT_PULLUP);
 	pinMode(8, INPUT_PULLUP);
+	pinMode(3, OUTPUT);
 	twiAddress = digitalRead(5); 
 	twiAddress |= digitalRead(6) << 1;
 	twiAddress |= digitalRead(7) << 2;
@@ -237,6 +238,9 @@ void doCommand(cmd_t cmd, int val)
 		case FADE_LED_2://cmd num 8
 			fadeLED(1, val);
 			break;
+		case SET_MICRO_LED:
+			uint8_t microVal = static_cast<uint8_t>(val);
+			analogWrite(3, microVal);
 	}
 }
 
