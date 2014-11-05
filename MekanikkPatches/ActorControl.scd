@@ -16,13 +16,21 @@ MIDIIn.connectAll;
 try{
     ["Elisabeth", "Martin"].do{arg name;
         try{
+            var midiOut, portName;
+            portName = "BCF2000%".format(name);
+            midiOut = MIDIOut.newByName(portName, "Port 1");
             MIDIdef.cc(name.toLower.asSymbol, {arg val, num, chan, src;
                 var addr, outVal;
                 outVal = val.linlin(0, 127, 0.0, 1.0);
                 addr = "/%/control/%".format(name.toLower, ~bcfMappings.at(num.asSymbol)).asSymbol;
                 "%: % \n %: %".format(name, [num, val, chan, src], addr, outVal).postln;
                 ~sendActorData.value(addr, outVal);
-            }, srcID: MIDIIn.findPort("BCF2000%".format(name), "Port 1").uid);
+            }, srcID: MIDIIn.findPort(portName, "Port 1").uid);
+            ~bcfMappings.keysValuesDo({arg key, val;
+                OSCFunc({arg msg, time, addr, port;
+                    midiOut.control(0, key.asInteger, msg[1].linlin(0.0, 1.0, 0,127).asInteger);
+                }, "/%/control/%".format(name.toLower, val).asSymbol);
+            });
         } {arg err; "% BCF2000 is not connected!".format(name).error.throw;}
     };
 
@@ -46,3 +54,6 @@ try{
 }{"Error starting actor control patch".error.postln;};
 
 "~/vt_robot/MekanikkPatches/Tallerkener.scd".standardizePath.load;
+"~/vt_robot/MekanikkPatches/Penser.scd".standardizePath.load;
+"~/vt_robot/MekanikkPatches/AliControl.scd".standardizePath.load;
+"~/vt_robot/MekanikkPatches/HvitFugl.scd".standardizePath.load;

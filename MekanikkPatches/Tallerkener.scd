@@ -8,7 +8,7 @@
             var bytes;
             ~speed = speed.clip(-1.0, 1.0);
             bytes = ~formatMsgBytes.value(env, ~speed);
-            ~port.putAll(bytes);
+			~port.putAll(bytes);
             "Tallerken % speed: %".format(~speed).postln;
             env.changed(\speed);
         };
@@ -41,6 +41,12 @@
 ~miniMonsterBox1 = SerialPort('/dev/tty.usbserial-FT3OMYLUA', 2400, crtscts:true);
 ~miniMonsterBox2 = SerialPort('/dev/tty.usbserial-FT3OMYLUB', 2400, crtscts:true);
 ~tallerken = Dictionary[];
+~tallerken.put(4,
+    Environment.new(proto: ~tallerkenProto, know: true).putAll((
+        number: 4, port: ~miniMonsterBox1, channel: 2
+    ))
+);
+
 ~tallerken.put(3,
     Environment.new(proto: ~tallerkenProto, know: true).putAll((
         number: 3, port: ~miniMonsterBox1, channel: 1

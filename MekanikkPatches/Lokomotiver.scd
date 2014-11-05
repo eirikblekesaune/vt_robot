@@ -48,7 +48,8 @@ fork{
 		'TOG10': 1, //skjevt hode
 		'TOG11': 5, //bred skjerm
 		'TOG12': 0, //tog 1
-		'TOG13': 13 //hyletog 4
+		'TOG13': 13, //hyletog 4
+		'TOG15': 14//reserve
 	);
 	~lok = IdentityDictionary.new;
 	~figur = Dictionary.new;
@@ -61,6 +62,7 @@ fork{
 		11 -> (device: ~togCtrlB, number: 6),
 		12 -> (device: ~togCtrlB, number: 7),
 		13 -> (device: ~togCtrlA, number: 6),
+		14 -> (device: ~togCtrlA, number: 8),
 		8 -> (device: ~togCtrlA, number: 1),
 		9 -> (device: ~togCtrlA, number: 2),
 		5 -> (device: ~togCtrlA, number: 3),
@@ -91,24 +93,15 @@ fork{
 		~trackingDataStore = data;
 	}.value;
 	~figurSoundData = Dictionary.new;
-	// ~trackingDataStore = Dictionary[
-	// 	1 -> IdentityDictionary[\rightEdge -> -5582],
-	// 	2 -> IdentityDictionary[\rightEdge -> 6080],
-	// 	3 -> IdentityDictionary[\rightEdge -> -6778],
-	// 	5 -> IdentityDictionary[\rightEdge -> -6849],
-	// 	6 -> IdentityDictionary[\rightEdge -> -10820],
-	// 	7 -> IdentityDictionary[\rightEdge -> -9899],
-	// 	8 -> IdentityDictionary[\rightEdge -> -15183],
-	// 	9 -> IdentityDictionary[\rightEdge -> 9048]
-	// ];
+
 	//////////////////////////////////////////////////////
 	//Lokomotiv GUI
 	//////////////////////////////////////////////////////
 	{
 		var makeFigurView = {arg figurNumber, parent;
-			var view, height, width, result;
+			var view, headView, trackingView, height, width, result;
 			var pKnob, iKnob, dKnob, offsetKnob, rightEdgeView, rightEdgeText;
-			var speedCtrlView, speedSlider;
+			var speedCtrlView, speedSlider, trackingStateButton;
 			var makeMonitorWindow, monitorController;
 			var margin = 2@2, gap = 2@2;
 			makeMonitorWindow = {
@@ -147,7 +140,7 @@ fork{
 				monitorController = SimpleController.new(monitorFigur);
 				setPlotterValue = {arg val, plotter, label, spec;
 					var newVal;
-					"Setting plotter: %".format([val, plotter, plotter.value]).postln;
+					// "Setting plotter: %".format([val, plotter, plotter.value]).postln;
 					newVal = plotter.value;
 					newVal.pop;
 					newVal = newVal.addFirst(spec.unmap(val));
@@ -165,13 +158,23 @@ fork{
 				trackingMonitorWindow.front;
 			}.inEnvir;
 
-			height = 100; width = 800;
+			height = 100; width = 850;
 			//"Making with this: % % %".format(figurNumber, parent, ~trackingData).postln;
 			view = FlowView.new(parent, Point(width, height));
-			StaticText(view, Point(50, (height / 2) - 4)).string_("Figur\n%".format(figurNumber)).font_(Font("Menlo", 16, true));
-			Button(view, Point(50, (height / 2) - 4)).states_([["monitor"]]).action_({
+			headView = FlowView.new(view, Point(100, height), 0@0, 0@0);
+			StaticText(headView, Point(50, (height / 2) - 4)).string_("Figur\n%".format(figurNumber)).font_(Font("Menlo", 16, true));
+			Button(headView, Point(50, (height / 2) - 4)).states_([["monitor"]]).action_({
 				makeMonitorWindow.value;
-			});
+			}).font_(Font("Menlo", 10));
+			headView.decorator.nextLine;
+			trackingStateButton = Button(headView, Point(100, height / 2))
+			.states_([["TrackingOFF", Color.black, Color.white], ["TrackingON", Color.white, Color.black]])
+			.action_({arg butt;
+				if(butt.value.booleanValue,
+					{ ~trackingData[figurNumber][\startVideoTracking].value },
+					{ ~trackingData[figurNumber][\stopVideoTracking].value }
+				);
+			}.inEnvir);
 			rightEdgeView = FlowView(view, Point(100, height)).background_(Color.grey.alpha_(0.5));
 			Button(rightEdgeView, Point(80, rightEdgeView.bounds.height * 0.45))
 			.states_([["Calibrate\nright"]])
@@ -183,7 +186,7 @@ fork{
 			offsetKnob = EZKnob(
 				view, Point(50, height), "offset", [-15.0, 15.0].asSpec,
 				{arg it; ~trackingData[figurNumber].put(\speedOffsetDirectionMultiplier, it.value)}.inEnvir, 0.0);
-			Button(view, Point(100, height))
+			Button(view, Point(50, height))
 			.states_([["Store\noffset\ndata"]])
 			.action_({NetAddr.localAddr.sendMsg("/robot/figur%/storeTrackingOffsetData".format(figurNumber.asPaddedString).asSymbol);});
 			speedCtrlView = FlowView.new(view, Point(200, height));
@@ -200,6 +203,7 @@ fork{
 						dKnob.value_(theChanger[figurNumber][\dVal]);
 						offsetKnob.value_(theChanger[figurNumber][\speedOffsetDirectionMultiplier]);
 						rightEdgeText.string_(theChanger[figurNumber][\rightEdge]);
+						trackingStateButton.value_(theChanger[figurNumber][\trackingIsRunning].asInteger);
 						view.refresh;
 					});
 				}.defer;
@@ -323,6 +327,7 @@ fork{
 					"Remote figur speed %: %".format(nodeID, msg[1]).postln;
 					togFader.valueAction_(msg[1].linlin(-1.0, 1.0, 0, 1023).asInteger);
 				}, "/robot/figur.%/bipolarSpeed".format(figurNumber).asSymbol);
+
 				~figur.put(figurNumber, newLokomotiv);
 				"~figur now: %".format(~figur).postln;
 				newLokomotiv.addDependant({arg theChanged, what, more;
@@ -345,15 +350,20 @@ fork{
 				sendPath = trackingData[\videoOSCPath];
 				//running state of tracking, false by default
 				trackingData.put(\trackingIsRunning, false);
-				trackingData.put(\trackingController, SimpleController.new(newLokomotiv));
 				trackingData.put(\lastTrackingSpeed, 0.0);
-				trackingData.put(\trackingAction, {
+
+				//function to start tracking for video
+				trackingData.put(\startVideoTracking, {
 					var ctrl, waitTime;
-					"TRacking action, test if running: %".format(trackingData[\trackingIsRunning]).postln;
+					//"TRacking action, test if running: %".format(trackingData[\trackingIsRunning]).postln;
 					if(trackingData[\trackingIsRunning].not, {
 						if(trackingData[\rightEdge].notNil, {
+							"Turning on tracking for figur number: %".format(figurNumber).postln;
+							trackingData.put(\trackingController, SimpleController.new(newLokomotiv));
 							ctrl = trackingData[\trackingController];
 							waitTime = trackingData[\updateRate] / trackingData[\interpolationStepsPerUpdate];
+
+							//Danger code
 							ctrl.put(\speed, {arg theChanged, theChanger, more;
 								if(theChanged.speed == 0, {
 									"Stopping routine: %".format(trackingData[\interpolationRoutine]).postln;
@@ -363,7 +373,7 @@ fork{
 							ctrl.put(\trackingData, {arg theChanged, theChanger, more;
 								var val, duration, speedOffset;
 								var pSpeed, iSpeed, dSpeed;
-								//"Calculateing: %".format(trackingData).postln;
+								// "Calculating: %".format(trackingData).postln;
 								duration = trackingData[\updateRate];
 								val = theChanged.trackingPosition;
 								pSpeed = theChanged.trackingSpeed;
@@ -373,7 +383,7 @@ fork{
 								speedOffset = (pSpeed * trackingData[\pVal]) + (iSpeed * trackingData[\iVal]) + (dSpeed * trackingData[\dVal]);
 								speedOffset = speedOffset * (trackingData[\speedOffsetDirectionMultiplier] * (theChanged.speed / 512).squared);
 								//"speedOffset: %, [%] [%] [%]".format(speedOffset, pSpeed, iSpeed, dSpeed).postln;
-								if(true, {
+								{
 									var stream;
 									if(theChanged.speed != 0, {
 										val = val + speedOffset;
@@ -392,17 +402,12 @@ fork{
 											waitTime.wait;
 										}
 									});
-									},
-									{
-										"Setting as speed 0".postln;
-										~video.sendMsg(sendPath, val.linlin(0.0,trackingData[\rightEdge],0.0,1.0,\none););
-										trackingData[\lastPosition] = val;
-									}
-								);
-							});
-							"Setting polling: %".format(trackingData[\updateRate]).postln;
+								}.value;
+							}.inEnvir);
+							//"Setting polling: %".format(trackingData[\updateRate]).postln;
 							newLokomotiv.set(\trackingPollingInterval, asInteger( trackingData[\updateRate]*1000 ) );
 							trackingData[\trackingIsRunning] = true;
+							~trackingData.changed(figurNumber);
 							},
 							{
 								"Can't start tracking! Figur % not calibrated!!".warn;
@@ -414,15 +419,20 @@ fork{
 						}
 					);
 				}.inEnvir);
-				//function to start tracking for video
-				trackingData.put(\startVideoTracking, trackingData[\trackingAction]);
 
 				//function to stop video tracking
 				trackingData.put(\stopVideoTracking, {
 					// var ctrl = trackingData[\trackingController];
 					// ctrl.remove;
-					newLokomotiv.set(\trackingPollingInterval, 0);
-					trackingData[\trackingIsRunning] = false;
+					if(trackingData[\trackingIsRunning], {
+						"Turning off tracking for figur number: %".format(figurNumber).postln;
+						newLokomotiv.set(\trackingPollingInterval, 0);
+						trackingData[\trackingController].remove(\speed);
+						trackingData[\trackingController].remove(\trackingData);
+						trackingData.removeAt(\trackingController);
+						trackingData[\trackingIsRunning] = false;
+						~trackingData.changed(figurNumber);
+					}, {"Tracking for figur % not running".format(figurNumber).warn;});
 				});
 				~trackingData.changed(figurNumber);
 
@@ -441,10 +451,9 @@ fork{
 					var val;
 					val = msg[1].booleanValue;
 					if(val, {
-						"Turning on tracking for figur number: %".format(figurNumber).postln;
+
 						trackingData[\startVideoTracking].value;
 						}, {
-							"Turning off tracking for figur number: %".format(figurNumber).postln;
 							trackingData[\stopVideoTracking].value;
 					});
 				}, "/robot/figur%/videoTracking".format(figurNumber.asPaddedString).asSymbol);
@@ -689,6 +698,47 @@ fork{
 					}
 				);
 				~togCtrlB.components.at('rotaryA.1').action = {arg comp; ~togLED1B.setLEDValue(comp.value.linlin(0, 127, 0, 0x07FF).asInteger)};
+				//tog 1 led micro 3
+				~togLED1C = (
+					tog: ~ledTog,
+					theTask: Task.new({}),
+					runUpdateTask: {arg ev;
+						ev.use{
+							if(~theTask.isPlaying.not, {
+								~theTask = Task.new({
+									loop {
+										//~setLEDValue.value(~address, ~networkAddress, ~ledValue);
+										if(~ledValue != ~lastTransmittedValue, {
+											"sending: % [%]\n".postf(~ledValue, ~tog);
+											//~tog.sendTXData(["ms".ascii, ~ledValue.asInteger, 13, 10].flatten);
+											~tog.set(\peripheral, (0x00 << 24) | (0x09 << 16) | (~ledValue.clip(0, 255).asInteger));//(0x05 << 16)
+											~lastTransmittedValue = ~ledValue;
+										});
+										0.05.wait;
+									};
+								}.inEnvir).play;
+								SystemClock.sched(0.5, {
+									if(~theTask.isPlaying, {
+										~stopUpdateTask.value(currentEnvironment);
+									});
+								}.inEnvir);
+							});
+						}
+					},
+					stopUpdateTask: {arg ev;
+						ev.use{
+							~theTask.stop;
+						}
+					},
+					ledValue: 0,
+					lastTransmittedValue: 0,
+					setLEDValue: {arg ev, val;
+						ev[\ledValue] = val.clip(0, 255);
+						ev[\runUpdateTask].value(ev);
+					}
+				);
+				//~togCtrlB.components.at('rotaryA.2').action = {arg comp; ~togLED1C.setLEDValue(comp.value.linlin(0, 127, 0, 250).asInteger)};
+				~togCtrlA.components.at('rotaryA.7').action = {arg comp; ~togLED1C.setLEDValue(comp.value.linlin(0, 127, 0, 250).asInteger)};
 			});
 			////////////////////////////////////////////////////
 			//Temprary hack for creating LED control for tog.2
@@ -738,7 +788,50 @@ fork{
 						ev[\runUpdateTask].value(ev);
 					}
 				);
+				~togLED2B = (
+					tog: ~ledTog,
+					theTask: Task.new({}),
+					runUpdateTask: {arg ev;
+						ev.use{
+							if(~theTask.isPlaying.not, {
+								~theTask = Task.new({
+									loop {
+										//~setLEDValue.value(~address, ~networkAddress, ~ledValue);
+										if(~ledValue != ~lastTransmittedValue, {
+											"sending: % [%]\n".postf(~ledValue, ~tog);
+											//~tog.sendTXData(["ms".ascii, ~ledValue.asInteger, 13, 10].flatten);
+											~tog.set(\peripheral, (0x00 << 24) | (0x04 << 16) | (~ledValue.clip(0, 0x7FF).asInteger));//(0x05 << 16)
+
+											~lastTransmittedValue = ~ledValue;
+										});
+										0.05.wait;
+									};
+								}.inEnvir).play;
+								SystemClock.sched(0.5, {
+									if(~theTask.isPlaying, {
+										~stopUpdateTask.value(currentEnvironment);
+									});
+								}.inEnvir);
+							});
+						}
+					},
+					stopUpdateTask: {arg ev;
+						ev.use{
+							~theTask.stop;
+						}
+					},
+					lookup: ([0] ++ (350..0x07FF)).resamp0(1024),
+					ledValue: 0,
+					lastTransmittedValue: 0,
+					setLEDValue: {arg ev, val;
+						var lookupIndex;
+						lookupIndex = val.clip(0, 0x07FF).linlin(0, 0x07FF, 0, ev[\lookup].size);
+						ev[\ledValue] = ev[\lookup][lookupIndex].asInteger;
+						ev[\runUpdateTask].value(ev);
+					}
+				);
 				~togCtrlB.components.at('rotaryA.6').action = {arg comp; ~togLED2.setLEDValue(comp.value.linlin(0, 127, 0, 0x07FF).asInteger)};
+				~togCtrlB.components.at('rotaryA.5').action = {arg comp; ~togLED2B.setLEDValue(comp.value.linlin(0, 127, 0, 0x07FF).asInteger)};
 			});
 			//Temprary hack for creating LED control for tog.3
 			if(~lok.includesKey(nodeID) && ("TOG05" == nodeID.asString), {
@@ -836,26 +929,26 @@ fork{
 				);
 				~togCtrlA.components.at('rotaryA.6').action = {arg comp; ~togLED4.setLEDValue(comp.value.linlin(0, 127, 0, 0x07FF).asInteger)};
 			});
-	});
-};
-~coordinator.addDependant(~togRegistrationService);
-~togCtrlA.components['button.20'].action_({"NodeDiscovery".postln;~coordinator.sendATCommand('NodeDiscover');});
-~togCtrlB.components['button.20'].action_({"NodeDiscovery".postln;~coordinator.sendATCommand('NodeDiscover');});
-~togCtrlB.components['button.19'].action_({"Global figur stop".postln;
-	//~figur.keysValuesDo({arg key, val; val.speed_(0)});
-	[0,1,2,3,4,11,12].do{arg item;
-		~figur[item].bipolarSpeed_(0);
-	}
-
-});
-~togCtrlA.components['button.19'].action_({"Global figur stop".postln;
-	[13,8,9,5,6,7].do{arg item;
-		~figur[item].bipolarSpeed_(0);
+		});
 	};
-});
+	~coordinator.addDependant(~togRegistrationService);
+	~togCtrlA.components['button.20'].action_({"NodeDiscovery".postln;~coordinator.sendATCommand('NodeDiscover');});
+	~togCtrlB.components['button.20'].action_({"NodeDiscovery".postln;~coordinator.sendATCommand('NodeDiscover');});
+	~togCtrlB.components['button.19'].action_({"Global figur stop".postln;
+		//~figur.keysValuesDo({arg key, val; val.speed_(0)});
+		[0,1,2,3,4,11,12].do{arg item;
+			~figur[item].bipolarSpeed_(0);
+		}
 
-~coordinator.sendATCommand('NodeDiscover');
+	});
+	~togCtrlA.components['button.19'].action_({"Global figur stop".postln;
+		[13,8,9,5,6,7].do{arg item;
+			~figur[item].bipolarSpeed_(0);
+		};
+	});
+
+	~coordinator.sendATCommand('NodeDiscover');
 
 
-"Lokomotiver ready".postln;
+	"Lokomotiver ready".postln;
 };

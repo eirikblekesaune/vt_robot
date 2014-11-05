@@ -12,8 +12,8 @@ p = [
 		nil,  nil,  'iVal',  1.000000,  
 		nil,  nil,  nil,  nil,  
 		nil,  nil,  nil,  nil,  
-		'pVal',  1.000000,  'rightEdge',  -17541,  
-		nil,  nil,  'speedOffsetDirectionMultiplier',  -6.680141,  
+		'pVal',  1.000000,  'rightEdge',  -19311,  
+		nil,  nil,  'speedOffsetDirectionMultiplier',  -5.799462,  
 		'dVal',  1.000000,  nil,  nil,  
 		nil,  nil,  nil,  nil ]
 ];
