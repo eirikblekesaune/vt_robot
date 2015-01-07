@@ -8,14 +8,14 @@
 class PinneRobot
 {
 public:
- 
-  PinneRobot();
-  void init();
-  void update();
-  PinneMotor *leftMotor;
-  PinneMotor *rightMotor;
-  RotationMotor *rotationMotor;
-  void GoToParkingPosition();
+
+	PinneRobot();
+	void init();
+	void update();
+	PinneMotor *leftMotor;
+	PinneMotor *rightMotor;
+	RotationMotor *rotationMotor;
+	void GoToParkingPosition();
 };
 
 
