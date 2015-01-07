@@ -53,7 +53,7 @@ private:
 	unsigned char _INA;
 	unsigned char _INB;
 	unsigned char _PWM;
-	
+
 };
 #endif
 

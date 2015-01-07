@@ -25,7 +25,7 @@ ISR(TIMER3_COMPA_vect, ISR_NOBLOCK)
 	measuredSpeed = (static_cast<double>(measuredTicks) * 0.5) + (lastMeasuredSpeed * 0.5);
 }
 
-LokomotivSpeedometer::LokomotivSpeedometer() : 
+LokomotivSpeedometer::LokomotivSpeedometer() :
 	_isrNumber(4)//pin 7 on Arduino Leonardo
 {
 	cli();
@@ -73,10 +73,10 @@ void LokomotivSpeedometer::DirectionChanged(int newDirection)
 {
 	if(newDirection == 0)
 	{
-		//attachInterrupt(_isrNumber, registerForwardSpeedTick, CHANGE);
-		ticksDelta = 1;
+	//attachInterrupt(_isrNumber, registerForwardSpeedTick, CHANGE);
+	ticksDelta = 1;
 	} else {
-		//attachInterrupt(_isrNumber, registerBackwardSpeedTick, CHANGE);
-		ticksDelta = -1;
+	//attachInterrupt(_isrNumber, registerBackwardSpeedTick, CHANGE);
+	ticksDelta = -1;
 	}
 }

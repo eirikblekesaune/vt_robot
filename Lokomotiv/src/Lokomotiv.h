@@ -11,7 +11,7 @@ public:
 	~Lokomotiv();
 	unsigned char GetLastIRBeaconID() {};
 	long GetDistanceFromLastIRBeaconDetection();
-	
+
 	long GetSpeed();
 	long GetEndSpeed() {_motor->GetEndSpeed();};
 	long GetDirection();

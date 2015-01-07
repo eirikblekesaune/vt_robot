@@ -67,12 +67,12 @@ void Lokomotiv::SetTrackingPollingInterval(long val)
 {
 	if(val == 0)
 	{
-		_trackingPollingEnabled = false;
-		_trackingPollingInterval = 0;
+	_trackingPollingEnabled = false;
+	_trackingPollingInterval = 0;
 	} else {
-		_trackingPollingEnabled = true;
-		_trackingPollingInterval = max(20, val);
-		SendTrackingData();
+	_trackingPollingEnabled = true;
+	_trackingPollingInterval = max(20, val);
+	SendTrackingData();
 	}
 }
 long Lokomotiv::GetTrackingPollingInterval()
@@ -116,15 +116,15 @@ void Lokomotiv::SetPeripheral(long data)
 	result = Wire.endTransmission();
 	if(result > 0)
 	{
-		DebugPrint("TWIerr");
-		DebugPrint(result);
+	DebugPrint("TWIerr");
+	DebugPrint(result);
 	}
 }
 
 void Lokomotiv::SetPeripheralRequest(long data)
 {
 	int8_t device, command;
-  int numReceived;
+	int numReceived;
 	byte result;
 	device = static_cast<int8_t>((data >> 24) & 0x000000FF);
 	device += twiStartingAddress;
@@ -135,19 +135,19 @@ void Lokomotiv::SetPeripheralRequest(long data)
 	//expecting cmd byte and 2 value bytes
 	if(result == 0)
 	{
-		numReceived = Wire.requestFrom(device, 3);
-		if(numReceived == 3)
-		{
-			long reply;
-			reply = static_cast<long>(device) << 24;
-			reply |= static_cast<long>(Wire.read()) << 16;
-			reply |= static_cast<long>(Wire.read()) << 8;
-			reply |= static_cast<long>(Wire.read());
-			ReturnGetValue(CMD_PERIPHERAL_REQUEST, reply);
-		}
+	numReceived = Wire.requestFrom(device, 3);
+	if(numReceived == 3)
+	{
+		long reply;
+		reply = static_cast<long>(device) << 24;
+		reply |= static_cast<long>(Wire.read()) << 16;
+		reply |= static_cast<long>(Wire.read()) << 8;
+		reply |= static_cast<long>(Wire.read());
+		ReturnGetValue(CMD_PERIPHERAL_REQUEST, reply);
+	}
 	} else {
-		DebugPrint("TWIerr");
-		DebugPrint(result);
+	DebugPrint("TWIerr");
+	DebugPrint(result);
 	}
 }
 
@@ -164,21 +164,21 @@ void Lokomotiv::Update()
 	_irReader->Update();
 	if(_trackingPollingEnabled)
 	{
-		long dist = GetDistanceFromLastAddress();
-		if(
-				((millis() - lastTrackingUpdate) >= _trackingPollingInterval) &&
-				(lastTrackingDistanceUpdateValue != dist)
-				)
-		{
-			SendTrackingData();
-		}
+	long dist = GetDistanceFromLastAddress();
+	if(
+		((millis() - lastTrackingUpdate) >= _trackingPollingInterval) &&
+		(lastTrackingDistanceUpdateValue != dist)
+		)
+	{
+		SendTrackingData();
+	}
 	}
 }
 
 void Lokomotiv::SendTrackingData()
 {
-	ReturnGetValue(CMD_TRACKING_DATA, GetTrackingData()); 
-	lastTrackingDistanceUpdateValue = GetDistanceFromLastAddress(); 
+	ReturnGetValue(CMD_TRACKING_DATA, GetTrackingData());
+	lastTrackingDistanceUpdateValue = GetDistanceFromLastAddress();
 	lastTrackingUpdate = millis();
 }
 
@@ -190,7 +190,7 @@ void Lokomotiv::GotAddr(long addr)
 	SetLastDetectedAddress(addr);
 	if((_lastDetectedAddressUpdate + _beaconAddressUpdateInterval) < millis())
 	{
-		ReturnGetValue(CMD_LAST_DETECTED_ADDRESS, GetLastDetectedAddress());
-		_lastDetectedAddressUpdate = millis();
+	ReturnGetValue(CMD_LAST_DETECTED_ADDRESS, GetLastDetectedAddress());
+	_lastDetectedAddressUpdate = millis();
 	}
 }

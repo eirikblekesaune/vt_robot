@@ -6,8 +6,8 @@ class LokomotivSpeedometer
 public:
 	LokomotivSpeedometer();
 	~LokomotivSpeedometer();
-	double GetMeasuredSpeed(); 
-	double GetMeasuredTicks(); 
+	double GetMeasuredSpeed();
+	double GetMeasuredTicks();
 	long GetCurrentTicks();
 	long GetRawSpeed();
 	void DirectionChanged(int newDirection);
