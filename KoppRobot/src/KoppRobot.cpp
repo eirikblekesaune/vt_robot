@@ -12,26 +12,21 @@ const int motorTopStopSensor = 8;
 
 KoppRobot::KoppRobot()
 {
-  VNH5019Driver *driver = new VNH5019Driver(driverINA, driverINB, driverENDIAG, driverPWM);
-  motor = new KoppMotor(motorTopStopSensor, motorSlackStopSensor, motorEncoderInterruptIndex, driver);
+	VNH5019Driver *driver = new VNH5019Driver(driverINA, driverINB, driverENDIAG, driverPWM);
+	motor = new KoppMotor(motorTopStopSensor, motorSlackStopSensor, motorEncoderInterruptIndex, driver);
 }
 
 void KoppRobot::init()
 {
-  motor->init();
+	motor->init();
 }
 
 void KoppRobot::update()
 {
-  motor->UpdateState();
+	motor->UpdateState();
 }
 
 void KoppRobot::GoToParkingPosition()
 {
-  motor->GoToParkingPosition();
+	motor->GoToParkingPosition();
 }
-
-
-
-
-
