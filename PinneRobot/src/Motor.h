@@ -7,7 +7,7 @@
 
 
 typedef int position_t;
-//todo: implement private inheritance of PID in motor classes 
+//todo: implement private inheritance of PID in motor classes
 
 class PinneMotor
 {
@@ -32,7 +32,7 @@ class PinneMotor
 
     void Stop();
 
-    void SetStop(int value);    
+    void SetStop(int value);
     void SetSpeed(int speed);
     void SetDirection(int direction);
     void SetTargetPosition(int pos);
@@ -44,7 +44,7 @@ class PinneMotor
     void SetGoToSpeedRampUp(int value);
     void SetGoToSpeedRampDown(int value);
 
-    
+
     int GetSpeed() { return static_cast<int>(_driver->GetSpeed()); };
     int GetDirection() { return static_cast<int>(_driver->GetDirection()); };
     int GetTargetPosition() { return static_cast<int>(_targetPosition); };
@@ -57,8 +57,8 @@ class PinneMotor
     int GetGoToSpeedRampUp() {return static_cast<int>(_speedRamper->GetRampUp()); };
     int GetGoToSpeedRampDown() {return static_cast<int>(_speedRamper->GetRampDown()); };
     int GetStop() {return _stoppingSpeed; };
-    
-    
+
+
     void GoToTargetPosition(int value);
 
     boolean IsBlocked();
@@ -78,7 +78,7 @@ class PinneMotor
     int _lastTopSensorReading;
     unsigned long _lastSlackSensorReadTime;
     int _lastSlackSensorReading;
-    
+
     position_t _currentPosition;
     position_t _targetPosition;
     position_t _minPosition;
@@ -99,12 +99,12 @@ class PinneMotor
     void _MinPositionReached();
     void _MaxPositionReached();
     void _GoingToTarget();
-    
+
     void _UpdateSpeedRamp();
     void _CalculateAndSetSpeed();
     void _SetBlocked(boolean block) {};
     int _state;
-    
+
     //SpeedRamp
     SpeedRamping* _speedRamper;
 };
@@ -118,22 +118,22 @@ class RotationMotor
 
     const static int DIRECTION_LEFT;
     const static int DIRECTION_RIGHT;
-    const static int DIRECTION_DOWN;  
+    const static int DIRECTION_DOWN;
     const static int DIRECTION_UP;
     const static int POSITION_MIN;
     const static int POSITION_MAX;
-    const static int POSITION_DEFAULT;    
+    const static int POSITION_DEFAULT;
     const static int POSITION_LEFT_LIMIT;
     const static int POSITION_RIGHT_LIMIT;
     const static int SPEED_STOP;
     const static int TURNING_LEFT;
     const static int TURNING_RIGHT;
-    
+
     void init();
 
     void Stop() { _driver->SetSpeed(SPEED_STOP); };
     void SetStop(int value);
-    
+
     void SetSpeed(int speed);
     void SetDirection(int direction);
     void SetTargetPosition(int pos);
@@ -144,9 +144,9 @@ class RotationMotor
     void SetGoToSpeedScaling(int value);
     void SetGoToSpeedRampUp(int value);
     void SetGoToSpeedRampDown(int value);
-    
+
     void GoToTargetPosition(int value);
-    
+
     int GetSpeed() { return static_cast<int>(_driver->GetSpeed()); };
     int GetDirection() { return static_cast<int>(_driver->GetDirection()); };
     int GetTargetPosition() { return static_cast<int>(_targetPosition); };
@@ -155,17 +155,17 @@ class RotationMotor
     int GetMaxPosition() { return static_cast<int>(_maxPosition); };
     int GetMinPosition() { return static_cast<int>(_minPosition); };
     int GetStop() {return _stoppingSpeed; };
-    
+
 
     int GetGoToSpeedScaling() {return static_cast<int>(_speedRamper->GetSpeedScaling() * 1000); };
     int GetGoToSpeedRampUp() {return static_cast<int>(_speedRamper->GetRampUp()); };
     int GetGoToSpeedRampDown() {return static_cast<int>(_speedRamper->GetRampDown()); };
-    
-    
+
+
     void GoToParkingPosition();
     boolean IsBlocked();
     void UpdateState();
-    
+
   private:
     int _state;
     MotorDriver* _driver;
@@ -184,7 +184,7 @@ class RotationMotor
     void _MinPositionReached();
     void _MaxPositionReached();
     void _GoingToTarget();
-    
+
     void _UpdateSpeedRamp();
     SpeedRamping* _speedRamper;
 };

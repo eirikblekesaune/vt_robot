@@ -116,6 +116,6 @@ unsigned char VNH5019Driver::GetFault()
 {
   return !digitalRead(_ENDIAG);
 }
-            
-    
-                  
+           
+   
+                 

@@ -18,7 +18,7 @@ void PinneAPIParser::_parseCommand(byte inByte)
   _currentCommand = (command_t)(inByte & PARSE_MASK_COMMAND);
   _currentAddress = (address_t)(inByte & PARSE_MASK_ADDRESS);
   _currentSetGet = (setGet_t)(inByte & PARSE_MASK_SETGET);
-  
+
   switch(_currentSetGet)
   {
     case SET_MESSAGE:
@@ -107,7 +107,7 @@ void PinneAPIParser::_parseCommand(byte inByte)
           break;
         case CMD_GOTO_SPEED_SCALING:
           _processGetGoToSpeedScalingCommand();
-          break;        
+          break;      
         default:
           DEBUG_PRINT("Unknown command");
       }
@@ -115,7 +115,7 @@ void PinneAPIParser::_parseCommand(byte inByte)
     default:
       DEBUG_PRINT("SetGet fault");
   }
-  
+
   _currentCommand = CMD_UNKNOWN;
   _currentAddress = ADDRESS_UNKNOWN;
   _currentSetGet = SETGET_UNKNOWN;

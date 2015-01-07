@@ -1,5 +1,5 @@
 #include "Motor.h"
-//Direction up is semantically mapped to turning left, and direction down is mapped to 
+//Direction up is semantically mapped to turning left, and direction down is mapped to
 //turning right. This is because the potmeter is increasing in position value when turning
 //right, thus reflects the same logic as for the pinne motor position increase and decrease schema.
 const int RotationMotor::DIRECTION_UP = 1;//turning left
@@ -46,7 +46,7 @@ void RotationMotor::SetSpeed(int speed)
   if(speed <= 0)
   {
     Stop();
-  } 
+  }
   else {
     if(!IsBlocked())
     {
@@ -99,7 +99,7 @@ boolean RotationMotor::IsBlocked()
   int direction = GetDirection();
   switch(_state)
   {
-    case BLOCKED_BY_MIN_POSITION:  
+    case BLOCKED_BY_MIN_POSITION: 
       if(direction == DIRECTION_LEFT)
       {
         return true;
@@ -238,7 +238,7 @@ void RotationMotor::SetTargetPosition(int targetPosition)
     value = constrain(targetPosition, GetMinPosition(), GetMaxPosition());
     _targetPosition = value;
     //change the direction if target in the opposite direction
-      int currPosition = GetCurrentPosition();    
+      int currPosition = GetCurrentPosition();   
     if(GetDirection() == DIRECTION_RIGHT)
     {
       if(currPosition > _targetPosition)

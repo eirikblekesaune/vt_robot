@@ -25,33 +25,33 @@ const int rotationPotmeterPin = A4;
 
 PinneRobot::PinneRobot()
 {
-  VNH5019Driver *leftDriver = new VNH5019Driver(leftDriverINA, leftDriverINB, leftDriverENDIAG, leftDriverPWM);
-  VNH5019Driver *rightDriver = new VNH5019Driver(rightDriverINA, rightDriverINB, rightDriverENDIAG, rightDriverPWM);
-  L293Driver *rotationDriver = new L293Driver(rotationDriver1A, rotationDriver2A, rotationDriverPWM);
-  leftMotor = new PinneMotor(leftMotorTopStopSensor, leftMotorSlackStopSensor, leftMotorEncoderInterruptIndex, leftDriver, ADDRESS_LEFT);
-  rightMotor = new PinneMotor(rightMotorTopStopSensor, rightMotorSlackStopSensor, rightMotorEncoderInterruptIndex, rightDriver, ADDRESS_RIGHT);
-  rotationMotor = new RotationMotor(rotationPotmeterPin, rotationDriver, ADDRESS_ROTATION);
+	VNH5019Driver *leftDriver = new VNH5019Driver(leftDriverINA, leftDriverINB, leftDriverENDIAG, leftDriverPWM);
+	VNH5019Driver *rightDriver = new VNH5019Driver(rightDriverINA, rightDriverINB, rightDriverENDIAG, rightDriverPWM);
+	L293Driver *rotationDriver = new L293Driver(rotationDriver1A, rotationDriver2A, rotationDriverPWM);
+	leftMotor = new PinneMotor(leftMotorTopStopSensor, leftMotorSlackStopSensor, leftMotorEncoderInterruptIndex, leftDriver, ADDRESS_LEFT);
+	rightMotor = new PinneMotor(rightMotorTopStopSensor, rightMotorSlackStopSensor, rightMotorEncoderInterruptIndex, rightDriver, ADDRESS_RIGHT);
+	rotationMotor = new RotationMotor(rotationPotmeterPin, rotationDriver, ADDRESS_ROTATION);
 }
 
 void PinneRobot::init()
 {
-  leftMotor->init();
-  rightMotor->init();
-  rotationMotor->init();
+	leftMotor->init();
+	rightMotor->init();
+	rotationMotor->init();
 }
 
 void PinneRobot::update()
 {
-  leftMotor->UpdateState();
-  rightMotor->UpdateState();
-  rotationMotor->UpdateState();
+	leftMotor->UpdateState();
+	rightMotor->UpdateState();
+	rotationMotor->UpdateState();
 }
 
 void PinneRobot::GoToParkingPosition()
 {
-  leftMotor->GoToParkingPosition();
-  rightMotor->GoToParkingPosition();
-  rotationMotor->GoToParkingPosition();  
+	leftMotor->GoToParkingPosition();
+	rightMotor->GoToParkingPosition();
+	rotationMotor->GoToParkingPosition(); 
 }
 
 

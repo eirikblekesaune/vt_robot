@@ -10,18 +10,18 @@ class PinneAPIParser
   public:
     PinneAPIParser(PinneRobot* robot);
     void parseIncomingByte(byte inByte);
-    
+   
   private:
     PinneRobot *_robot;
     command_t _currentCommand;
     setGet_t _currentSetGet;
     address_t _currentAddress;
     char _dataByteBuffer[2];
-    
+   
     void _parseCommand(byte inByte);
     boolean _getDataBytes();
     int _parseDataValue();
-    
+   
     void _processSetStopCommand();
     void _processSetSpeedCommand();
     void _processSetDirectionCommand();
@@ -35,9 +35,9 @@ class PinneAPIParser
     void _processSetGoToSpeedRampDownCommand();
     void _processSetGoToSpeedScalingCommand();
 		void _processSetGotoParkingPosition();
-    
+   
     void _processGetStateCommand();
-    void _processGetSpeedCommand();    
+    void _processGetSpeedCommand();   
     void _processGetDirectionCommand();
     void _processGetTargetPositionCommand();
     void _processGetCurrentPositionCommand();

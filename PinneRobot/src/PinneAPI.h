@@ -23,14 +23,14 @@ enum command_t
   CMD_UNKNOWN
 };
 
-enum address_t { 
-  ADDRESS_LEFT = 0x00, 
+enum address_t {
+  ADDRESS_LEFT = 0x00,
   ADDRESS_RIGHT = 0x10,
   ADDRESS_ROTATION = 0x20,
   ADDRESS_GLOBAL = 0x30,
-  ADDRESS_UNKNOWN 
+  ADDRESS_UNKNOWN
 };
-    
+   
 enum setGet_t
 {
   SET_MESSAGE = 0x00,
@@ -118,7 +118,7 @@ static void DebugPrint(int msg)
 }
 
 #define DEBUG
-#ifdef DEBUG 
+#ifdef DEBUG
 #define DEBUG_PRINT(x) DebugPrint(x)
 #define DEBUG_NL
 #else

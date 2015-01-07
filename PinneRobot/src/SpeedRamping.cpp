@@ -71,7 +71,7 @@ boolean SpeedRamping::Calculate(int currPosition)
         _currentFloatIndex = 2.0;
       }
     }
-    
+   
     _lastCalcTime = nowTime;
     return true;
   } else {

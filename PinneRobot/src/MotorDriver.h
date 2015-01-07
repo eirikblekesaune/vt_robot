@@ -9,18 +9,18 @@ typedef int speed_t;
 //Rename to DCMotorDriver?
 class MotorDriver
 {
-  public:  
+  public:
     MotorDriver() {};
     virtual void init() = 0;// Set pin directions etc.
-    
+
     virtual void SetSpeed(speed_t speed) = 0;
     virtual void SetDirection(int direction) = 0;
     virtual void SetBrake(speed_t brake) = 0;
-    
+
     virtual speed_t GetSpeed() { return _speed; };
     virtual int GetDirection() { return _direction; };
     virtual speed_t GetBrake() { return _brake; };
-    
+
     virtual void UpdateDirection();
   protected:
     speed_t _speed;
@@ -32,10 +32,10 @@ class L293Driver: public MotorDriver
 {
   public:
    L293Driver(unsigned char INA, unsigned char INB, unsigned char PWM);
-   
+
    const static speed_t SPEED_MIN;
    const static speed_t SPEED_MAX;
-   
+
    void init();
    virtual void SetSpeed(speed_t speed);
    virtual void SetDirection(int direction);
@@ -53,7 +53,7 @@ class L293Driver: public MotorDriver
 //The latter is the sole responsibility of the Motor class itself
 class VNH5019Driver: public MotorDriver
 {
-  public:  
+  public:
     VNH5019Driver(unsigned char INA, unsigned char INB, unsigned char ENDIAG, unsigned char PWM);
     //enum BRAKE { BRAKE_NONE = 0, BRAKE_FULL = 400 };
     //enum SPEED { SPEED_STOP = 0, SPEED_MIN = 0, SPEED_MAX = 400};

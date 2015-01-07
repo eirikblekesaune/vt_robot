@@ -24,31 +24,31 @@ const unsigned long slackSensorDebounceDelay = 350;
 
 void encoderISR1()
 {
-  encoderCounter1 = max(encoderCounter1 + encoderIncrement1, 0);
+	encoderCounter1 = max(encoderCounter1 + encoderIncrement1, 0);
 }
 
 void encoderISR2()
 {
-  encoderCounter2 = max(encoderCounter2 + encoderIncrement2, 0);
+	encoderCounter2 = max(encoderCounter2 + encoderIncrement2, 0);
 }
 
 int PinneMotor::GetCurrentPosition()
-{ 
-  int value;
-  uint8_t data[sizeof(int)];
-  noInterrupts();
-  data[0] = (*_encoderCounter >> 7) & 0x7F;
-  data[1] = lowByte(*_encoderCounter) & 0x7F;
-  interrupts();
-  value = (data[0] << 7) | data[1];
-  return value;
+{
+	int value;
+	uint8_t data[sizeof(int)];
+	noInterrupts();
+	data[0] = (*_encoderCounter >> 7) & 0x7F;
+	data[1] = lowByte(*_encoderCounter) & 0x7F;
+	interrupts();
+	value = (data[0] << 7) | data[1];
+	return value;
 };
 
 
 PinneMotor::PinneMotor(int topStopSensorPin, int slackStopSensorPin, int encoderInterruptIndex, VNH5019Driver* driver, address_t address) :
-_currentPosition(POSITION_ALL_UP), 
-_targetPosition(TARGET_NONE), 
-_minPosition(POSITION_ALL_UP), 
+_currentPosition(POSITION_ALL_UP),
+_targetPosition(TARGET_NONE),
+_minPosition(POSITION_ALL_UP),
 _maxPosition(POSITION_DEFAULT_MAX),
 _topStopSensorPin(topStopSensorPin),
 _slackStopSensorPin(slackStopSensorPin),
@@ -61,58 +61,58 @@ _encoderInterruptIndex(encoderInterruptIndex)
 
 void PinneMotor::init()
 {
-  switch(_encoderInterruptIndex)
-  {
-  case 0:
-    attachInterrupt(0, encoderISR1, CHANGE);
-    _encoderCounter = &encoderCounter1;
-    _encoderIncrement = &encoderIncrement1;
-    break;
-  case 1:
-    attachInterrupt(1, encoderISR2, CHANGE);
-    _encoderCounter = &encoderCounter2;
-    _encoderIncrement = &encoderIncrement2;
-    break;
-  }
-  pinMode(_topStopSensorPin, INPUT);
-  pinMode(_slackStopSensorPin, INPUT);
-  _driver->init();
-  _driver->SetDirection(DIRECTION_UP);
-  SetDirection(DIRECTION_DOWN);
-  Stop();
-  _blocked = false;
-  _topStopSensorValue = digitalRead(_topStopSensorPin);
-  if(_topStopSensorValue == TOP_SENSOR_IN)
-    _TopStopSensorIn();
-  _slackStopSensorValue = digitalRead(_slackStopSensorPin);
-  if(_slackStopSensorValue == SLACK_SENSOR_OUT)
-    _SlackStopSensorOut();
-  
-  _speedRamper = new SpeedRamping(
-    VNH5019Driver::SPEED_MAX * 0.115,
-    VNH5019Driver::SPEED_MAX
-  );
+	switch(_encoderInterruptIndex)
+	{
+	case 0:
+	 attachInterrupt(0, encoderISR1, CHANGE);
+	 _encoderCounter = &encoderCounter1;
+		_encoderIncrement = &encoderIncrement1;
+		break;
+	case 1:
+		attachInterrupt(1, encoderISR2, CHANGE);
+		_encoderCounter = &encoderCounter2;
+		_encoderIncrement = &encoderIncrement2;
+		break;
+	}
+	pinMode(_topStopSensorPin, INPUT);
+	pinMode(_slackStopSensorPin, INPUT);
+	_driver->init();
+	_driver->SetDirection(DIRECTION_UP);
+	SetDirection(DIRECTION_DOWN);
+	Stop();
+	_blocked = false;
+	_topStopSensorValue = digitalRead(_topStopSensorPin);
+	if(_topStopSensorValue == TOP_SENSOR_IN)
+		_TopStopSensorIn();
+	_slackStopSensorValue = digitalRead(_slackStopSensorPin);
+	if(_slackStopSensorValue == SLACK_SENSOR_OUT)
+		_SlackStopSensorOut();
+
+	_speedRamper = new SpeedRamping(
+		VNH5019Driver::SPEED_MAX * 0.115,
+		VNH5019Driver::SPEED_MAX
+	);
 }
 
 void PinneMotor::Stop()
 {
-  _driver->SetSpeed(VNH5019Driver::SPEED_STOP);
+	_driver->SetSpeed(VNH5019Driver::SPEED_STOP);
 }
 
 void PinneMotor::SetStop(int value)
 {
-  _stoppingSpeed = constrain(value, 0, 5000);
-  _driver->SetSpeed(VNH5019Driver::SPEED_STOP);
+	_stoppingSpeed = constrain(value, 0, 5000);
+	_driver->SetSpeed(VNH5019Driver::SPEED_STOP);
 }
 
 void PinneMotor::SetSpeed(int speed)
 {
-  if(speed <= 0)
-  {
-    Stop();
-  } 
-  else {
-    if(!IsBlocked())
+	if(speed <= 0)
+	{
+		Stop();
+	}
+	else {
+		if(!IsBlocked())
     {
       _driver->SetSpeed(speed);
     }
@@ -130,12 +130,12 @@ void PinneMotor::SetDirection(int direction)
     {
       *_encoderIncrement = DIRECTION_DOWN_INCREMENT;
       _GoingDown();
-    } 
+    }
     else if(dir == DIRECTION_UP) {
       *_encoderIncrement = DIRECTION_UP_INCREMENT;
       _GoingUp();
     }
-  } 
+  }
   else {
     _driver->UpdateDirection();
   }
@@ -148,7 +148,7 @@ boolean PinneMotor::IsBlocked()
     int direction = GetDirection();
     switch(_state)
     {
-      case BLOCKED_BY_MIN_POSITION:  
+      case BLOCKED_BY_MIN_POSITION: 
       case BLOCKED_BY_TOP_SENSOR:
       case BLOCKED_BY_ABS_MIN_POSITION:
         if(direction == DIRECTION_UP)
@@ -169,7 +169,7 @@ boolean PinneMotor::IsBlocked()
       default:
         //
         return false;
-    }    
+    }   
   } else {
     return false;
   }
@@ -183,7 +183,7 @@ void PinneMotor::UpdateState()
   ReadSlackStopSensor();
   if((_state == BLOCKED_BY_TOP_SENSOR) || (_state == BLOCKED_BY_SLACK_SENSOR))
   {//sensors have priority over position lilmits
-      
+     
   } else {
     int currPosition = *_encoderCounter;
     int minPosition = GetMinPosition();
@@ -222,7 +222,7 @@ void PinneMotor::UpdateState()
          }
       }
     }
-  } 
+  }
 }
 
 void PinneMotor::_UpdateSpeedRamp()
@@ -398,7 +398,7 @@ void PinneMotor::SetTargetPosition(int targetPosition)
     value = constrain(targetPosition, GetMinPosition(), GetMaxPosition());
     _targetPosition = value;
     int currPosition = GetCurrentPosition();
-    
+   
     //change the direction if target in the opposite direction
     if(GetDirection() == DIRECTION_DOWN)
     {
@@ -447,7 +447,7 @@ void PinneMotor::GoToParkingPosition()
     //fake the currentPosition to default max
     SetCurrentPosition(POSITION_DEFAULT_MAX);
     SetDirection(DIRECTION_UP);
-    SetSpeed(VNH5019Driver::SPEED_MAX / 4);    
+    SetSpeed(VNH5019Driver::SPEED_MAX / 4);   
   }
 }
 
