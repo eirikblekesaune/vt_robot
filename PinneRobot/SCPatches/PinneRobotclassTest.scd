@@ -1,6 +1,7 @@
 //Pinner
+SerialPort.listDevices;
 (
-~pinne1 = VTPinneRobot("/dev/tty.usbserial-FT5QT6TQA");// pinne en
+~pinne1 = VTPinneRobot("/dev/tty.usbserial-FT5QT6JNA");// pinne en
 ~pinne2 = VTPinneRobot("/dev/tty.usbserial-FT5QT6TQB");// pinne to
 ~pinne3 = VTPinneRobot("/dev/tty.usbserial-FT5QT6TZA");// pinne tre
 ~pinne4 = VTPinneRobot("/dev/tty.usbserial-FT5QT6TZB");// pinne fire
@@ -11,14 +12,15 @@
 );
 
 
-~pinne = ~pinner[1];
+~pinne = ~pinne1;
+~pinne.stopRefreshTask;
 ~pinne.stop;
 ~pinne.leftMotor.speed_(120);
 ~pinne.leftMotor.speed_(0);
 ~pinne.leftMotor.direction_(\down);
 ~pinne.leftMotor.direction_(\up);
-~pinne.rightMotor.speed_(100);
 ~pinne.rightMotor.stop(1000);
+~pinne.rightMotor.speed_(100);
 ~pinne.rightMotor.speed_(0);
 ~pinne.rightMotor.direction_(\down);
 ~pinne.rightMotor.direction_(\up);
