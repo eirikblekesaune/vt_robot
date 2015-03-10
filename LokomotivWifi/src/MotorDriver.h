@@ -2,7 +2,7 @@
 #define MOTORDRIVER_H
 
 #include <Arduino.h>
-#include "LokomotivAPI.h"
+#include "LokomotivWIFI.h"
 
 typedef int speed_t;
 

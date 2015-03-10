@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <avr/interrupt.h>
 #include <avr/io.h>
-#include "LokomotivAPI.h"
+#include "LokomotivWIFI.h"
 #include "LokomotivSpeedometer.h"
 
 volatile int32_t ticks = 0;

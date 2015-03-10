@@ -1,7 +1,7 @@
 #ifndef IR_READER_H
 #define IR_READER_H
 
-#include "LokomotivAPI.h"
+#include "LokomotivWIFI.h"
 #include "IRremote.h"
 
 class Lokomotiv;

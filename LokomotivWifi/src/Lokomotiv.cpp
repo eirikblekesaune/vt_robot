@@ -143,7 +143,7 @@ void Lokomotiv::SetPeripheralRequest(long data)
 		reply |= static_cast<long>(Wire.read()) << 16;
 		reply |= static_cast<long>(Wire.read()) << 8;
 		reply |= static_cast<long>(Wire.read());
-		ReturnGetValue(CMD_PERIPHERAL_REQUEST, reply);
+		SendMsg(COMMAND_PERIPHERAL_REQUEST, reply);
 	}
 	} else {
 	DebugPrint("TWIerr");
@@ -177,8 +177,9 @@ void Lokomotiv::Update()
 
 void Lokomotiv::SendTrackingData()
 {
-	ReturnGetValue(CMD_TRACKING_DATA, GetTrackingData());
-	lastTrackingDistanceUpdateValue = GetDistanceFromLastAddress();
+	int32_t trackingData = GetDistanceFromLastAddress();
+	SendMsg(COMMAND_TRACKING_DATA, trackingData);
+	lastTrackingDistanceUpdateValue = trackingData;
 	lastTrackingUpdate = millis();
 }
 
@@ -190,7 +191,7 @@ void Lokomotiv::GotAddr(long addr)
 	SetLastDetectedAddress(addr);
 	if((_lastDetectedAddressUpdate + _beaconAddressUpdateInterval) < millis())
 	{
-	ReturnGetValue(CMD_LAST_DETECTED_ADDRESS, GetLastDetectedAddress());
+	SendMsg(COMMAND_LAST_DETECTED_ADDRESS, GetLastDetectedAddress());
 	_lastDetectedAddressUpdate = millis();
 	}
 }
