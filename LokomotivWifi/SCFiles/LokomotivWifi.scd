@@ -10,6 +10,8 @@ NetAddr("10.0.0.21", 0x2616).sendMsg("/t/s>", 400);
 NetAddr("10.0.0.21", 0x2616).sendMsg("/t/s>", 0);
 NetAddr("10.0.0.21", 0x2616).sendMsg("/t/d>", 1);//right
 NetAddr("10.0.0.21", 0x2616).sendMsg("/t/d>", 0);//left
+NetAddr("10.0.0.21", 0x2616).sendMsg("/t/S>", 5000);
+NetAddr("10.0.0.21", 0x2616).sendMsg("/t/S>", 0);
 
 30.reciprocal * 1000
 NetAddr("10.0.0.21", 0x2616).sendMsg("/t/T>", 20);
@@ -21,7 +23,7 @@ NetAddr("1.2.3.44", 1234).sendMsg('/figur.3/tracking',1)
 (
 OSCdef(\figTrack, {arg msg, time, addr, port;
 	var leftSide = 0,rightSide = 15765;
-	//NetAddr("1.2.3.44", 1234).sendMsg('/figur.3/tracking', msg[1].linlin(leftSide, rightSide, 0.0, 1.0));
+	NetAddr("1.2.3.44", 1234).sendMsg('/figur.3/tracking', msg[1].linlin(leftSide, rightSide, 0.0, 1.0));
 	~trackingData = msg[1].linlin(leftSide, rightSide, 0.0, 1.0);
 	["position", msg, time].postln;}.inEnvir,
 	'/t/A>')
@@ -33,6 +35,7 @@ OSCdef(\figTrack, {arg msg, time, addr, port;
 		30.reciprocal.wait;
 	}}.inEnvir).play(SystemClock);
 )
+Tdef(\sendTrack).stop.clear
 ("1.2.3.150".split($.).collect(_.asInt) << [24, 16, 8,0]).sum
 "1.2.3.150".split($.).collect(_.asInt).collect(_.asHexString(2))
 0xC0A80182.asIPString
