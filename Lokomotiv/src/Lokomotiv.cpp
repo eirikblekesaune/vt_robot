@@ -186,7 +186,16 @@ void Lokomotiv::GotAddr(long addr)
 {
 	//We don't need to update repeating beacon address more than once a
 	//second.
+	
+	long oldAddr = _speedometer->GetCurrentTicks();
+	if(_targetPosition != 0) {
+		if(oldAddr != _encoderCounterAtLastAddress) {
+			Stop(0);
+		}
+	}
+
 	_encoderCounterAtLastAddress = _speedometer->GetCurrentTicks();
+
 	SetLastDetectedAddress(addr);
 	if((_lastDetectedAddressUpdate + _beaconAddressUpdateInterval) < millis())
 	{

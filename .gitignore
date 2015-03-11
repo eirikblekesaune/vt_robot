@@ -10,3 +10,5 @@
 *.elf
 *.swl
 *.swp
+.build
+tags
