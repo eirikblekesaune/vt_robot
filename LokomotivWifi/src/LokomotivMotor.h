@@ -14,7 +14,7 @@ public:
 	static const int kSpeedMax;
 	static const int kSpeedStop;
 	static const long kSpeedUpdateInterval;
-	enum {MANUAL_MODE, CRUISE_CONTROL_MODE};
+	enum {MANUAL_MODE, CRUISE_CONTROL_MODE, TARGET_SPEED_MODE};
 	void init() {};
 	void SetSpeed(speed_t speed);
 	void Stop(int stopTime);
@@ -53,7 +53,7 @@ private:
 	unsigned char _INA;
 	unsigned char _INB;
 	unsigned char _PWM;
-
+	bool _cruiseControlActive;
 };
 #endif
 

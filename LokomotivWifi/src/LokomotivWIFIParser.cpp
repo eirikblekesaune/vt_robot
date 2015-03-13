@@ -267,7 +267,7 @@ void LokomotivWIFIParser::_executeCommand()
 			_robot->SetTrackingPollingInterval(_decodeIntegerValue(_value));
 			break;
 		case COMMAND_PID_TARGET_SPEED:
-			_robot->SetPidTargetSpeed(_decodeIntegerValue(_value));
+			_robot->SetPidTargetSpeed(_decodeDecimalValue(_value));
 			break;
 		default:
 			DebugPrint("Unknown command");

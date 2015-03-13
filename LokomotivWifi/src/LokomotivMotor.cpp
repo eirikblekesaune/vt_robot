@@ -14,7 +14,8 @@ LokomotivMotor::LokomotivMotor(LokomotivSpeedometer* speedometer) :
 	_PWM(10),
 	_endSpeed(50),
 	_lastSpeedUpdateTime(0),
-	_isInterpolating(false)
+	_isInterpolating(false),
+	_cruiseControlActive(false)
 {
 	pinMode(_INA, OUTPUT);
 	pinMode(_INB, OUTPUT);
@@ -43,12 +44,60 @@ LokomotivMotor::LokomotivMotor(LokomotivSpeedometer* speedometer) :
 		static_cast<double>(LokomotivMotor::kSpeedMax)
 	);
 	_pid->SetSampleTime(100);
-	_pid->SetMode(MANUAL);
-	SetMotorMode(CRUISE_CONTROL_MODE);
+	_pid->SetMode(AUTOMATIC);
+	SetMotorMode(MANUAL_MODE);
 }
 
 void LokomotivMotor::Update()
 {
+	_input = abs(_speedometer->GetMeasuredSpeed());
+	if(_isInterpolating)
+	{
+		if((_lastSpeedUpdateTime + kSpeedUpdateInterval) < millis())
+		{
+			if(_hasReachedEndSpeed())
+			{
+				SetSpeed(_endSpeed);
+				_isInterpolating = false;
+			} else {
+				SetSpeed(_speed + _speedInterpolationDelta);
+			}
+			_lastSpeedUpdateTime = millis();
+		}
+	} else {
+		switch(_motorMode) {
+			case MANUAL_MODE:
+				break;
+			case CRUISE_CONTROL_MODE:
+				if(!_cruiseControlActive)
+				{
+					if((lastSpeedSetTime + millisBeforePIDEnable) <= millis()) {
+						//store current speed as target speed
+						//no need to activate pid when motor is not moving
+						if((_speed != 0) && (_input > 1.5))
+						{
+							SetPidTargetSpeed(_input);
+							_cruiseControlActive = true;
+						}
+					}
+				}
+				//dynamic pid tuning
+				if((abs(_input - _setpoint)) > 10.0)
+				{
+					_pid->SetTunings(1.3, 5.0, 0.01);
+				} else {
+					_pid->SetTunings(1.3, 0.3, 0.01);
+				}
+				//jump directly to next case, thus no break statement
+			case TARGET_SPEED_MODE:
+				if(_pid->Compute())
+				{
+					SetSpeed(static_cast<long>(_output));
+				}
+				break;
+		}
+	}
+	/*
 	if(_isInterpolating)
 	{
 	if((_lastSpeedUpdateTime + kSpeedUpdateInterval) < millis())
@@ -63,7 +112,6 @@ void LokomotivMotor::Update()
 		_lastSpeedUpdateTime = millis();
 	}
 	} else {
-	_input = abs(_speedometer->GetMeasuredSpeed());
 	if(_pid->GetMode())//if mode is automatic
 	{
 		//dynamic pid tuning
@@ -96,22 +144,21 @@ void LokomotivMotor::Update()
 		}
 	}
 	}
+	*/
 }
 
 void LokomotivMotor::SetSpeed(speed_t newSpeed)
 {
 	if(newSpeed > kSpeedMax)
-	newSpeed = kSpeedMax;
+		newSpeed = kSpeedMax;
 	if(newSpeed < kSpeedMin)
-	newSpeed = kSpeedMin;
+		newSpeed = kSpeedMin;
 	_speed = newSpeed;
 	OCR1B = _speed;
 	if (_speed == 0)
 	{
 		digitalWrite(_INA, LOW);	 // Make the motor coast no
 		digitalWrite(_INB, LOW);	 // matter which direction it is spinning.
-	SetPidTargetSpeed(0.0);
-	_pid->SetMode(MANUAL);
 	} else {
 		UpdateDirection();
 	}
@@ -120,7 +167,7 @@ void LokomotivMotor::SetSpeed(speed_t newSpeed)
 void LokomotivMotor::UserChangedSpeed()
 {
 	lastSpeedSetTime = millis();
-	_pid->SetMode(MANUAL);
+	_cruiseControlActive = false;
 }
 
 void LokomotivMotor::SetPidPValue(double val)
@@ -146,13 +193,17 @@ void LokomotivMotor::SetPidTargetSpeed(double val)
 void LokomotivMotor::SetMotorMode(int val)
 {
 	//The internal mode for PID is set here.
-	int result;
-	if(val == 0)
-	{
-	_motorMode = MANUAL_MODE;
-	_pid->SetMode(MANUAL);
-	} else {
-	_motorMode = CRUISE_CONTROL_MODE;
+	switch(val) {
+		case MANUAL_MODE:
+			_motorMode = MANUAL_MODE;
+			break;
+		case CRUISE_CONTROL_MODE:
+			_motorMode = CRUISE_CONTROL_MODE;
+			_cruiseControlActive = false;
+			break;
+		case TARGET_SPEED_MODE:
+			_motorMode = TARGET_SPEED_MODE;
+			break;
 	}
 }
 

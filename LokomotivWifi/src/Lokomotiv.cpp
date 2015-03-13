@@ -93,7 +93,7 @@ void Lokomotiv::SetMotorMode(long val)
 	_motor->SetMotorMode(static_cast<int>(val));
 }
 
-void Lokomotiv::SetPidTargetSpeed(long val)
+void Lokomotiv::SetPidTargetSpeed(double val)
 {
 	_motor->SetPidTargetSpeed(static_cast<double>(val));
 }
