@@ -69,7 +69,7 @@ void LokomotivWIFIParser::parseIncomingByte(int inByte)
 				}
 			} else {
 				_reset();//should never happen
-				SendMsg(COMMAND_INFO, "EXCEPTION2");
+				SendMsg(COMMAND_PARSER_ERROR, "EXCEPTION2");
 			}
 			break;
 		case XBEE_READ_DESTINATION_PORT:
@@ -126,7 +126,7 @@ void LokomotivWIFIParser::parseIncomingByte(int inByte)
 		case XBEE_READ_CHECKSUM:
 			//dont care about doing checksumum for now
 			if(_parseOSCData()) {
-				SendMsg(COMMAND_INFO, "ParseRRROR");
+				SendMsg(COMMAND_PARSER_ERROR, "ParseRRROR");
 			}
 			_reset();
 			break;
@@ -194,21 +194,21 @@ double LokomotivWIFIParser::_decodeDecimalValue(uint32_t val) {
 
 void LokomotivWIFIParser::_executeCommand()
 {
-	SendMsg(COMMAND_INFO, "command");
-	SendMsg(COMMAND_INFO, _currentCommand);
-	SendMsg(COMMAND_INFO, "setget");
-	SendMsg(COMMAND_INFO, _currentSetGet);
-	SendMsg(COMMAND_INFO, "tag");
-	SendMsg(COMMAND_INFO, _currentTypeTag);
-	SendMsg(COMMAND_INFO, "val");
-	switch(_currentTypeTag) {
-		case 'i':
-			SendMsg(COMMAND_INFO, *(reinterpret_cast<int32_t*>(&_value)));
-			break;
-		case 'f':
-			SendMsg(COMMAND_INFO, *(reinterpret_cast<double*>(&_value)));
-			break;
-	}
+//	SendMsg(COMMAND_INFO, "command");
+//	SendMsg(COMMAND_INFO, _currentCommand);
+//	SendMsg(COMMAND_INFO, "setget");
+//	SendMsg(COMMAND_INFO, _currentSetGet);
+//	SendMsg(COMMAND_INFO, "tag");
+//	SendMsg(COMMAND_INFO, _currentTypeTag);
+//	SendMsg(COMMAND_INFO, "val");
+//	switch(_currentTypeTag) {
+//		case 'i':
+//			SendMsg(COMMAND_INFO, *(reinterpret_cast<int32_t*>(&_value)));
+//			break;
+//		case 'f':
+//			SendMsg(COMMAND_INFO, *(reinterpret_cast<double*>(&_value)));
+//			break;
+//	}
 	
 	switch(_currentSetGet)
 	{
@@ -268,6 +268,12 @@ void LokomotivWIFIParser::_executeCommand()
 			break;
 		case COMMAND_PID_TARGET_SPEED:
 			_robot->SetPidTargetSpeed(_decodeDecimalValue(_value));
+			break;
+		case COMMAND_TRACKING_STATE:
+			_robot->SetTrackingState(_decodeIntegerValue(_value));
+			break;
+		case COMMAND_WHOAREYOU:
+		case COMMAND_PARSER_ERROR:
 			break;
 		default:
 			DebugPrint("Unknown command");
@@ -331,7 +337,16 @@ void LokomotivWIFIParser::_executeCommand()
 			SendMsg(COMMAND_PID_TARGET_SPEED, _robot->GetPidTargetSpeed());
 			break;
 		case COMMAND_TRACKING_DATA:
-			SendMsg(COMMAND_TRACKING_DATA, _robot->GetTrackingData());
+			//SendMsg(COMMAND_TRACKING_DATA, _robot->GetTrackingData());
+			break;
+		case COMMAND_TRACKING_STATE:
+			SendMsg(COMMAND_TRACKING_STATE, _robot->GetTrackingState());
+			break;
+		case COMMAND_WHOAREYOU:
+			//SendMsg(COMMAND_WHOAREYOU, _robot->GetName());
+			SendMsg(COMMAND_WHOAREYOU, "test");
+			break;
+		case COMMAND_PARSER_ERROR:
 			break;
 		default:
 			DebugPrint("Unknown command");

@@ -44,13 +44,11 @@ LokomotivMotor::LokomotivMotor(LokomotivSpeedometer* speedometer) :
 		static_cast<double>(LokomotivMotor::kSpeedMax)
 	);
 	_pid->SetSampleTime(100);
-	_pid->SetMode(AUTOMATIC);
 	SetMotorMode(MANUAL_MODE);
 }
 
 void LokomotivMotor::Update()
 {
-	_input = abs(_speedometer->GetMeasuredSpeed());
 	if(_isInterpolating)
 	{
 		if((_lastSpeedUpdateTime + kSpeedUpdateInterval) < millis())
@@ -65,6 +63,7 @@ void LokomotivMotor::Update()
 			_lastSpeedUpdateTime = millis();
 		}
 	} else {
+		_input = abs(_speedometer->GetMeasuredSpeed());
 		switch(_motorMode) {
 			case MANUAL_MODE:
 				break;
@@ -77,22 +76,33 @@ void LokomotivMotor::Update()
 						if((_speed != 0) && (_input > 1.5))
 						{
 							SetPidTargetSpeed(_input);
+							_pid->Compute();
 							_cruiseControlActive = true;
 						}
 					}
-				}
-				//dynamic pid tuning
-				if((abs(_input - _setpoint)) > 10.0)
-				{
-					_pid->SetTunings(1.3, 5.0, 0.01);
 				} else {
-					_pid->SetTunings(1.3, 0.3, 0.01);
+					//dynamic pid tuning
+					if((abs(_input - _setpoint)) > 10.0)
+					{
+						_pid->SetTunings(1.3, 5.0, 0.01);
+					} else {
+						_pid->SetTunings(1.3, 0.3, 0.01);
+					}
+					if(_pid->Compute())
+					{
+						SetSpeed(static_cast<long>(_output));
+					}
 				}
-				//jump directly to next case, thus no break statement
+				break;
 			case TARGET_SPEED_MODE:
 				if(_pid->Compute())
 				{
-					SetSpeed(static_cast<long>(_output));
+					if(_setpoint > 1.5)
+					{
+						SetSpeed(static_cast<long>(_output));
+					} else {
+						SetSpeed(0);
+					}
 				}
 				break;
 		}
@@ -185,24 +195,31 @@ void LokomotivMotor::SetPidDValue(double val)
 	_pid->SetTunings(_pid->GetKp(), _pid->GetKi(), val);
 }
 
+double LokomotivMotor::GetPidPValue() { return _pid->GetKp(); }
+double LokomotivMotor::GetPidIValue() { return _pid->GetKi(); }
+double LokomotivMotor::GetPidDValue() { return _pid->GetKd(); }
+
 void LokomotivMotor::SetPidTargetSpeed(double val)
 {
 	_setpoint = val;
 }
 
-void LokomotivMotor::SetMotorMode(int val)
+void LokomotivMotor::SetMotorMode(long val)
 {
 	//The internal mode for PID is set here.
 	switch(val) {
 		case MANUAL_MODE:
 			_motorMode = MANUAL_MODE;
+			_pid->SetMode(MANUAL);
 			break;
 		case CRUISE_CONTROL_MODE:
 			_motorMode = CRUISE_CONTROL_MODE;
+			_pid->SetMode(AUTOMATIC);
 			_cruiseControlActive = false;
 			break;
 		case TARGET_SPEED_MODE:
 			_motorMode = TARGET_SPEED_MODE;
+			_pid->SetMode(AUTOMATIC);
 			break;
 	}
 }

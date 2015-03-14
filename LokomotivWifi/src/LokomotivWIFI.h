@@ -33,6 +33,8 @@ enum command_t
 	COMMAND_PID_TARGET_SPEED = 'G',
 	COMMAND_TRACKING_DATA = 'A',
 	COMMAND_PARSER_ERROR = 'X',
+	COMMAND_TRACKING_STATE = 'w',
+	COMMAND_WHOAREYOU = 'H',
 	COMMAND_UNKNOWN
 };
 
@@ -131,7 +133,7 @@ static void SendMsg(command_t command, const char * str)
 		msg[n + messageOffset] = str[n];
 		n++;
 	}
-	while((n % 4) != 0) {
+	while((n % 32) != 0) {
 		msg[n + messageOffset] = '\0';
 		n++;
 	}

@@ -25,12 +25,15 @@ public:
 	void InterpolateSpeed(speed_t begin, speed_t target, int duration);
 	void SetDirection(int direction);
 	void SetBrake(speed_t brake) {};
-	bool GetMotorMode() {return _motorMode;};
-	void SetMotorMode(int val);
+	long GetMotorMode() {return _motorMode;};
+	void SetMotorMode(long val);
 	void SetPidTargetSpeed(double val);
 	void SetPidPValue(double val);
 	void SetPidIValue(double val);
 	void SetPidDValue(double val);
+	double GetPidPValue();
+	double GetPidIValue();
+	double GetPidDValue();
 	void UserChangedSpeed();
 	double GetPidTargetSpeed() {return _setpoint;};
 	void Update();
@@ -39,7 +42,7 @@ public:
 private:
 	LokomotivSpeedometer* _speedometer;
 	PID *_pid;
-	int _motorMode;
+	long _motorMode;
 	double _setpoint;
 	double _input;
 	double _output;

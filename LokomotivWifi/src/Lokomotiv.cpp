@@ -59,38 +59,48 @@ long Lokomotiv::GetPeripheral(long data){return 0;}
 long Lokomotiv::GetState(){return _state;}
 double Lokomotiv::GetMeasuredSpeed(){return _speedometer->GetMeasuredSpeed();};
 long Lokomotiv::GetLastDetectedAddress(){return _lastDetectedAddress;}
-double Lokomotiv::GetPidPValue(){return _pidPValue;}
-double Lokomotiv::GetPidIValue(){return _pidIValue;}
-double Lokomotiv::GetPidDValue(){return _pidDValue;}
+double Lokomotiv::GetPidPValue(){return _motor->GetPidPValue();}
+double Lokomotiv::GetPidIValue(){return _motor->GetPidIValue();}
+double Lokomotiv::GetPidDValue(){return _motor->GetPidDValue();}
 //Setters
 void Lokomotiv::SetTrackingPollingInterval(long val)
 {
-	if(val == 0)
-	{
-	_trackingPollingEnabled = false;
-	_trackingPollingInterval = 0;
-	} else {
-	_trackingPollingEnabled = true;
-	_trackingPollingInterval = max(20, val);
-	SendTrackingData();
-	}
+	_trackingPollingInterval = max(1, val);
 }
+
 long Lokomotiv::GetTrackingPollingInterval()
 {
 	return _trackingPollingInterval;
 }
 
-long Lokomotiv::GetTrackingData()
-{
-	int32_t result;
-	result = static_cast<int32_t>(_speedometer->GetMeasuredSpeed() * 100.0) << 16;
-	result = (result & 0xFFFF0000) | (0x0000FFFF & GetDistanceFromLastAddress());
-	return result;
+void Lokomotiv::SetTrackingState(long val) {
+	if(val) {
+		_trackingPollingEnabled = true;
+		SendTrackingData();
+	} else {
+		_trackingPollingEnabled = false;
+	}
 }
+
+long Lokomotiv::GetTrackingState() {
+	if(_trackingPollingEnabled) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+//long Lokomotiv::GetTrackingData()
+//{
+//	int32_t result;
+//	result = static_cast<int32_t>(_speedometer->GetMeasuredSpeed() * 100.0) << 16;
+//	result = (result & 0xFFFF0000) | (0x0000FFFF & GetDistanceFromLastAddress());
+//	return result;
+//}
 
 void Lokomotiv::SetMotorMode(long val)
 {
-	_motor->SetMotorMode(static_cast<int>(val));
+	_motor->SetMotorMode(val);
 }
 
 void Lokomotiv::SetPidTargetSpeed(double val)

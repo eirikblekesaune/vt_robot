@@ -25,9 +25,10 @@ public:
 	double GetPidIValue();
 	double GetPidDValue();
 	long GetTrackingPollingInterval();
+	long GetTrackingState();
 	long GetMotorMode() {return static_cast<long>(_motor->GetMotorMode());};
 	double GetPidTargetSpeed() {return static_cast<double>(_motor->GetPidTargetSpeed());};
-	long GetTrackingData();
+	//long GetTrackingData();
 
 	void SetSpeed(long val) {_motor->SetSpeed(static_cast<speed_t>(val));};
 	void SetEndSpeed(long val) {_motor->SetEndSpeed(static_cast<speed_t>(val));};
@@ -43,6 +44,7 @@ public:
 	void SetPidIValue(double val);
 	void SetPidDValue(double val);
 	void SetTrackingPollingInterval(long val);
+	void SetTrackingState(long val);
 	void SetMotorMode(long val);
 	void SetPidTargetSpeed(double val);
 
