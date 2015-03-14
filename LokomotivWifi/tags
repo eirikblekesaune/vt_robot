@@ -1,0 +1,583 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+AUTOMATIC	src/PID_v1.h	/^	#define AUTOMATIC	/;"	d
+BLINKLED	src/IRremoteInt.h	/^#define BLINKLED	/;"	d
+BLINKLED_OFF	src/IRremoteInt.h	/^#define BLINKLED_OFF(/;"	d
+BLINKLED_ON	src/IRremoteInt.h	/^#define BLINKLED_ON(/;"	d
+BRAKE_FULL	ThrashLokomotiv/VNH5019Driver.cpp	/^const speed_t VNH5019Driver::BRAKE_FULL = 512;$/;"	m	class:VNH5019Driver	file:
+BRAKE_FULL	ThrashLokomotiv/VNH5019Driver.h	/^    const static speed_t BRAKE_FULL;$/;"	m	class:VNH5019Driver
+BRAKE_NONE	ThrashLokomotiv/VNH5019Driver.cpp	/^const speed_t VNH5019Driver::BRAKE_NONE = 0;$/;"	m	class:VNH5019Driver	file:
+BRAKE_NONE	ThrashLokomotiv/VNH5019Driver.h	/^    const static speed_t BRAKE_NONE;$/;"	m	class:VNH5019Driver
+BUFFER_LENGTH	src/Wire.h	/^#define BUFFER_LENGTH /;"	d
+BYTE_COMMAND	src/LokomotivAPI.h	/^	BYTE_COMMAND = 0x80,$/;"	e	enum:byteType_t
+BYTE_DATA	src/LokomotivAPI.h	/^	BYTE_DATA = 0x00,$/;"	e	enum:byteType_t
+BYTE_UNKNOWN	src/LokomotivAPI.h	/^	BYTE_UNKNOWN$/;"	e	enum:byteType_t
+CMD_DIRECTION	src/LokomotivAPI.h	/^	CMD_DIRECTION = 0x02,$/;"	e	enum:command_t
+CMD_DISTANCE_FROM_LAST_ADDRESS	src/LokomotivAPI.h	/^	CMD_DISTANCE_FROM_LAST_ADDRESS = 0x04,$/;"	e	enum:command_t
+CMD_END_SPEED	src/LokomotivAPI.h	/^	CMD_END_SPEED = 0x0E,$/;"	e	enum:command_t
+CMD_END_TRANSMISSION	src/LokomotivAPI.h	/^	CMD_END_TRANSMISSION = 0x0F,$/;"	e	enum:command_t
+CMD_GLIDE_TO_SPEED	src/LokomotivAPI.h	/^	CMD_GLIDE_TO_SPEED = 0x0D,$/;"	e	enum:command_t
+CMD_INFO	src/LokomotivAPI.h	/^	CMD_INFO = 0x07,\/\/used for debugging, arbitrary numboer of asci characters$/;"	e	enum:command_t
+CMD_LAST_DETECTED_ADDRESS	src/LokomotivAPI.h	/^	CMD_LAST_DETECTED_ADDRESS = 0x09,$/;"	e	enum:command_t
+CMD_MEASURED_SPEED	src/LokomotivAPI.h	/^	CMD_MEASURED_SPEED = 0x08,$/;"	e	enum:command_t
+CMD_MOTOR_MODE	src/LokomotivAPI.h	/^	CMD_MOTOR_MODE = 0x11,$/;"	e	enum:command_t
+CMD_PERIPHERAL	src/LokomotivAPI.h	/^	CMD_PERIPHERAL = 0x05,$/;"	e	enum:command_t
+CMD_PERIPHERAL_REQUEST	src/LokomotivAPI.h	/^	CMD_PERIPHERAL_REQUEST = 0x10,$/;"	e	enum:command_t
+CMD_PID_D_VALUE	src/LokomotivAPI.h	/^	CMD_PID_D_VALUE = 0x0C,$/;"	e	enum:command_t
+CMD_PID_I_VALUE	src/LokomotivAPI.h	/^	CMD_PID_I_VALUE = 0x0B,$/;"	e	enum:command_t
+CMD_PID_P_VALUE	src/LokomotivAPI.h	/^	CMD_PID_P_VALUE = 0x0A,$/;"	e	enum:command_t
+CMD_PID_TARGET_SPEED	src/LokomotivAPI.h	/^	CMD_PID_TARGET_SPEED = 0x13,$/;"	e	enum:command_t
+CMD_SPEED	src/LokomotivAPI.h	/^	CMD_SPEED = 0x01,$/;"	e	enum:command_t
+CMD_STATE	src/LokomotivAPI.h	/^	CMD_STATE = 0x06,$/;"	e	enum:command_t
+CMD_STOP	src/LokomotivAPI.h	/^	CMD_STOP = 0x00,\/\/speed fade out time as argument$/;"	e	enum:command_t
+CMD_TARGET_POSITION	src/LokomotivAPI.h	/^	CMD_TARGET_POSITION = 0x03,$/;"	e	enum:command_t
+CMD_TRACKING_DATA	src/LokomotivAPI.h	/^	CMD_TRACKING_DATA = 0x14,$/;"	e	enum:command_t
+CMD_TRACKING_POLLING_INTERVAL	src/LokomotivAPI.h	/^	CMD_TRACKING_POLLING_INTERVAL = 0x12,$/;"	e	enum:command_t
+CMD_UNKNOWN	src/LokomotivAPI.h	/^	CMD_UNKNOWN$/;"	e	enum:command_t
+CRUISE_CONTROL_MODE	src/LokomotivMotor.h	/^	enum {MANUAL_MODE, CRUISE_CONTROL_MODE};$/;"	e	enum:LokomotivMotor::__anon3
+Compute	src/PID_v1.cpp	/^bool PID::Compute()$/;"	f	class:PID
+DECODED	src/IRremoteInt.h	/^#define DECODED /;"	d
+DETECTED_ADDRESS	src/LokomotivAPI.h	/^	DETECTED_ADDRESS,$/;"	e	enum:stateChange_t
+DIRECT	src/PID_v1.h	/^	#define DIRECT	/;"	d
+DISH	src/IRremote.h	/^#define DISH /;"	d
+DISH_BITS	src/IRremoteInt.h	/^#define DISH_BITS /;"	d
+DISH_BIT_MARK	src/IRremoteInt.h	/^#define DISH_BIT_MARK /;"	d
+DISH_HDR_MARK	src/IRremoteInt.h	/^#define DISH_HDR_MARK /;"	d
+DISH_HDR_SPACE	src/IRremoteInt.h	/^#define DISH_HDR_SPACE /;"	d
+DISH_ONE_SPACE	src/IRremoteInt.h	/^#define DISH_ONE_SPACE /;"	d
+DISH_RPT_SPACE	src/IRremoteInt.h	/^#define DISH_RPT_SPACE /;"	d
+DISH_TOP_BIT	src/IRremoteInt.h	/^#define DISH_TOP_BIT /;"	d
+DISH_ZERO_SPACE	src/IRremoteInt.h	/^#define DISH_ZERO_SPACE /;"	d
+DRIVER_FAULT	src/LokomotivAPI.h	/^	DRIVER_FAULT\/\/Something is wrong with the driver itself$/;"	e	enum:stateChange_t
+DebugPrint	src/LokomotivAPI.h	/^static void DebugPrint(const char* msg)$/;"	f
+DebugPrint	src/LokomotivAPI.h	/^static void DebugPrint(double msg)$/;"	f
+DebugPrint	src/LokomotivAPI.h	/^static void DebugPrint(float msg)$/;"	f
+DebugPrint	src/LokomotivAPI.h	/^static void DebugPrint(int msg)$/;"	f
+DebugPrint	src/LokomotivAPI.h	/^static void DebugPrint(int32_t msg)$/;"	f
+DebugPrint	src/LokomotivAPI.h	/^static void DebugPrint(uint32_t msg)$/;"	f
+DebugUnitPrint	src/LokomotivAPI.h	/^static void DebugUnitPrint(const char* msg)$/;"	f
+DebugUnitPrint	src/LokomotivAPI.h	/^static void DebugUnitPrint(int msg)$/;"	f
+DirectionChanged	src/LokomotivSpeedometer.cpp	/^void LokomotivSpeedometer::DirectionChanged(int newDirection)$/;"	f	class:LokomotivSpeedometer
+ERR	src/IRremoteInt.h	/^#define ERR /;"	d
+FNV_BASIS_32	src/IRremote.cpp	/^#define FNV_BASIS_32 /;"	d	file:
+FNV_PRIME_32	src/IRremote.cpp	/^#define FNV_PRIME_32 /;"	d	file:
+GAP_TICKS	src/IRremoteInt.h	/^#define GAP_TICKS /;"	d
+GET_MESSAGE	src/LokomotivAPI.h	/^	GET_MESSAGE = 0x40,$/;"	e	enum:setGet_t
+GOING_BACKWARDS	src/LokomotivAPI.h	/^	GOING_BACKWARDS,\/\/directiom set to down$/;"	e	enum:stateChange_t
+GOING_FORWARD	src/LokomotivAPI.h	/^	GOING_FORWARD,\/\/direction set to up$/;"	e	enum:stateChange_t
+GetBrake	src/MotorDriver.h	/^		virtual speed_t GetBrake() { return _brake; };$/;"	f	class:MotorDriver
+GetCurrentTicks	src/LokomotivSpeedometer.cpp	/^long LokomotivSpeedometer::GetCurrentTicks()$/;"	f	class:LokomotivSpeedometer
+GetDirection	src/Lokomotiv.cpp	/^long Lokomotiv::GetDirection(){return static_cast<long>(_motor->GetDirection());}$/;"	f	class:Lokomotiv
+GetDirection	src/MotorDriver.h	/^		virtual int GetDirection() { return _direction; };$/;"	f	class:MotorDriver
+GetDirection	src/PID_v1.cpp	/^int PID::GetDirection(){ return controllerDirection;}$/;"	f	class:PID
+GetDistanceFromLastAddress	src/Lokomotiv.cpp	/^long Lokomotiv::GetDistanceFromLastAddress(){$/;"	f	class:Lokomotiv
+GetEndSpeed	src/Lokomotiv.h	/^	long GetEndSpeed() {_motor->GetEndSpeed();};$/;"	f	class:Lokomotiv
+GetEndSpeed	src/LokomotivMotor.h	/^	speed_t GetEndSpeed() {return _endSpeed;};$/;"	f	class:LokomotivMotor
+GetFault	ThrashLokomotiv/VNH5019Driver.cpp	/^unsigned char VNH5019Driver::GetFault()$/;"	f	class:VNH5019Driver
+GetKd	src/PID_v1.cpp	/^double PID::GetKd(){ return	dispKd;}$/;"	f	class:PID
+GetKi	src/PID_v1.cpp	/^double PID::GetKi(){ return	dispKi;}$/;"	f	class:PID
+GetKp	src/PID_v1.cpp	/^double PID::GetKp(){ return	dispKp; }$/;"	f	class:PID
+GetLastDetectedAddress	src/Lokomotiv.cpp	/^long Lokomotiv::GetLastDetectedAddress(){return _lastDetectedAddress;}$/;"	f	class:Lokomotiv
+GetLastIRBeaconID	src/Lokomotiv.h	/^	unsigned char GetLastIRBeaconID() {};$/;"	f	class:Lokomotiv
+GetMeasuredSpeed	src/Lokomotiv.cpp	/^double Lokomotiv::GetMeasuredSpeed(){return _speedometer->GetMeasuredSpeed();};$/;"	f	class:Lokomotiv
+GetMeasuredSpeed	src/LokomotivSpeedometer.cpp	/^double LokomotivSpeedometer::GetMeasuredSpeed()$/;"	f	class:LokomotivSpeedometer
+GetMeasuredTicks	src/LokomotivSpeedometer.cpp	/^double LokomotivSpeedometer::GetMeasuredTicks()$/;"	f	class:LokomotivSpeedometer
+GetMode	src/PID_v1.cpp	/^int PID::GetMode(){ return	inAuto ? AUTOMATIC : MANUAL;}$/;"	f	class:PID
+GetMotorMode	src/Lokomotiv.h	/^	long GetMotorMode() {return static_cast<long>(_motor->GetMotorMode());};$/;"	f	class:Lokomotiv
+GetMotorMode	src/LokomotivMotor.h	/^	bool GetMotorMode() {return _motorMode;};$/;"	f	class:LokomotivMotor
+GetPeripheral	src/Lokomotiv.cpp	/^long Lokomotiv::GetPeripheral(long data){return 0;}$/;"	f	class:Lokomotiv
+GetPidDValue	src/Lokomotiv.cpp	/^double Lokomotiv::GetPidDValue(){return _pidDValue;}$/;"	f	class:Lokomotiv
+GetPidIValue	src/Lokomotiv.cpp	/^double Lokomotiv::GetPidIValue(){return _pidIValue;}$/;"	f	class:Lokomotiv
+GetPidPValue	src/Lokomotiv.cpp	/^double Lokomotiv::GetPidPValue(){return _pidPValue;}$/;"	f	class:Lokomotiv
+GetPidTargetSpeed	src/Lokomotiv.h	/^	long GetPidTargetSpeed() {return static_cast<long>(_motor->GetPidTargetSpeed());};$/;"	f	class:Lokomotiv
+GetPidTargetSpeed	src/LokomotivMotor.h	/^	double GetPidTargetSpeed() {return _setpoint;};$/;"	f	class:LokomotivMotor
+GetRawSpeed	src/LokomotivSpeedometer.cpp	/^long LokomotivSpeedometer::GetRawSpeed()$/;"	f	class:LokomotivSpeedometer
+GetSpeed	src/Lokomotiv.cpp	/^long Lokomotiv::GetSpeed(){return static_cast<long>(_motor->GetSpeed());}$/;"	f	class:Lokomotiv
+GetSpeed	src/MotorDriver.h	/^		virtual speed_t GetSpeed() { return _speed; };$/;"	f	class:MotorDriver
+GetStartSpeed	src/LokomotivMotor.h	/^	speed_t GetStartSpeed() {return _startSpeed;};$/;"	f	class:LokomotivMotor
+GetState	src/Lokomotiv.cpp	/^long Lokomotiv::GetState(){return _state;}$/;"	f	class:Lokomotiv
+GetTargetPosition	src/Lokomotiv.cpp	/^long Lokomotiv::GetTargetPosition(){return _targetPosition;}$/;"	f	class:Lokomotiv
+GetTrackingData	src/Lokomotiv.cpp	/^long Lokomotiv::GetTrackingData()$/;"	f	class:Lokomotiv
+GetTrackingPollingInterval	src/Lokomotiv.cpp	/^long Lokomotiv::GetTrackingPollingInterval()$/;"	f	class:Lokomotiv
+GlideToSpeed	src/LokomotivMotor.cpp	/^void LokomotivMotor::GlideToSpeed(int startTime)$/;"	f	class:LokomotivMotor
+GotAddr	src/Lokomotiv.cpp	/^void Lokomotiv::GotAddr(long addr)$/;"	f	class:Lokomotiv
+IRReader	src/IRReader.cpp	/^IRReader::IRReader(int receivePin, Lokomotiv *lok) :$/;"	f	class:IRReader
+IRReader	src/IRReader.h	/^class IRReader {$/;"	c
+IR_READER_H	src/IRReader.h	/^#define IR_READER_H$/;"	d
+IR_USE_TIMER1	src/IRremoteInt.h	/^	#define IR_USE_TIMER1	/;"	d
+IR_USE_TIMER2	src/IRremoteInt.h	/^	#define IR_USE_TIMER2	/;"	d
+IR_USE_TIMER4_HS	src/IRremoteInt.h	/^	#define IR_USE_TIMER4_HS	/;"	d
+IRrecv	src/IRremote.cpp	/^IRrecv::IRrecv(int recvpin)$/;"	f	class:IRrecv
+IRrecv	src/IRremote.h	/^class IRrecv$/;"	c
+IRremote_h	src/IRremote.h	/^#define IRremote_h$/;"	d
+IRremoteint_h	src/IRremoteInt.h	/^#define IRremoteint_h$/;"	d
+IRsend	src/IRremote.h	/^	IRsend() {}$/;"	f	class:IRsend
+IRsend	src/IRremote.h	/^class IRsend$/;"	c
+ISR	src/IRremote.cpp	/^ISR(TIMER_INTR_NAME)$/;"	f
+ISR	src/LokomotivSpeedometer.cpp	/^ISR(INT6_vect) {$/;"	f
+ISR	src/LokomotivSpeedometer.cpp	/^ISR(TIMER3_COMPA_vect, ISR_NOBLOCK)$/;"	f
+ISR	src/twi.c	/^ISR(TWI_vect)$/;"	f
+ITerm	src/PID_v1.h	/^	double ITerm, lastInput;$/;"	m	class:PID
+Init	src/IRReader.cpp	/^void IRReader::Init()$/;"	f	class:IRReader
+Init	src/Lokomotiv.cpp	/^void Lokomotiv::Init()$/;"	f	class:Lokomotiv
+Initialize	src/PID_v1.cpp	/^void PID::Initialize()$/;"	f	class:PID
+InterpolateSpeed	src/LokomotivMotor.cpp	/^void LokomotivMotor::InterpolateSpeed(speed_t begin, speed_t target, int duration)$/;"	f	class:LokomotivMotor
+JVC	src/IRremote.h	/^#define JVC /;"	d
+JVC_BITS	src/IRremoteInt.h	/^#define JVC_BITS /;"	d
+JVC_BIT_MARK	src/IRremoteInt.h	/^#define JVC_BIT_MARK /;"	d
+JVC_HDR_MARK	src/IRremoteInt.h	/^#define JVC_HDR_MARK /;"	d
+JVC_HDR_SPACE	src/IRremoteInt.h	/^#define JVC_HDR_SPACE /;"	d
+JVC_ONE_SPACE	src/IRremoteInt.h	/^#define JVC_ONE_SPACE /;"	d
+JVC_RPT_LENGTH	src/IRremoteInt.h	/^#define JVC_RPT_LENGTH /;"	d
+JVC_ZERO_SPACE	src/IRremoteInt.h	/^#define JVC_ZERO_SPACE /;"	d
+LED_DIMMER_H	src/LEDDimmer.h	/^#define LED_DIMMER_H$/;"	d
+LIBRARY_VERSION	src/PID_v1.h	/^#define LIBRARY_VERSION	/;"	d
+LOKOMOTIV_API_H	src/LokomotivAPI.h	/^#define LOKOMOTIV_API_H$/;"	d
+LOKOMOTIV_H	src/Lokomotiv.h	/^#define LOKOMOTIV_H$/;"	d
+LOKOMOTIV_MOTOR_H	src/LokomotivMotor.h	/^#define LOKOMOTIV_MOTOR_H$/;"	d
+LOKOMOTIV_PARSER_H	src/LokomotivAPIParser.h	/^#define LOKOMOTIV_PARSER_H$/;"	d
+LOKOMOTIV_SPEEDOMETER_H	src/LokomotivSpeedometer.h	/^#define LOKOMOTIV_SPEEDOMETER_H$/;"	d
+LTOL	src/IRremoteInt.h	/^#define LTOL /;"	d
+Lokomotiv	src/Lokomotiv.cpp	/^Lokomotiv::Lokomotiv() :$/;"	f	class:Lokomotiv
+Lokomotiv	src/Lokomotiv.h	/^class Lokomotiv{$/;"	c
+LokomotivAPIParser	src/LokomotivAPIParser.cpp	/^LokomotivAPIParser::LokomotivAPIParser(Lokomotiv* robot) :$/;"	f	class:LokomotivAPIParser
+LokomotivAPIParser	src/LokomotivAPIParser.h	/^class LokomotivAPIParser$/;"	c
+LokomotivMotor	src/LokomotivMotor.cpp	/^LokomotivMotor::LokomotivMotor(LokomotivSpeedometer* speedometer) :$/;"	f	class:LokomotivMotor
+LokomotivMotor	src/LokomotivMotor.h	/^class LokomotivMotor: public MotorDriver{$/;"	c
+LokomotivSpeedometer	src/LokomotivSpeedometer.cpp	/^LokomotivSpeedometer::LokomotivSpeedometer() :$/;"	f	class:LokomotivSpeedometer
+LokomotivSpeedometer	src/LokomotivSpeedometer.h	/^class LokomotivSpeedometer$/;"	c
+MANUAL	src/PID_v1.h	/^	#define MANUAL	/;"	d
+MANUAL_MODE	src/LokomotivMotor.h	/^	enum {MANUAL_MODE, CRUISE_CONTROL_MODE};$/;"	e	enum:LokomotivMotor::__anon3
+MARK	src/IRremoteInt.h	/^#define MARK	/;"	d
+MARK_EXCESS	src/IRremote.h	/^#define MARK_EXCESS /;"	d
+MATCH	src/IRremote.cpp	/^int MATCH(int measured, int desired) {$/;"	f
+MATCH	src/IRremoteInt.h	/^int MATCH(int measured, int desired) {return measured >= TICKS_LOW(desired) && measured <= TICKS_HIGH(desired);}$/;"	f
+MATCH_MARK	src/IRremote.cpp	/^int MATCH_MARK(int measured_ticks, int desired_us) {$/;"	f
+MATCH_MARK	src/IRremoteInt.h	/^int MATCH_MARK(int measured_ticks, int desired_us) {return MATCH(measured_ticks, (desired_us + MARK_EXCESS));}$/;"	f
+MATCH_SPACE	src/IRremote.cpp	/^int MATCH_SPACE(int measured_ticks, int desired_us) {$/;"	f
+MATCH_SPACE	src/IRremoteInt.h	/^int MATCH_SPACE(int measured_ticks, int desired_us) {return MATCH(measured_ticks, (desired_us - MARK_EXCESS));}$/;"	f
+MIN_RC5_SAMPLES	src/IRremoteInt.h	/^#define MIN_RC5_SAMPLES /;"	d
+MIN_RC6_SAMPLES	src/IRremoteInt.h	/^#define MIN_RC6_SAMPLES /;"	d
+MITSUBISHI	src/IRremote.h	/^#define MITSUBISHI /;"	d
+MITSUBISHI_BITS	src/IRremoteInt.h	/^#define MITSUBISHI_BITS /;"	d
+MITSUBISHI_HDR_SPACE	src/IRremoteInt.h	/^#define MITSUBISHI_HDR_SPACE	/;"	d
+MITSUBISHI_ONE_MARK	src/IRremoteInt.h	/^#define MITSUBISHI_ONE_MARK /;"	d
+MITSUBISHI_ZERO_MARK	src/IRremoteInt.h	/^#define MITSUBISHI_ZERO_MARK	/;"	d
+MOTORDRIVER_H	src/MotorDriver.h	/^#define MOTORDRIVER_H$/;"	d
+MotorDriver	src/MotorDriver.h	/^		MotorDriver() {};$/;"	f	class:MotorDriver
+MotorDriver	src/MotorDriver.h	/^class MotorDriver$/;"	c
+NEC	src/IRremote.h	/^#define NEC /;"	d
+NEC_BITS	src/IRremoteInt.h	/^#define NEC_BITS /;"	d
+NEC_BIT_MARK	src/IRremoteInt.h	/^#define NEC_BIT_MARK	/;"	d
+NEC_HDR_MARK	src/IRremoteInt.h	/^#define NEC_HDR_MARK	/;"	d
+NEC_HDR_SPACE	src/IRremoteInt.h	/^#define NEC_HDR_SPACE /;"	d
+NEC_ONE_SPACE	src/IRremoteInt.h	/^#define NEC_ONE_SPACE /;"	d
+NEC_RPT_SPACE	src/IRremoteInt.h	/^#define NEC_RPT_SPACE /;"	d
+NEC_ZERO_SPACE	src/IRremoteInt.h	/^#define NEC_ZERO_SPACE	/;"	d
+NO_TARGET	src/LokomotivMotor.h	/^#define NO_TARGET /;"	d
+NotifyStateChange	src/LokomotivAPI.h	/^static void NotifyStateChange(stateChange_t stateChange)$/;"	f
+PANASONIC	src/IRremote.h	/^#define PANASONIC /;"	d
+PANASONIC_BITS	src/IRremoteInt.h	/^#define PANASONIC_BITS /;"	d
+PANASONIC_BIT_MARK	src/IRremoteInt.h	/^#define PANASONIC_BIT_MARK /;"	d
+PANASONIC_HDR_MARK	src/IRremoteInt.h	/^#define PANASONIC_HDR_MARK /;"	d
+PANASONIC_HDR_SPACE	src/IRremoteInt.h	/^#define PANASONIC_HDR_SPACE /;"	d
+PANASONIC_ONE_SPACE	src/IRremoteInt.h	/^#define PANASONIC_ONE_SPACE /;"	d
+PANASONIC_ZERO_SPACE	src/IRremoteInt.h	/^#define PANASONIC_ZERO_SPACE /;"	d
+PARSE_MASK_COMMAND	src/LokomotivAPI.h	/^	PARSE_MASK_COMMAND = 0x1F,$/;"	e	enum:parseMask_t
+PARSE_MASK_DATA_TYPE	src/LokomotivAPI.h	/^#define PARSE_MASK_DATA_TYPE /;"	d
+PARSE_MASK_MESSAGE_TYPE	src/LokomotivAPI.h	/^	PARSE_MASK_MESSAGE_TYPE = 0x80,\/\/command byte of data byte$/;"	e	enum:parseMask_t
+PARSE_MASK_SETGET	src/LokomotivAPI.h	/^	PARSE_MASK_SETGET = 0x40,\/\/setter or getter$/;"	e	enum:parseMask_t
+PARSE_MASK_UNKNOWN	src/LokomotivAPI.h	/^	PARSE_MASK_UNKNOWN$/;"	e	enum:parseMask_t
+PID	src/PID_v1.cpp	/^PID::PID(double* Input, double* Output, double* Setpoint,$/;"	f	class:PID
+PID	src/PID_v1.h	/^class PID$/;"	c
+PID_v1_h	src/PID_v1.h	/^#define PID_v1_h$/;"	d
+RAWBUF	src/IRremote.h	/^#define RAWBUF /;"	d
+RC5	src/IRremote.h	/^#define RC5 /;"	d
+RC5_RPT_LENGTH	src/IRremoteInt.h	/^#define RC5_RPT_LENGTH	/;"	d
+RC5_T1	src/IRremoteInt.h	/^#define RC5_T1	/;"	d
+RC6	src/IRremote.h	/^#define RC6 /;"	d
+RC6_HDR_MARK	src/IRremoteInt.h	/^#define RC6_HDR_MARK	/;"	d
+RC6_HDR_SPACE	src/IRremoteInt.h	/^#define RC6_HDR_SPACE /;"	d
+RC6_RPT_LENGTH	src/IRremoteInt.h	/^#define RC6_RPT_LENGTH	/;"	d
+RC6_T1	src/IRremoteInt.h	/^#define RC6_T1	/;"	d
+REPEAT	src/IRremote.h	/^#define REPEAT /;"	d
+REVERSE	src/PID_v1.h	/^	#define REVERSE	/;"	d
+Reply	src/LokomotivAPI.h	/^static void Reply(const char* str)$/;"	f
+ResetPositionCounter	src/LokomotivMotor.cpp	/^void LokomotivMotor::ResetPositionCounter()$/;"	f	class:LokomotivMotor
+ReturnGetValue	src/LokomotivAPI.h	/^static void ReturnGetValue(command_t command, double value)$/;"	f
+ReturnGetValue	src/LokomotivAPI.h	/^static void ReturnGetValue(command_t command, float value)$/;"	f
+ReturnGetValue	src/LokomotivAPI.h	/^static void ReturnGetValue(command_t command, int value)$/;"	f
+ReturnGetValue	src/LokomotivAPI.h	/^static void ReturnGetValue(command_t command, long value)$/;"	f
+SANYO	src/IRremote.h	/^#define SANYO /;"	d
+SANYO_BITS	src/IRremoteInt.h	/^#define SANYO_BITS /;"	d
+SANYO_DOUBLE_SPACE_USECS	src/IRremoteInt.h	/^#define SANYO_DOUBLE_SPACE_USECS	/;"	d
+SANYO_HDR_MARK	src/IRremoteInt.h	/^#define SANYO_HDR_MARK	/;"	d
+SANYO_HDR_SPACE	src/IRremoteInt.h	/^#define SANYO_HDR_SPACE /;"	d
+SANYO_ONE_MARK	src/IRremoteInt.h	/^#define SANYO_ONE_MARK	/;"	d
+SANYO_RPT_LENGTH	src/IRremoteInt.h	/^#define SANYO_RPT_LENGTH /;"	d
+SANYO_ZERO_MARK	src/IRremoteInt.h	/^#define SANYO_ZERO_MARK /;"	d
+SERIAL	.build/leonardo/src/sketch.cpp	/^#define SERIAL /;"	d	file:
+SERIAL	src/LokomotivAPI.h	/^#define SERIAL /;"	d
+SETGET_UNKNOWN	src/LokomotivAPI.h	/^	SETGET_UNKNOWN$/;"	e	enum:setGet_t
+SET_MESSAGE	src/LokomotivAPI.h	/^	SET_MESSAGE = 0x00,$/;"	e	enum:setGet_t
+SHARP	src/IRremote.h	/^#define SHARP /;"	d
+SHARP_BITS	src/IRremoteInt.h	/^#define SHARP_BITS /;"	d
+SHARP_BIT_MARK	src/IRremoteInt.h	/^#define SHARP_BIT_MARK /;"	d
+SHARP_GAP	src/IRremoteInt.h	/^#define SHARP_GAP /;"	d
+SHARP_ONE_SPACE	src/IRremoteInt.h	/^#define SHARP_ONE_SPACE /;"	d
+SHARP_RPT_SPACE	src/IRremoteInt.h	/^#define SHARP_RPT_SPACE /;"	d
+SHARP_TOGGLE_MASK	src/IRremoteInt.h	/^#define SHARP_TOGGLE_MASK /;"	d
+SHARP_ZERO_SPACE	src/IRremoteInt.h	/^#define SHARP_ZERO_SPACE /;"	d
+SONY	src/IRremote.h	/^#define SONY /;"	d
+SONY_BITS	src/IRremoteInt.h	/^#define SONY_BITS /;"	d
+SONY_DOUBLE_SPACE_USECS	src/IRremoteInt.h	/^#define SONY_DOUBLE_SPACE_USECS	/;"	d
+SONY_HDR_MARK	src/IRremoteInt.h	/^#define SONY_HDR_MARK /;"	d
+SONY_HDR_SPACE	src/IRremoteInt.h	/^#define SONY_HDR_SPACE	/;"	d
+SONY_ONE_MARK	src/IRremoteInt.h	/^#define SONY_ONE_MARK /;"	d
+SONY_RPT_LENGTH	src/IRremoteInt.h	/^#define SONY_RPT_LENGTH /;"	d
+SONY_ZERO_MARK	src/IRremoteInt.h	/^#define SONY_ZERO_MARK	/;"	d
+SPACE	src/IRremoteInt.h	/^#define SPACE /;"	d
+SPEED_MAX	ThrashLokomotiv/VNH5019Driver.cpp	/^const speed_t VNH5019Driver::SPEED_MAX = 512;$/;"	m	class:VNH5019Driver	file:
+SPEED_MAX	ThrashLokomotiv/VNH5019Driver.h	/^    const static speed_t SPEED_MAX;$/;"	m	class:VNH5019Driver
+SPEED_MIN	ThrashLokomotiv/VNH5019Driver.cpp	/^const speed_t VNH5019Driver::SPEED_MIN = 0;$/;"	m	class:VNH5019Driver	file:
+SPEED_MIN	ThrashLokomotiv/VNH5019Driver.h	/^    const static speed_t SPEED_MIN;$/;"	m	class:VNH5019Driver
+SPEED_STOP	ThrashLokomotiv/VNH5019Driver.cpp	/^const speed_t VNH5019Driver::SPEED_STOP = 0;$/;"	m	class:VNH5019Driver	file:
+SPEED_STOP	ThrashLokomotiv/VNH5019Driver.h	/^    const static speed_t SPEED_STOP;$/;"	m	class:VNH5019Driver
+STATE_IDLE	src/IRremoteInt.h	/^#define STATE_IDLE	/;"	d
+STATE_MARK	src/IRremoteInt.h	/^#define STATE_MARK	/;"	d
+STATE_SPACE	src/IRremoteInt.h	/^#define STATE_SPACE	/;"	d
+STATE_STOP	src/IRremoteInt.h	/^#define STATE_STOP	/;"	d
+STOPPED	src/LokomotivAPI.h	/^	STOPPED,\/\/Stopped manually$/;"	e	enum:stateChange_t
+STOPPED_AT_TARGET	src/LokomotivAPI.h	/^	STOPPED_AT_TARGET,\/\/$/;"	e	enum:stateChange_t
+SYSCLOCK	src/IRremoteInt.h	/^#define SYSCLOCK /;"	d
+SampleTime	src/PID_v1.h	/^	unsigned long SampleTime;$/;"	m	class:PID
+SendTrackingData	src/Lokomotiv.cpp	/^void Lokomotiv::SendTrackingData()$/;"	f	class:Lokomotiv
+SetBrake	ThrashLokomotiv/VNH5019Driver.cpp	/^void VNH5019Driver::SetBrake(speed_t brake)$/;"	f	class:VNH5019Driver
+SetBrake	src/LokomotivMotor.h	/^	void SetBrake(speed_t brake) {};$/;"	f	class:LokomotivMotor
+SetControllerDirection	src/PID_v1.cpp	/^void PID::SetControllerDirection(int Direction)$/;"	f	class:PID
+SetDirection	ThrashLokomotiv/VNH5019Driver.cpp	/^void VNH5019Driver::SetDirection(int direction)$/;"	f	class:VNH5019Driver
+SetDirection	src/Lokomotiv.h	/^	void SetDirection(long val) {_motor->SetDirection(static_cast<int16_t>(val));};$/;"	f	class:Lokomotiv
+SetDirection	src/LokomotivMotor.cpp	/^void LokomotivMotor::SetDirection(int newDirection)$/;"	f	class:LokomotivMotor
+SetDistanceFromLastAddress	src/Lokomotiv.cpp	/^void Lokomotiv::SetDistanceFromLastAddress(long val){$/;"	f	class:Lokomotiv
+SetEndSpeed	src/Lokomotiv.h	/^	void SetEndSpeed(long val) {_motor->SetEndSpeed(static_cast<speed_t>(val));};$/;"	f	class:Lokomotiv
+SetEndSpeed	src/LokomotivMotor.h	/^	void SetEndSpeed(speed_t endSpeed) {_endSpeed = endSpeed;};$/;"	f	class:LokomotivMotor
+SetGlideToSpeed	src/Lokomotiv.h	/^	void SetGlideToSpeed(long val) {_motor->GlideToSpeed(static_cast<int16_t>(val));};$/;"	f	class:Lokomotiv
+SetLastDetectedAddress	src/Lokomotiv.cpp	/^void Lokomotiv::SetLastDetectedAddress(long val){_lastDetectedAddress = val;}$/;"	f	class:Lokomotiv
+SetMode	src/PID_v1.cpp	/^void PID::SetMode(int Mode)$/;"	f	class:PID
+SetMotorMode	src/Lokomotiv.cpp	/^void Lokomotiv::SetMotorMode(long val)$/;"	f	class:Lokomotiv
+SetMotorMode	src/LokomotivMotor.cpp	/^void LokomotivMotor::SetMotorMode(int val)$/;"	f	class:LokomotivMotor
+SetOutputLimits	src/PID_v1.cpp	/^void PID::SetOutputLimits(double Min, double Max)$/;"	f	class:PID
+SetPeripheral	src/Lokomotiv.cpp	/^void Lokomotiv::SetPeripheral(long data)$/;"	f	class:Lokomotiv
+SetPeripheralRequest	src/Lokomotiv.cpp	/^void Lokomotiv::SetPeripheralRequest(long data)$/;"	f	class:Lokomotiv
+SetPidDValue	src/Lokomotiv.cpp	/^void Lokomotiv::SetPidDValue(double val){_motor->SetPidDValue(val);}$/;"	f	class:Lokomotiv
+SetPidDValue	src/LokomotivMotor.cpp	/^void LokomotivMotor::SetPidDValue(double val)$/;"	f	class:LokomotivMotor
+SetPidIValue	src/Lokomotiv.cpp	/^void Lokomotiv::SetPidIValue(double val){_motor->SetPidIValue(val);}$/;"	f	class:Lokomotiv
+SetPidIValue	src/LokomotivMotor.cpp	/^void LokomotivMotor::SetPidIValue(double val)$/;"	f	class:LokomotivMotor
+SetPidPValue	src/Lokomotiv.cpp	/^void Lokomotiv::SetPidPValue(double val){_motor->SetPidPValue(val);}$/;"	f	class:Lokomotiv
+SetPidPValue	src/LokomotivMotor.cpp	/^void LokomotivMotor::SetPidPValue(double val)$/;"	f	class:LokomotivMotor
+SetPidTargetSpeed	src/Lokomotiv.cpp	/^void Lokomotiv::SetPidTargetSpeed(long val)$/;"	f	class:Lokomotiv
+SetPidTargetSpeed	src/LokomotivMotor.cpp	/^void LokomotivMotor::SetPidTargetSpeed(double val)$/;"	f	class:LokomotivMotor
+SetSampleTime	src/PID_v1.cpp	/^void PID::SetSampleTime(int NewSampleTime)$/;"	f	class:PID
+SetSpeed	ThrashLokomotiv/VNH5019Driver.cpp	/^void VNH5019Driver::SetSpeed(speed_t speed)$/;"	f	class:VNH5019Driver
+SetSpeed	src/Lokomotiv.h	/^	void SetSpeed(long val) {_motor->SetSpeed(static_cast<speed_t>(val));};$/;"	f	class:Lokomotiv
+SetSpeed	src/LokomotivMotor.cpp	/^void LokomotivMotor::SetSpeed(speed_t newSpeed)$/;"	f	class:LokomotivMotor
+SetState	src/Lokomotiv.cpp	/^void Lokomotiv::SetState(long val){_state = val;}$/;"	f	class:Lokomotiv
+SetTargetPosition	src/Lokomotiv.cpp	/^void Lokomotiv::SetTargetPosition(long val){_targetPosition = val;}$/;"	f	class:Lokomotiv
+SetTrackingPollingInterval	src/Lokomotiv.cpp	/^void Lokomotiv::SetTrackingPollingInterval(long val)$/;"	f	class:Lokomotiv
+SetTunings	src/PID_v1.cpp	/^void PID::SetTunings(double Kp, double Ki, double Kd)$/;"	f	class:PID
+Stop	src/Lokomotiv.h	/^	void Stop(long val) {_motor->Stop(static_cast<int16_t>(val));};$/;"	f	class:Lokomotiv
+Stop	src/LokomotivMotor.cpp	/^void LokomotivMotor::Stop(int stopTime)$/;"	f	class:LokomotivMotor
+TICKS_HIGH	src/IRremoteInt.h	/^#define TICKS_HIGH(/;"	d
+TICKS_LOW	src/IRremoteInt.h	/^#define TICKS_LOW(/;"	d
+TIMER_CONFIG_KHZ	src/IRremoteInt.h	/^#define TIMER_CONFIG_KHZ(/;"	d
+TIMER_CONFIG_NORMAL	src/IRremoteInt.h	/^#define TIMER_CONFIG_NORMAL(/;"	d
+TIMER_COUNT_TOP	src/IRremoteInt.h	/^#define TIMER_COUNT_TOP	/;"	d
+TIMER_DISABLE_INTR	src/IRremoteInt.h	/^	#define TIMER_DISABLE_INTR	/;"	d
+TIMER_DISABLE_INTR	src/IRremoteInt.h	/^#define TIMER_DISABLE_INTR	/;"	d
+TIMER_DISABLE_PWM	src/IRremoteInt.h	/^#define TIMER_DISABLE_PWM	/;"	d
+TIMER_ENABLE_INTR	src/IRremoteInt.h	/^	#define TIMER_ENABLE_INTR	/;"	d
+TIMER_ENABLE_INTR	src/IRremoteInt.h	/^#define TIMER_ENABLE_INTR	/;"	d
+TIMER_ENABLE_PWM	src/IRremoteInt.h	/^#define TIMER_ENABLE_PWM	/;"	d
+TIMER_INTR_NAME	src/IRremoteInt.h	/^	#define TIMER_INTR_NAME	/;"	d
+TIMER_INTR_NAME	src/IRremoteInt.h	/^#define TIMER_INTR_NAME	/;"	d
+TIMER_PWM_PIN	src/IRremoteInt.h	/^#define TIMER_PWM_PIN	/;"	d
+TIMER_RESET	src/IRremoteInt.h	/^#define TIMER_RESET$/;"	d
+TOLERANCE	src/IRremoteInt.h	/^#define TOLERANCE /;"	d
+TOPBIT	src/IRremoteInt.h	/^#define TOPBIT /;"	d
+TWI_BUFFER_LENGTH	src/twi.h	/^	#define TWI_BUFFER_LENGTH /;"	d
+TWI_FREQ	src/twi.h	/^	#define TWI_FREQ /;"	d
+TWI_MRX	src/twi.h	/^	#define TWI_MRX	/;"	d
+TWI_MTX	src/twi.h	/^	#define TWI_MTX	/;"	d
+TWI_READY	src/twi.h	/^	#define TWI_READY /;"	d
+TWI_SRX	src/twi.h	/^	#define TWI_SRX	/;"	d
+TWI_STX	src/twi.h	/^	#define TWI_STX	/;"	d
+TYPE_DECIMAL	src/LokomotivAPI.h	/^	TYPE_DECIMAL = 0x40,$/;"	e	enum:dataTypeMark_t
+TYPE_INTEGER	src/LokomotivAPI.h	/^	TYPE_INTEGER = 0x00,$/;"	e	enum:dataTypeMark_t
+TYPE_UNKNOWN	src/LokomotivAPI.h	/^	TYPE_UNKNOWN$/;"	e	enum:dataTypeMark_t
+TwoWire	src/Wire.cpp	/^TwoWire::TwoWire()$/;"	f	class:TwoWire
+TwoWire	src/Wire.h	/^class TwoWire : public Stream$/;"	c
+TwoWire_h	src/Wire.h	/^#define TwoWire_h$/;"	d
+UNKNOWN	src/IRremote.h	/^#define UNKNOWN /;"	d
+USECPERTICK	src/IRremote.h	/^#define USECPERTICK /;"	d
+UTOL	src/IRremoteInt.h	/^#define UTOL /;"	d
+Update	src/IRReader.cpp	/^void IRReader::Update()$/;"	f	class:IRReader
+Update	src/Lokomotiv.cpp	/^void Lokomotiv::Update()$/;"	f	class:Lokomotiv
+Update	src/LokomotivMotor.cpp	/^void LokomotivMotor::Update()$/;"	f	class:LokomotivMotor
+UpdateDirection	ThrashLokomotiv/VNH5019Driver.cpp	/^void VNH5019Driver::UpdateDirection()$/;"	f	class:VNH5019Driver
+UpdateDirection	src/LokomotivMotor.cpp	/^void LokomotivMotor::UpdateDirection()$/;"	f	class:LokomotivMotor
+UserChangedSpeed	src/Lokomotiv.h	/^	void UserChangedSpeed() {_motor->UserChangedSpeed();};$/;"	f	class:Lokomotiv
+UserChangedSpeed	src/LokomotivMotor.cpp	/^void LokomotivMotor::UserChangedSpeed()$/;"	f	class:LokomotivMotor
+VIRTUAL	src/IRremote.h	/^#define VIRTUAL /;"	d
+VIRTUAL	src/IRremote.h	/^#define VIRTUAL$/;"	d
+VNH5019DRIVER_H	ThrashLokomotiv/VNH5019Driver.h	/^#define VNH5019DRIVER_H$/;"	d
+VNH5019Driver	ThrashLokomotiv/VNH5019Driver.cpp	/^VNH5019Driver::VNH5019Driver(unsigned char INA, unsigned char INB, unsigned char ENDIAG,  unsigned char PWM)$/;"	f	class:VNH5019Driver
+VNH5019Driver	ThrashLokomotiv/VNH5019Driver.h	/^class VNH5019Driver: public MotorDriver$/;"	c
+VTLokomotiv	SCFiles/VTLokomotiv.sc	/^VTLokomotiv {$/;"	c
+WAITING_FOR_COMMAND_BYTE	src/LokomotivAPIParser.h	/^	WAITING_FOR_COMMAND_BYTE,$/;"	e	enum:__anon2
+WAITING_FOR_VALUE_BYTE	src/LokomotivAPIParser.h	/^	WAITING_FOR_VALUE_BYTE$/;"	e	enum:__anon2
+Wire	src/Wire.cpp	/^TwoWire Wire = TwoWire();$/;"	v
+_ENDIAG	ThrashLokomotiv/VNH5019Driver.h	/^    unsigned char _ENDIAG;$/;"	m	class:VNH5019Driver
+_GAP	src/IRremoteInt.h	/^#define _GAP /;"	d
+_INA	ThrashLokomotiv/VNH5019Driver.h	/^    unsigned char _INA;$/;"	m	class:VNH5019Driver
+_INA	src/LokomotivMotor.h	/^	unsigned char _INA;$/;"	m	class:LokomotivMotor
+_INB	ThrashLokomotiv/VNH5019Driver.h	/^    unsigned char _INB;$/;"	m	class:VNH5019Driver
+_INB	src/LokomotivMotor.h	/^	unsigned char _INB;$/;"	m	class:LokomotivMotor
+_PWM	ThrashLokomotiv/VNH5019Driver.h	/^    unsigned char _PWM;$/;"	m	class:VNH5019Driver
+_PWM	src/LokomotivMotor.h	/^	unsigned char _PWM;$/;"	m	class:LokomotivMotor
+_beaconAddressUpdateInterval	src/Lokomotiv.cpp	/^const long Lokomotiv::_beaconAddressUpdateInterval = 1000;$/;"	m	class:Lokomotiv	file:
+_beaconAddressUpdateInterval	src/Lokomotiv.h	/^	static const long _beaconAddressUpdateInterval;$/;"	m	class:Lokomotiv
+_beginSpeed	src/LokomotivMotor.h	/^	speed_t _beginSpeed;$/;"	m	class:LokomotivMotor
+_brake	src/MotorDriver.h	/^		speed_t _brake;$/;"	m	class:MotorDriver
+_currentCommand	src/LokomotivAPIParser.h	/^		command_t _currentCommand;$/;"	m	class:LokomotivAPIParser
+_currentDataType	src/LokomotivAPIParser.h	/^	dataTypeMark_t _currentDataType;$/;"	m	class:LokomotivAPIParser
+_currentSetGet	src/LokomotivAPIParser.h	/^		setGet_t _currentSetGet;$/;"	m	class:LokomotivAPIParser
+_data	src/LokomotivAPIParser.h	/^	uint32_t _data;$/;"	m	class:LokomotivAPIParser
+_decodeDecimalValue	src/LokomotivAPIParser.cpp	/^double LokomotivAPIParser::_decodeDecimalValue(uint32_t data)$/;"	f	class:LokomotivAPIParser
+_decodeIntegerValue	src/LokomotivAPIParser.cpp	/^long LokomotivAPIParser::_decodeIntegerValue(uint32_t data)$/;"	f	class:LokomotivAPIParser
+_direction	src/MotorDriver.h	/^		int _direction;$/;"	m	class:MotorDriver
+_distanceFromLastAddress	src/Lokomotiv.h	/^	long _distanceFromLastAddress;$/;"	m	class:Lokomotiv
+_encoderCounterAtLastAddress	src/Lokomotiv.h	/^	long _encoderCounterAtLastAddress;$/;"	m	class:Lokomotiv
+_endSpeed	src/LokomotivMotor.h	/^	speed_t _endSpeed;$/;"	m	class:LokomotivMotor
+_executeCommand	src/LokomotivAPIParser.cpp	/^void LokomotivAPIParser::_executeCommand()$/;"	f	class:LokomotivAPIParser
+_hasReachedEndSpeed	src/LokomotivMotor.cpp	/^bool LokomotivMotor::_hasReachedEndSpeed()$/;"	f	class:LokomotivMotor
+_input	src/LokomotivMotor.h	/^	double _input;$/;"	m	class:LokomotivMotor
+_irReader	src/Lokomotiv.h	/^	IRReader *_irReader;$/;"	m	class:Lokomotiv
+_isInterpolating	src/LokomotivMotor.h	/^	bool _isInterpolating;$/;"	m	class:LokomotivMotor
+_isrNumber	src/LokomotivSpeedometer.h	/^	int _isrNumber;$/;"	m	class:LokomotivSpeedometer
+_lastDetectedAddress	src/Lokomotiv.h	/^	long _lastDetectedAddress;$/;"	m	class:Lokomotiv
+_lastDetectedAddressUpdate	src/Lokomotiv.h	/^	long _lastDetectedAddressUpdate;$/;"	m	class:Lokomotiv
+_lastSpeedUpdateTime	src/LokomotivMotor.h	/^	long _lastSpeedUpdateTime;$/;"	m	class:LokomotivMotor
+_led	src/Lokomotiv.h	/^	int16_t _led;$/;"	m	class:Lokomotiv
+_measuredSpeed	src/Lokomotiv.h	/^	long _measuredSpeed;$/;"	m	class:Lokomotiv
+_measuredSpeed	src/LokomotivSpeedometer.h	/^	long _measuredSpeed;$/;"	m	class:LokomotivSpeedometer
+_motor	src/Lokomotiv.h	/^	LokomotivMotor *_motor;$/;"	m	class:Lokomotiv
+_motorMode	src/LokomotivMotor.h	/^	int _motorMode;$/;"	m	class:LokomotivMotor
+_numValueBytesReceived	src/LokomotivAPIParser.h	/^	int _numValueBytesReceived;$/;"	m	class:LokomotivAPIParser
+_output	src/LokomotivMotor.h	/^	double _output;$/;"	m	class:LokomotivMotor
+_parseValueByte	src/LokomotivAPIParser.cpp	/^void LokomotivAPIParser::_parseValueByte(byte inByte)$/;"	f	class:LokomotivAPIParser
+_pid	src/LokomotivMotor.h	/^	PID *_pid;$/;"	m	class:LokomotivMotor
+_pidDValue	src/Lokomotiv.h	/^	double _pidDValue;$/;"	m	class:Lokomotiv
+_pidIValue	src/Lokomotiv.h	/^	double _pidIValue;$/;"	m	class:Lokomotiv
+_pidPValue	src/Lokomotiv.h	/^	double _pidPValue;$/;"	m	class:Lokomotiv
+_reset	src/LokomotivAPIParser.cpp	/^void LokomotivAPIParser::_reset()$/;"	f	class:LokomotivAPIParser
+_robot	src/LokomotivAPIParser.h	/^		Lokomotiv *_robot;$/;"	m	class:LokomotivAPIParser
+_setpoint	src/LokomotivMotor.h	/^	double _setpoint;$/;"	m	class:LokomotivMotor
+_speed	src/MotorDriver.h	/^		speed_t _speed;$/;"	m	class:MotorDriver
+_speedInterpolationDelta	src/LokomotivMotor.h	/^	float _speedInterpolationDelta;$/;"	m	class:LokomotivMotor
+_speedometer	src/Lokomotiv.h	/^	LokomotivSpeedometer *_speedometer;$/;"	m	class:Lokomotiv
+_speedometer	src/LokomotivMotor.h	/^	LokomotivSpeedometer* _speedometer;$/;"	m	class:LokomotivMotor
+_startSpeed	src/LokomotivMotor.h	/^	speed_t _startSpeed;$/;"	m	class:LokomotivMotor
+_state	src/Lokomotiv.h	/^	long _state;$/;"	m	class:Lokomotiv
+_state	src/LokomotivAPIParser.h	/^	int _state;$/;"	m	class:LokomotivAPIParser
+_targetPosition	src/Lokomotiv.h	/^	long _targetPosition;$/;"	m	class:Lokomotiv
+_trackingPollingEnabled	src/Lokomotiv.h	/^	bool _trackingPollingEnabled;$/;"	m	class:Lokomotiv
+_trackingPollingInterval	src/Lokomotiv.h	/^	long _trackingPollingInterval;$/;"	m	class:Lokomotiv
+available	src/Wire.cpp	/^int TwoWire::available(void)$/;"	f	class:TwoWire
+begin	src/Wire.cpp	/^void TwoWire::begin(int address)$/;"	f	class:TwoWire
+begin	src/Wire.cpp	/^void TwoWire::begin(uint8_t address)$/;"	f	class:TwoWire
+begin	src/Wire.cpp	/^void TwoWire::begin(void)$/;"	f	class:TwoWire
+beginTransmission	src/Wire.cpp	/^void TwoWire::beginTransmission(int address)$/;"	f	class:TwoWire
+beginTransmission	src/Wire.cpp	/^void TwoWire::beginTransmission(uint8_t address)$/;"	f	class:TwoWire
+bits	src/IRremote.h	/^	int bits; \/\/ Number of bits in decoded value$/;"	m	class:decode_results
+blink13	src/IRremote.cpp	/^void IRrecv::blink13(int blinkflag)$/;"	f	class:IRrecv
+blinkflag	src/IRremoteInt.h	/^	uint8_t blinkflag;				 \/\/ TRUE to enable blinking of pin 13 on IR processing$/;"	m	struct:__anon1
+byteType_t	src/LokomotivAPI.h	/^enum byteType_t$/;"	g
+cbi	src/IRremoteInt.h	/^#define cbi(/;"	d
+cbi	src/twi.c	/^#define cbi(/;"	d	file:
+command_t	src/LokomotivAPI.h	/^enum command_t$/;"	g
+compare	src/IRremote.cpp	/^int IRrecv::compare(unsigned int oldval, unsigned int newval) {$/;"	f	class:IRrecv
+controllerDirection	src/PID_v1.h	/^	int controllerDirection;$/;"	m	class:PID
+dataTypeMark_t	src/LokomotivAPI.h	/^enum dataTypeMark_t {$/;"	g
+decode	src/IRremote.cpp	/^int IRrecv::decode(decode_results *results) {$/;"	f	class:IRrecv
+decodeHash	src/IRremote.cpp	/^long IRrecv::decodeHash(decode_results *results) {$/;"	f	class:IRrecv
+decodeJVC	src/IRremote.cpp	/^long IRrecv::decodeJVC(decode_results *results) {$/;"	f	class:IRrecv
+decodeMitsubishi	src/IRremote.cpp	/^long IRrecv::decodeMitsubishi(decode_results *results) {$/;"	f	class:IRrecv
+decodeNEC	src/IRremote.cpp	/^long IRrecv::decodeNEC(decode_results *results) {$/;"	f	class:IRrecv
+decodePanasonic	src/IRremote.cpp	/^long IRrecv::decodePanasonic(decode_results *results) {$/;"	f	class:IRrecv
+decodeRC5	src/IRremote.cpp	/^long IRrecv::decodeRC5(decode_results *results) {$/;"	f	class:IRrecv
+decodeRC6	src/IRremote.cpp	/^long IRrecv::decodeRC6(decode_results *results) {$/;"	f	class:IRrecv
+decodeSanyo	src/IRremote.cpp	/^long IRrecv::decodeSanyo(decode_results *results) {$/;"	f	class:IRrecv
+decodeSony	src/IRremote.cpp	/^long IRrecv::decodeSony(decode_results *results) {$/;"	f	class:IRrecv
+decode_results	src/IRremote.h	/^class decode_results {$/;"	c
+decode_type	src/IRremote.h	/^	int decode_type; \/\/ NEC, SONY, RC5, UNKNOWN$/;"	m	class:decode_results
+dispKd	src/PID_v1.h	/^	double dispKd;		\/\/$/;"	m	class:PID
+dispKi	src/PID_v1.h	/^	double dispKi;		\/\/	 format for display purposes$/;"	m	class:PID
+dispKp	src/PID_v1.h	/^	double dispKp;		\/\/ * we'll hold on to the tuning parameters in user-entered$/;"	m	class:PID
+driverENDIAG	src/Lokomotiv.cpp	/^const int driverENDIAG = 6;$/;"	v
+enableIRIn	src/IRremote.cpp	/^void IRrecv::enableIRIn() {$/;"	f	class:IRrecv
+enableIROut	src/IRremote.cpp	/^void IRsend::enableIROut(int khz) {$/;"	f	class:IRsend
+endTransmission	src/Wire.cpp	/^uint8_t TwoWire::endTransmission(uint8_t sendStop)$/;"	f	class:TwoWire
+endTransmission	src/Wire.cpp	/^uint8_t TwoWire::endTransmission(void)$/;"	f	class:TwoWire
+flush	src/Wire.cpp	/^void TwoWire::flush(void)$/;"	f	class:TwoWire
+getRClevel	src/IRremote.cpp	/^int IRrecv::getRClevel(decode_results *results, int *offset, int *used, int t1) {$/;"	f	class:IRrecv
+inAuto	src/PID_v1.h	/^	bool inAuto;$/;"	m	class:PID
+init	ThrashLokomotiv/VNH5019Driver.cpp	/^void VNH5019Driver::init()$/;"	f	class:VNH5019Driver
+init	src/LokomotivMotor.h	/^	void init() {};$/;"	f	class:LokomotivMotor
+irReaderReceivePin	src/Lokomotiv.cpp	/^const int irReaderReceivePin = 8;$/;"	v
+irparams	src/IRremote.cpp	/^volatile irparams_t irparams;$/;"	v
+irparams_t	src/IRremoteInt.h	/^irparams_t;$/;"	t	typeref:struct:__anon1
+kMagicNumber	src/IRReader.cpp	/^const unsigned long IRReader::kMagicNumber = 0xABCDEF00;$/;"	m	class:IRReader	file:
+kMagicNumber	src/IRReader.h	/^	const static unsigned long kMagicNumber;$/;"	m	class:IRReader
+kPad1	src/IRReader.h	/^	const static unsigned long kPad1;$/;"	m	class:IRReader
+kPad2	src/IRReader.h	/^	const static unsigned long kPad2;$/;"	m	class:IRReader
+kPad3	src/IRReader.h	/^	const static unsigned long kPad3;$/;"	m	class:IRReader
+kSpeedMax	src/LokomotivMotor.cpp	/^const int LokomotivMotor::kSpeedMax = 511;$/;"	m	class:LokomotivMotor	file:
+kSpeedMax	src/LokomotivMotor.h	/^	static const int kSpeedMax;$/;"	m	class:LokomotivMotor
+kSpeedMin	src/LokomotivMotor.cpp	/^const int LokomotivMotor::kSpeedMin = 0;$/;"	m	class:LokomotivMotor	file:
+kSpeedMin	src/LokomotivMotor.h	/^	static const int kSpeedMin;$/;"	m	class:LokomotivMotor
+kSpeedStop	src/LokomotivMotor.cpp	/^const int LokomotivMotor::kSpeedStop = LokomotivMotor::kSpeedMin;$/;"	m	class:LokomotivMotor	file:
+kSpeedStop	src/LokomotivMotor.h	/^	static const int kSpeedStop;$/;"	m	class:LokomotivMotor
+kSpeedUpdateInterval	src/LokomotivMotor.cpp	/^const long LokomotivMotor::kSpeedUpdateInterval = 50;$/;"	m	class:LokomotivMotor	file:
+kSpeedUpdateInterval	src/LokomotivMotor.h	/^	static const long kSpeedUpdateInterval;$/;"	m	class:LokomotivMotor
+kd	src/PID_v1.h	/^		double kd;									\/\/ * (D)erivative Tuning Parameter$/;"	m	class:PID
+ki	src/PID_v1.h	/^		double ki;									\/\/ * (I)ntegral Tuning Parameter$/;"	m	class:PID
+kp	src/PID_v1.h	/^	double kp;									\/\/ * (P)roportional Tuning Parameter$/;"	m	class:PID
+lastHeartbeat	.build/leonardo/src/sketch.cpp	/^unsigned long lastHeartbeat;$/;"	v
+lastInput	src/PID_v1.h	/^	double ITerm, lastInput;$/;"	m	class:PID
+lastMeasuredSpeed	src/LokomotivSpeedometer.cpp	/^double lastMeasuredSpeed = 0.0;$/;"	v
+lastMeasuredTicks	src/LokomotivSpeedometer.cpp	/^volatile int32_t lastMeasuredTicks = 0;$/;"	v
+lastPadReceived_	src/IRReader.h	/^	unsigned long lastPadReceived_;$/;"	m	class:IRReader
+lastReceivedAddress_	src/IRReader.h	/^	unsigned long lastReceivedAddress_;$/;"	m	class:IRReader
+lastSpeedSetTime	src/LokomotivMotor.cpp	/^unsigned long lastSpeedSetTime = 0;$/;"	v
+lastTime	.build/leonardo/src/sketch.cpp	/^unsigned long lastTime;$/;"	v
+lastTime	src/PID_v1.h	/^	unsigned long lastTime;$/;"	m	class:PID
+lastTrackingDistanceUpdateValue	src/Lokomotiv.cpp	/^long lastTrackingDistanceUpdateValue = 0;$/;"	v
+lastTrackingUpdate	src/Lokomotiv.cpp	/^long lastTrackingUpdate = 0;$/;"	v
+lok	.build/leonardo/src/sketch.cpp	/^Lokomotiv *lok;$/;"	v
+lok_	src/IRReader.h	/^	Lokomotiv* lok_;$/;"	m	class:IRReader
+loop	.build/leonardo/src/sketch.cpp	/^void loop()$/;"	f
+mark	src/IRremote.cpp	/^void IRsend::mark(int time) {$/;"	f	class:IRsend
+measuredSpeed	src/LokomotivSpeedometer.cpp	/^double measuredSpeed = 0.0;$/;"	v
+measuredTicks	src/LokomotivSpeedometer.cpp	/^volatile int32_t measuredTicks = 0;$/;"	v
+millisBeforePIDEnable	src/LokomotivMotor.cpp	/^unsigned long millisBeforePIDEnable = 1000;$/;"	v
+motorEncoderInterruptIndex	src/Lokomotiv.cpp	/^const int motorEncoderInterruptIndex = 0;\/\/ digital pin 2 on Leonardo implicitly$/;"	v
+myInput	src/PID_v1.h	/^		double *myInput;							\/\/ * Pointers to the Input, Output, and Setpoint variables$/;"	m	class:PID
+myOutput	src/PID_v1.h	/^		double *myOutput;						 \/\/	 This creates a hard link between the variables and the$/;"	m	class:PID
+mySetpoint	src/PID_v1.h	/^		double *mySetpoint;					 \/\/	 PID, freeing the user from having to constantly tell us$/;"	m	class:PID
+onReceive	src/Wire.cpp	/^void TwoWire::onReceive( void (*function)(int) )$/;"	f	class:TwoWire
+onReceiveService	src/Wire.cpp	/^void TwoWire::onReceiveService(uint8_t* inBytes, int numBytes)$/;"	f	class:TwoWire
+onRequest	src/Wire.cpp	/^void TwoWire::onRequest( void (*function)(void) )$/;"	f	class:TwoWire
+onRequestService	src/Wire.cpp	/^void TwoWire::onRequestService(void)$/;"	f	class:TwoWire
+outMax	src/PID_v1.h	/^	double outMin, outMax;$/;"	m	class:PID
+outMin	src/PID_v1.h	/^	double outMin, outMax;$/;"	m	class:PID
+padsReceived_	src/IRReader.h	/^	int padsReceived_;$/;"	m	class:IRReader
+panasonicAddress	src/IRremote.h	/^	unsigned int panasonicAddress; \/\/ This is only used for decoding Panasonic data$/;"	m	class:decode_results
+parseIncomingByte	src/LokomotivAPIParser.cpp	/^void LokomotivAPIParser::parseIncomingByte(byte inByte)$/;"	f	class:LokomotivAPIParser
+parseMask_t	src/LokomotivAPI.h	/^enum parseMask_t {$/;"	g
+parser	.build/leonardo/src/sketch.cpp	/^LokomotivAPIParser *parser;$/;"	v
+peek	src/Wire.cpp	/^int TwoWire::peek(void)$/;"	f	class:TwoWire
+rawSpeed	src/LokomotivSpeedometer.cpp	/^volatile int32_t rawSpeed = 0;$/;"	v
+rawbuf	src/IRremote.h	/^	volatile unsigned int *rawbuf; \/\/ Raw intervals in .5 us ticks$/;"	m	class:decode_results
+rawbuf	src/IRremoteInt.h	/^	unsigned int rawbuf[RAWBUF]; \/\/ raw data$/;"	m	struct:__anon1
+rawlen	src/IRremote.h	/^	int rawlen; \/\/ Number of records in rawbuf.$/;"	m	class:decode_results
+rawlen	src/IRremoteInt.h	/^	uint8_t rawlen;				 \/\/ counter of entries in rawbuf$/;"	m	struct:__anon1
+rcvstate	src/IRremoteInt.h	/^	uint8_t rcvstate;					\/\/ state machine$/;"	m	struct:__anon1
+read	src/Wire.cpp	/^int TwoWire::read(void)$/;"	f	class:TwoWire
+receivePin_	src/IRReader.h	/^	int receivePin_;$/;"	m	class:IRReader
+receiver_	src/IRReader.h	/^	IRrecv *receiver_;$/;"	m	class:IRReader
+recvpin	src/IRremoteInt.h	/^	uint8_t recvpin;					 \/\/ pin for IR data from detector$/;"	m	struct:__anon1
+requestFrom	src/Wire.cpp	/^uint8_t TwoWire::requestFrom(int address, int quantity)$/;"	f	class:TwoWire
+requestFrom	src/Wire.cpp	/^uint8_t TwoWire::requestFrom(int address, int quantity, int sendStop)$/;"	f	class:TwoWire
+requestFrom	src/Wire.cpp	/^uint8_t TwoWire::requestFrom(uint8_t address, uint8_t quantity)$/;"	f	class:TwoWire
+requestFrom	src/Wire.cpp	/^uint8_t TwoWire::requestFrom(uint8_t address, uint8_t quantity, uint8_t sendStop)$/;"	f	class:TwoWire
+resetParser_	src/IRReader.cpp	/^void IRReader::resetParser_()$/;"	f	class:IRReader
+results_	src/IRReader.h	/^	decode_results results_;$/;"	m	class:IRReader
+resume	src/IRremote.cpp	/^void IRrecv::resume() {$/;"	f	class:IRrecv
+rxBuffer	src/Wire.cpp	/^uint8_t TwoWire::rxBuffer[BUFFER_LENGTH];$/;"	m	class:TwoWire	file:
+rxBuffer	src/Wire.h	/^		static uint8_t rxBuffer[];$/;"	m	class:TwoWire
+rxBufferIndex	src/Wire.cpp	/^uint8_t TwoWire::rxBufferIndex = 0;$/;"	m	class:TwoWire	file:
+rxBufferIndex	src/Wire.h	/^		static uint8_t rxBufferIndex;$/;"	m	class:TwoWire
+rxBufferLength	src/Wire.cpp	/^uint8_t TwoWire::rxBufferLength = 0;$/;"	m	class:TwoWire	file:
+rxBufferLength	src/Wire.h	/^		static uint8_t rxBufferLength;$/;"	m	class:TwoWire
+sbi	src/IRremoteInt.h	/^#define sbi(/;"	d
+sbi	src/twi.c	/^#define sbi(/;"	d	file:
+sendDISH	src/IRremote.cpp	/^void IRsend::sendDISH(unsigned long data, int nbits)$/;"	f	class:IRsend
+sendJVC	src/IRremote.cpp	/^void IRsend::sendJVC(unsigned long data, int nbits, int repeat)$/;"	f	class:IRsend
+sendNEC	src/IRremote.cpp	/^void IRsend::sendNEC(unsigned long data, int nbits)$/;"	f	class:IRsend
+sendPanasonic	src/IRremote.cpp	/^void IRsend::sendPanasonic(unsigned int address, unsigned long data) {$/;"	f	class:IRsend
+sendRC5	src/IRremote.cpp	/^void IRsend::sendRC5(unsigned long data, int nbits)$/;"	f	class:IRsend
+sendRC6	src/IRremote.cpp	/^void IRsend::sendRC6(unsigned long data, int nbits)$/;"	f	class:IRsend
+sendRaw	src/IRremote.cpp	/^void IRsend::sendRaw(unsigned int buf[], int len, int hz)$/;"	f	class:IRsend
+sendSharp	src/IRremote.cpp	/^void IRsend::sendSharp(unsigned long data, int nbits) {$/;"	f	class:IRsend
+sendSony	src/IRremote.cpp	/^void IRsend::sendSony(unsigned long data, int nbits) {$/;"	f	class:IRsend
+setGet_t	src/LokomotivAPI.h	/^enum setGet_t$/;"	g
+setup	.build/leonardo/src/sketch.cpp	/^void setup()$/;"	f
+space	src/IRremote.cpp	/^void IRsend::space(int time) {$/;"	f	class:IRsend
+speed_t	src/MotorDriver.h	/^typedef int speed_t;$/;"	t
+stateChange_t	src/LokomotivAPI.h	/^enum stateChange_t$/;"	g
+ticks	src/LokomotivSpeedometer.cpp	/^volatile int32_t ticks = 0;$/;"	v
+ticksDelta	src/LokomotivSpeedometer.cpp	/^volatile int32_t ticksDelta = 1;$/;"	v
+timer	src/IRremoteInt.h	/^	unsigned int timer;		 \/\/ state timer, counts 50uS ticks.$/;"	m	struct:__anon1
+transmitting	src/Wire.cpp	/^uint8_t TwoWire::transmitting = 0;$/;"	m	class:TwoWire	file:
+transmitting	src/Wire.h	/^		static uint8_t transmitting;$/;"	m	class:TwoWire
+twiStartingAddress	src/Lokomotiv.cpp	/^const int twiStartingAddress = 0x08; \/\/all VT TWI modules have the same starting address$/;"	v
+twi_attachSlaveRxEvent	src/twi.c	/^void twi_attachSlaveRxEvent( void (*function)(uint8_t*, int) )$/;"	f
+twi_attachSlaveTxEvent	src/twi.c	/^void twi_attachSlaveTxEvent( void (*function)(void) )$/;"	f
+twi_error	src/twi.c	/^static volatile uint8_t twi_error;$/;"	v	file:
+twi_h	src/twi.h	/^#define twi_h$/;"	d
+twi_inRepStart	src/twi.c	/^static volatile uint8_t twi_inRepStart;		\/\/ in the middle of a repeated start$/;"	v	file:
+twi_init	src/twi.c	/^void twi_init(void)$/;"	f
+twi_masterBuffer	src/twi.c	/^static uint8_t twi_masterBuffer[TWI_BUFFER_LENGTH];$/;"	v	file:
+twi_masterBufferIndex	src/twi.c	/^static volatile uint8_t twi_masterBufferIndex;$/;"	v	file:
+twi_masterBufferLength	src/twi.c	/^static volatile uint8_t twi_masterBufferLength;$/;"	v	file:
+twi_onSlaveReceive	src/twi.c	/^static void (*twi_onSlaveReceive)(uint8_t*, int);$/;"	v	file:
+twi_onSlaveTransmit	src/twi.c	/^static void (*twi_onSlaveTransmit)(void);$/;"	v	file:
+twi_readFrom	src/twi.c	/^uint8_t twi_readFrom(uint8_t address, uint8_t* data, uint8_t length, uint8_t sendStop)$/;"	f
+twi_releaseBus	src/twi.c	/^void twi_releaseBus(void)$/;"	f
+twi_reply	src/twi.c	/^void twi_reply(uint8_t ack)$/;"	f
+twi_rxBuffer	src/twi.c	/^static uint8_t twi_rxBuffer[TWI_BUFFER_LENGTH];$/;"	v	file:
+twi_rxBufferIndex	src/twi.c	/^static volatile uint8_t twi_rxBufferIndex;$/;"	v	file:
+twi_sendStop	src/twi.c	/^static volatile uint8_t twi_sendStop;		\/\/ should the transaction end with a stop$/;"	v	file:
+twi_setAddress	src/twi.c	/^void twi_setAddress(uint8_t address)$/;"	f
+twi_slarw	src/twi.c	/^static volatile uint8_t twi_slarw;$/;"	v	file:
+twi_state	src/twi.c	/^static volatile uint8_t twi_state;$/;"	v	file:
+twi_stop	src/twi.c	/^void twi_stop(void)$/;"	f
+twi_transmit	src/twi.c	/^uint8_t twi_transmit(const uint8_t* data, uint8_t length)$/;"	f
+twi_txBuffer	src/twi.c	/^static uint8_t twi_txBuffer[TWI_BUFFER_LENGTH];$/;"	v	file:
+twi_txBufferIndex	src/twi.c	/^static volatile uint8_t twi_txBufferIndex;$/;"	v	file:
+twi_txBufferLength	src/twi.c	/^static volatile uint8_t twi_txBufferLength;$/;"	v	file:
+twi_writeTo	src/twi.c	/^uint8_t twi_writeTo(uint8_t address, uint8_t* data, uint8_t length, uint8_t wait, uint8_t sendStop)$/;"	f
+txAddress	src/Wire.cpp	/^uint8_t TwoWire::txAddress = 0;$/;"	m	class:TwoWire	file:
+txAddress	src/Wire.h	/^		static uint8_t txAddress;$/;"	m	class:TwoWire
+txBuffer	src/Wire.cpp	/^uint8_t TwoWire::txBuffer[BUFFER_LENGTH];$/;"	m	class:TwoWire	file:
+txBuffer	src/Wire.h	/^		static uint8_t txBuffer[];$/;"	m	class:TwoWire
+txBufferIndex	src/Wire.cpp	/^uint8_t TwoWire::txBufferIndex = 0;$/;"	m	class:TwoWire	file:
+txBufferIndex	src/Wire.h	/^		static uint8_t txBufferIndex;$/;"	m	class:TwoWire
+txBufferLength	src/Wire.cpp	/^uint8_t TwoWire::txBufferLength = 0;$/;"	m	class:TwoWire	file:
+txBufferLength	src/Wire.h	/^		static uint8_t txBufferLength;$/;"	m	class:TwoWire
+updateInterval	.build/leonardo/src/sketch.cpp	/^unsigned long updateInterval = 10;$/;"	v
+user_onReceive	src/Wire.cpp	/^void (*TwoWire::user_onReceive)(int);$/;"	v
+user_onReceive	src/Wire.h	/^		static void (*user_onReceive)(int);$/;"	m	class:TwoWire
+user_onRequest	src/Wire.cpp	/^void (*TwoWire::user_onRequest)(void);$/;"	v
+user_onRequest	src/Wire.h	/^		static void (*user_onRequest)(void);$/;"	m	class:TwoWire
+value	src/IRremote.h	/^	unsigned long value; \/\/ Decoded value$/;"	m	class:decode_results
+write	src/Wire.cpp	/^size_t TwoWire::write(const uint8_t *data, size_t quantity)$/;"	f	class:TwoWire
+write	src/Wire.cpp	/^size_t TwoWire::write(uint8_t data)$/;"	f	class:TwoWire
+write	src/Wire.h	/^		inline size_t write(int n) { return write((uint8_t)n); }$/;"	f	class:TwoWire
+write	src/Wire.h	/^		inline size_t write(long n) { return write((uint8_t)n); }$/;"	f	class:TwoWire
+write	src/Wire.h	/^		inline size_t write(unsigned int n) { return write((uint8_t)n); }$/;"	f	class:TwoWire
+write	src/Wire.h	/^		inline size_t write(unsigned long n) { return write((uint8_t)n); }$/;"	f	class:TwoWire

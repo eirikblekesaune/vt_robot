@@ -7,6 +7,7 @@ OSCdef(\figTrack, {arg msg, time, addr, port; ["position", msg, time].postln;}, 
 OSCdef(\figStation, {arg msg, time, addr, port; ["station", msg, time].postln;}, '/t/l>')
 
 NetAddr("10.0.0.21", 0x2616).sendMsg("/t/s>", 100);
+NetAddr("10.0.0.21", 0x2616).sendMsg("/t/s>", 400);
 NetAddr("10.0.0.21", 0x2616).sendMsg("/t/s>", 0);
 NetAddr("10.0.0.21", 0x2616).sendMsg("/t/d>", 1);//right
 NetAddr("10.0.0.21", 0x2616).sendMsg("/t/d>", 0);//left
@@ -185,3 +186,9 @@ a.collect({arg item; a.getID(item).postln})
 
 32.asBinaryString.reverse
 
+
+"killall sclang".unixCmd
+a = VTLokomotiv2.new(NetAddr("1.2.3.151", 0x2616));
+a.set(\speed, 200);
+a.get(\speed);
+0x03E8kkkkkkkkkk
