@@ -16,7 +16,6 @@ const int RotationMotor::TURNING_RIGHT = GOING_DOWN;
 
 const int RotationMotor::SPEED_STOP = 0;
 const int RotationMotor::TARGET_NONE = 0;
-extern const int LOOP_UPDATE_RATE;
 
 RotationMotor::RotationMotor(unsigned char rotationPotmeterPin, L293Driver* driver, address_t address) :
 	_driver(driver),
@@ -258,7 +257,7 @@ void RotationMotor::SetTargetPosition(int targetPosition)
 void RotationMotor::GoToParkingPosition()
 {
 	SetTargetPosition(POSITION_DEFAULT);
-	SetSpeed(int(L293Driver::SPEED_MAX * 0.7));
+	SetSpeed(int(L293Driver::SPEED_MAX));
 }
 
 void RotationMotor::GoToTargetPosition(int value)
