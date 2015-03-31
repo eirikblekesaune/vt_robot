@@ -68,9 +68,9 @@ static void Reply(const char* str)
 	//SERIAL.println(str);
 }
 
-
 static void FrameMessage(byte * msg, int numBytes) {
-	static byte destinationIP[4] = {10, 0, 0, 25};
+	static byte destinationIP[4] = {1, 2, 3, 150};
+	//static byte destinationIP[4] = {10, 0, 0, 25};
 	static byte destinationPort[2] = {0xDF, 0x20};//sclang port 57120
 	static byte thisPort[2] = {0x26, 0x16};//the port num for the XBee
 	int length = numBytes + 12;//there are 12 bytes in addition to the data being sent
@@ -219,6 +219,10 @@ static void DebugPrint(int32_t msg)
 static void DebugPrint(uint32_t msg)
 {
 	SendMsg(COMMAND_INFO, static_cast<int32_t>(msg));
+}
+
+static void WhoAreYou() {
+	SendMsg(COMMAND_WHOAREYOU, "tog4");
 }
 
 

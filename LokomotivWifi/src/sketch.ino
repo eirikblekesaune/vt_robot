@@ -31,6 +31,7 @@ void setup()
 	lok->Init();
 	
 	lastTime = millis();
+	WhoAreYou();
 }
 
 void loop()

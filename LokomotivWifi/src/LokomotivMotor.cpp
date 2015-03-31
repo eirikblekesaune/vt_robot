@@ -57,6 +57,9 @@ void LokomotivMotor::Update()
 			{
 				SetSpeed(_endSpeed);
 				_isInterpolating = false;
+				if((_endSpeed == 0) && (_motorMode != MANUAL_MODE)) {
+					_setpoint = 0;
+				}
 			} else {
 				SetSpeed(_speed + _speedInterpolationDelta);
 			}
@@ -76,6 +79,8 @@ void LokomotivMotor::Update()
 						if((_speed != 0) && (_input > 1.5))
 						{
 							SetPidTargetSpeed(_input);
+							_output = _speed;
+							_pid->SetMode(AUTOMATIC);
 							_pid->Compute();
 							_cruiseControlActive = true;
 						}
@@ -214,7 +219,7 @@ void LokomotivMotor::SetMotorMode(long val)
 			break;
 		case CRUISE_CONTROL_MODE:
 			_motorMode = CRUISE_CONTROL_MODE;
-			_pid->SetMode(AUTOMATIC);
+			_pid->SetMode(MANUAL);
 			_cruiseControlActive = false;
 			break;
 		case TARGET_SPEED_MODE:

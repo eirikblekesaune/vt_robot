@@ -344,7 +344,8 @@ void LokomotivWIFIParser::_executeCommand()
 			break;
 		case COMMAND_WHOAREYOU:
 			//SendMsg(COMMAND_WHOAREYOU, _robot->GetName());
-			SendMsg(COMMAND_WHOAREYOU, "test");
+			//SendMsg(COMMAND_WHOAREYOU, "figur3");
+			WhoAreYou();
 			break;
 		case COMMAND_PARSER_ERROR:
 			break;
