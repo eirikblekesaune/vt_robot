@@ -54,7 +54,7 @@ void LokomotivWIFIParser::parseIncomingByte(int inByte)
 			if(byteCounter < 4) {
 				if(byteCounter == 0) {
 					_currentIP |= static_cast<uint32_t>(inByte) << 24;
-				} else if(byteCounter == 1) {
+			} else if(byteCounter == 1) {
 					_currentIP |= static_cast<uint32_t>(inByte) << 16;
 				} else if(byteCounter == 2) {
 					_currentIP |= static_cast<uint32_t>(inByte) << 8;
@@ -217,13 +217,11 @@ void LokomotivWIFIParser::_executeCommand()
 		{
 		case COMMAND_STOP:
 			_robot->Stop(_decodeIntegerValue(_value));
-			break;
-		case COMMAND_SPEED:
-			_robot->SetSpeed(_decodeIntegerValue(_value));
 			_robot->UserChangedSpeed();
 			break;
-		case COMMAND_DIRECTION:
-			_robot->SetDirection(_decodeIntegerValue(_value));
+		case COMMAND_BIPOLAR_SPEED:
+			_robot->SetBipolarSpeed(_decodeIntegerValue(_value));
+			_robot->UserChangedSpeed();
 			break;
 		case COMMAND_TARGET_POSITION:
 			_robot->SetTargetPosition(_decodeIntegerValue(_value));
@@ -256,6 +254,7 @@ void LokomotivWIFIParser::_executeCommand()
 			break;
 		case COMMAND_GLIDE_TO_SPEED:
 			_robot->SetGlideToSpeed(_decodeIntegerValue(_value));
+			_robot->UserChangedSpeed();
 			break;
 		case COMMAND_END_SPEED:
 			_robot->SetEndSpeed(_decodeIntegerValue(_value));
@@ -285,11 +284,8 @@ void LokomotivWIFIParser::_executeCommand()
 		{
 		case COMMAND_STOP:
 			break;
-		case COMMAND_SPEED:
-			SendMsg(COMMAND_SPEED,_robot->GetSpeed());
-			break;
-		case COMMAND_DIRECTION:
-			SendMsg(COMMAND_DIRECTION,_robot->GetDirection());
+		case COMMAND_BIPOLAR_SPEED:
+			SendMsg(COMMAND_BIPOLAR_SPEED,_robot->GetBipolarSpeed());
 			break;
 		case COMMAND_TARGET_POSITION:
 			SendMsg(COMMAND_TARGET_POSITION,_robot->GetTargetPosition());
@@ -303,7 +299,7 @@ void LokomotivWIFIParser::_executeCommand()
 		case COMMAND_PERIPHERAL_REQUEST:
 			break;
 		case COMMAND_STATE:
-			SendMsg(COMMAND_STATE,_robot->GetState());
+			SendMsg(COMMAND_STATE,static_cast<long>(_robot->GetState()));
 			break;
 		case COMMAND_INFO:
 			break;

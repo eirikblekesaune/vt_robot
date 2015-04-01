@@ -7,8 +7,9 @@ const long LokomotivMotor::kSpeedUpdateInterval = 50;
 unsigned long lastSpeedSetTime = 0;
 unsigned long millisBeforePIDEnable = 1000;
 
-LokomotivMotor::LokomotivMotor(LokomotivSpeedometer* speedometer) :
+LokomotivMotor::LokomotivMotor(LokomotivSpeedometer* speedometer, Lokomotiv* lokomotiv) :
 	_speedometer(speedometer),
+	_lokomotiv(lokomotiv),
 	_INA(12),
 	_INB(11),
 	_PWM(10),
@@ -34,7 +35,7 @@ LokomotivMotor::LokomotivMotor(LokomotivSpeedometer* speedometer) :
 //	//set max speed
 	ICR1 = 0x01FF;
 
-	SetDirection(0);
+	SetDirection(DIRECTION_FORWARD);
 	SetSpeed(0);
 	//Since we are doing automatic startup of PID we are using conservative
 	//PID parameters here.
@@ -57,8 +58,20 @@ void LokomotivMotor::Update()
 			{
 				SetSpeed(_endSpeed);
 				_isInterpolating = false;
-				if((_endSpeed == 0) && (_motorMode != MANUAL_MODE)) {
-					_setpoint = 0;
+				if(_endSpeed == 0) {
+					_lokomotiv->StateChanged(STATE_STOPPED);
+					SendMsg(COMMAND_BIPOLAR_SPEED, 0);
+					if(_motorMode != MANUAL_MODE) {
+						_setpoint = 0;
+					}
+				} else {
+					if(_direction == DIRECTION_FORWARD) {
+						_lokomotiv->StateChanged(STATE_GOING_FORWARD);
+						SendMsg(COMMAND_BIPOLAR_SPEED, GetSpeed());
+					} else {
+						_lokomotiv->StateChanged(STATE_GOING_BACKWARDS);
+						SendMsg(COMMAND_BIPOLAR_SPEED, -GetSpeed());
+					}
 				}
 			} else {
 				SetSpeed(_speed + _speedInterpolationDelta);
@@ -235,6 +248,7 @@ void LokomotivMotor::SetDirection(int newDirection)
 	newDirection = 0;
 	if(newDirection>1)
 	newDirection = 1;
+	
 	_direction = newDirection;
 	_speedometer->DirectionChanged(newDirection);
 //	if(_direction)
@@ -285,11 +299,13 @@ void LokomotivMotor::InterpolateSpeed(speed_t begin, speed_t target, int duratio
 void LokomotivMotor::Stop(int stopTime)
 {
 	InterpolateSpeed(_speed, kSpeedStop, stopTime);
+	_lokomotiv->StateChanged(STATE_STOPPING);
 }
 
 void LokomotivMotor::GlideToSpeed(int startTime)
 {
 	InterpolateSpeed(_speed, _endSpeed, startTime);
+	_lokomotiv->StateChanged(STATE_INTERPOLATING_SPEED);
 }
 
 bool LokomotivMotor::_hasReachedEndSpeed()

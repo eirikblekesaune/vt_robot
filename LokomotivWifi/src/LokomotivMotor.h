@@ -3,12 +3,14 @@
 
 #include "PID_v1.h"
 #include "MotorDriver.h"
+#include "LokomotivWIFI.h"
 #include "LokomotivSpeedometer.h"
 
-#define NO_TARGET -1
+class Lokomotiv;//forward declaration
+
 class LokomotivMotor: public MotorDriver{
 public:
-	LokomotivMotor(LokomotivSpeedometer* speedometer);
+	LokomotivMotor(LokomotivSpeedometer* speedometer, Lokomotiv* lokomotiv);
 	~LokomotivMotor();
 	static const int kSpeedMin;
 	static const int kSpeedMax;
@@ -41,6 +43,7 @@ public:
 	void UpdateDirection();
 private:
 	LokomotivSpeedometer* _speedometer;
+	Lokomotiv* _lokomotiv;
 	PID *_pid;
 	long _motorMode;
 	double _setpoint;
@@ -58,5 +61,7 @@ private:
 	unsigned char _PWM;
 	bool _cruiseControlActive;
 };
+
+#include "Lokomotiv.h"
 #endif
 

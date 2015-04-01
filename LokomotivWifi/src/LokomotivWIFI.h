@@ -13,8 +13,7 @@ static void DebugPrint(const char* msg);
 enum command_t
 {
 	COMMAND_STOP = 'S',//speed fade out time as argument
-	COMMAND_SPEED = 's',
-	COMMAND_DIRECTION = 'd',
+	COMMAND_BIPOLAR_SPEED = 's',
 	COMMAND_TARGET_POSITION = 't',
 	COMMAND_DISTANCE_FROM_LAST_ADDRESS = 'F',
 	COMMAND_PERIPHERAL = 'p',
@@ -53,14 +52,20 @@ enum oscTypeTag_t {
 	TYPE_UNKNOWN
 };
 
+enum direction_t {
+	DIRECTION_FORWARD,
+	DIRECTION_BACKWARDS
+};
+
 enum stateChange_t
 {
-	STOPPED,//Stopped manually
-	GOING_FORWARD,//direction set to up
-	GOING_BACKWARDS,//directiom set to down
-	STOPPED_AT_TARGET,//
-	DETECTED_ADDRESS,
-	DRIVER_FAULT//Something is wrong with the driver itself
+	STATE_STOPPED,//Stopped manually
+	STATE_GOING_FORWARD,//direction set to up
+	STATE_GOING_BACKWARDS,//directiom set to down
+	STATE_STOPPED_AT_TARGET,//
+	STATE_STOPPING,
+	STATE_INTERPOLATING_SPEED,
+	NUM_STATES//Something is wrong with the driver itself
 };
 
 static void Reply(const char* str)
@@ -114,6 +119,22 @@ static void SendMsg(command_t command, oscTypeTag_t typeTag, byte * value)
 	};
 
 	FrameMessage(msg, 16);
+}
+
+static void SendTrackingDataMsg(int32_t position, double speed) {
+	byte * posByte = (byte *) &position;
+	byte * speedByte = (byte *) &speed;
+	byte msg[20] = {
+		47,116,47,//path start -> '/t/t
+		COMMAND_TRACKING_DATA,
+		SET_MESSAGE,
+		0,0,0,//OSC path padding
+		44,105,102,0,//type tags for int and float
+		posByte[3], posByte[2], posByte[1], posByte[0],
+		speedByte[3], speedByte[2], speedByte[1], speedByte[0]
+	};
+
+	FrameMessage(msg, 20);
 }
 
 static void SendMsg(command_t command, const char * str)
@@ -222,7 +243,7 @@ static void DebugPrint(uint32_t msg)
 }
 
 static void WhoAreYou() {
-	SendMsg(COMMAND_WHOAREYOU, "tog4");
+	SendMsg(COMMAND_WHOAREYOU, "figur6");
 }
 
 

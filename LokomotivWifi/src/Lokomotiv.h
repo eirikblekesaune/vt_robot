@@ -12,13 +12,12 @@ public:
 	unsigned char GetLastIRBeaconID() {};
 	long GetDistanceFromLastIRBeaconDetection();
 
-	long GetSpeed();
+	long GetBipolarSpeed();
 	long GetEndSpeed() {_motor->GetEndSpeed();};
-	long GetDirection();
 	long GetTargetPosition();
 	long GetDistanceFromLastAddress();
 	long GetPeripheral(long data);
-	long GetState();
+	stateChange_t GetState();
 	double GetMeasuredSpeed();
 	long GetLastDetectedAddress();
 	double GetPidPValue();
@@ -30,15 +29,13 @@ public:
 	double GetPidTargetSpeed() {return static_cast<double>(_motor->GetPidTargetSpeed());};
 	//long GetTrackingData();
 
-	void SetSpeed(long val) {_motor->SetSpeed(static_cast<speed_t>(val));};
+	void SetBipolarSpeed(long val);
 	void SetEndSpeed(long val) {_motor->SetEndSpeed(static_cast<speed_t>(val));};
 	void SetGlideToSpeed(long val) {_motor->GlideToSpeed(static_cast<int16_t>(val));};
-	void SetDirection(long val) {_motor->SetDirection(static_cast<int16_t>(val));};
 	void SetTargetPosition(long val);
 	void SetDistanceFromLastAddress(long val);
 	void SetPeripheral(long val);
 	void SetPeripheralRequest(long val);
-	void SetState(long val);
 	void SetLastDetectedAddress(long val);
 	void SetPidPValue(double val);
 	void SetPidIValue(double val);
@@ -53,7 +50,8 @@ public:
 	void Update();
 	void GotAddr(long val);
 	void UserChangedSpeed() {_motor->UserChangedSpeed();};
-	void SendTrackingData();
+	void SendTrackingData(int32_t dist);
+	void StateChanged(stateChange_t newState);
 
 private:
 	LokomotivMotor *_motor;
@@ -66,7 +64,7 @@ private:
 	long _targetPosition;
 	long _distanceFromLastAddress;
 	int16_t _led;
-	long _state;
+	stateChange_t _state;
 	long _measuredSpeed;
 	long _lastDetectedAddress;
 	double _pidPValue;

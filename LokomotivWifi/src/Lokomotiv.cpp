@@ -11,7 +11,8 @@ long lastTrackingUpdate = 0;
 long lastTrackingDistanceUpdateValue = 0;
 //IR reader
 const int irReaderReceivePin = 8;
-
+#define TARGET_POSITION_NONE 0
+#define TARGET_POSITION_ALL -1
 //Led dimmming
 //const int ledPin = 5;
 
@@ -20,7 +21,7 @@ Lokomotiv::Lokomotiv() :
 	_targetPosition(0),
 	_distanceFromLastAddress(0),
 	_led(0),
-	_state(0),
+	_state(STATE_STOPPED),
 	_measuredSpeed(0),
 	_lastDetectedAddress(0),
 	_pidPValue(0),
@@ -30,7 +31,7 @@ Lokomotiv::Lokomotiv() :
 	_trackingPollingInterval(0)
 {
 	_speedometer = new LokomotivSpeedometer();
-	_motor = new LokomotivMotor(_speedometer);
+	_motor = new LokomotivMotor(_speedometer, this);
 	_irReader = new IRReader(irReaderReceivePin, this);
 	_encoderCounterAtLastAddress = _speedometer->GetCurrentTicks();
 }
@@ -42,8 +43,14 @@ void Lokomotiv::Init()
 }
 
 //Getters
-long Lokomotiv::GetSpeed(){return static_cast<long>(_motor->GetSpeed());}
-long Lokomotiv::GetDirection(){return static_cast<long>(_motor->GetDirection());}
+long Lokomotiv::GetBipolarSpeed() {
+	long rawSpeed = static_cast<long>(_motor->GetSpeed());
+	if(_motor->GetDirection() == DIRECTION_BACKWARDS) {
+		rawSpeed = -rawSpeed;
+	}
+	return rawSpeed;
+}
+
 long Lokomotiv::GetTargetPosition(){return _targetPosition;}
 
 long Lokomotiv::GetDistanceFromLastAddress(){
@@ -56,7 +63,7 @@ void Lokomotiv::SetDistanceFromLastAddress(long val){
 
 
 long Lokomotiv::GetPeripheral(long data){return 0;}
-long Lokomotiv::GetState(){return _state;}
+stateChange_t Lokomotiv::GetState(){return _state;}
 double Lokomotiv::GetMeasuredSpeed(){return _speedometer->GetMeasuredSpeed();};
 long Lokomotiv::GetLastDetectedAddress(){return _lastDetectedAddress;}
 double Lokomotiv::GetPidPValue(){return _motor->GetPidPValue();}
@@ -73,10 +80,18 @@ long Lokomotiv::GetTrackingPollingInterval()
 	return _trackingPollingInterval;
 }
 
+void Lokomotiv::StateChanged(stateChange_t newState) {
+	_state = newState;
+	SendMsg(COMMAND_STATE, static_cast<long>(_state));
+	if((_state == STATE_STOPPED) && _trackingPollingEnabled) {
+		SendTrackingData(GetDistanceFromLastAddress());
+	}
+}
+
 void Lokomotiv::SetTrackingState(long val) {
 	if(val) {
 		_trackingPollingEnabled = true;
-		SendTrackingData();
+		SendTrackingData(GetDistanceFromLastAddress());
 	} else {
 		_trackingPollingEnabled = false;
 	}
@@ -90,13 +105,24 @@ long Lokomotiv::GetTrackingState() {
 	}
 }
 
-//long Lokomotiv::GetTrackingData()
-//{
-//	int32_t result;
-//	result = static_cast<int32_t>(_speedometer->GetMeasuredSpeed() * 100.0) << 16;
-//	result = (result & 0xFFFF0000) | (0x0000FFFF & GetDistanceFromLastAddress());
-//	return result;
-//}
+void Lokomotiv::SetBipolarSpeed(long val) {
+	if(val == 0) {
+		_motor->SetSpeed(0);
+		StateChanged(STATE_STOPPED);
+	} else if(val < 0) {
+		_motor->SetSpeed(abs(val));
+		if((_motor->GetDirection() == DIRECTION_FORWARD) || (_state == STATE_STOPPED)) {
+			_motor->SetDirection(DIRECTION_BACKWARDS);
+			StateChanged(STATE_GOING_BACKWARDS);
+		}
+	} else {
+		_motor->SetSpeed(val);
+		if((_motor->GetDirection() == DIRECTION_BACKWARDS) || (_state == STATE_STOPPED)) {
+			_motor->SetDirection(DIRECTION_FORWARD);
+			StateChanged(STATE_GOING_FORWARD);
+		}
+	}
+}
 
 void Lokomotiv::SetMotorMode(long val)
 {
@@ -161,7 +187,6 @@ void Lokomotiv::SetPeripheralRequest(long data)
 	}
 }
 
-void Lokomotiv::SetState(long val){_state = val;}
 void Lokomotiv::SetLastDetectedAddress(long val){_lastDetectedAddress = val;}
 void Lokomotiv::SetPidPValue(double val){_motor->SetPidPValue(val);}
 void Lokomotiv::SetPidIValue(double val){_motor->SetPidIValue(val);}
@@ -180,16 +205,15 @@ void Lokomotiv::Update()
 		(lastTrackingDistanceUpdateValue != dist)
 		)
 	{
-		SendTrackingData();
+		SendTrackingData(dist);
 	}
 	}
 }
 
-void Lokomotiv::SendTrackingData()
+void Lokomotiv::SendTrackingData(int32_t dist)
 {
-	int32_t trackingData = GetDistanceFromLastAddress();
-	SendMsg(COMMAND_TRACKING_DATA, trackingData);
-	lastTrackingDistanceUpdateValue = trackingData;
+	SendTrackingDataMsg(dist, _speedometer->GetMeasuredSpeed());
+	lastTrackingDistanceUpdateValue = dist;
 	lastTrackingUpdate = millis();
 }
 
@@ -199,9 +223,22 @@ void Lokomotiv::GotAddr(long addr)
 	//second.
 	_encoderCounterAtLastAddress = _speedometer->GetCurrentTicks();
 	SetLastDetectedAddress(addr);
+	//if target position is negative 1 it stops on all stations
+	if((_targetPosition == TARGET_POSITION_ALL) || (_targetPosition == addr)) {
+			//only stop if not already stopped
+		if(_motor->GetSpeed() != 0) {
+			SetBipolarSpeed(0);
+			SendMsg(COMMAND_STATE, STATE_STOPPED_AT_TARGET);
+			SendMsg(COMMAND_BIPOLAR_SPEED, 0);
+
+			//Notify computer that the target position has changed to none
+			SetTargetPosition(TARGET_POSITION_NONE);
+			SendMsg(COMMAND_TARGET_POSITION, TARGET_POSITION_NONE);
+		}
+	}
 	if((_lastDetectedAddressUpdate + _beaconAddressUpdateInterval) < millis())
 	{
-	SendMsg(COMMAND_LAST_DETECTED_ADDRESS, GetLastDetectedAddress());
-	_lastDetectedAddressUpdate = millis();
+		SendMsg(COMMAND_LAST_DETECTED_ADDRESS, GetLastDetectedAddress());
+		_lastDetectedAddressUpdate = millis();
 	}
 }
