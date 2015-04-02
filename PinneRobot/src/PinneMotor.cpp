@@ -35,12 +35,14 @@ void encoderISR2()
 int PinneMotor::GetCurrentPosition()
 {
 	int value;
-	uint8_t data[sizeof(int)];
-	noInterrupts();
-	data[0] = (*_encoderCounter >> 7) & 0x7F;
-	data[1] = lowByte(*_encoderCounter) & 0x7F;
-	interrupts();
-	value = (data[0] << 7) | data[1];
+//	uint8_t data[sizeof(int)];
+//	noInterrupts();
+//	data[0] = (*_encoderCounter >> 7) & 0x7F;
+//	data[1] = lowByte(*_encoderCounter) & 0x7F;
+//	interrupts();
+//	value = (data[0] << 7) | data[1];
+	//value = static_cast<int>(*_encoderCounter);
+	value = *_encoderCounter;
 	return value;
 };
 
