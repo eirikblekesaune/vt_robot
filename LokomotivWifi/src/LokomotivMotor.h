@@ -17,6 +17,7 @@ public:
 	static const int kSpeedStop;
 	static const long kSpeedUpdateInterval;
 	enum {MANUAL_MODE, CRUISE_CONTROL_MODE, TARGET_SPEED_MODE};
+	enum {SPEED_INCREASING, SPEED_DECREASING};
 	void init() {};
 	void SetSpeed(speed_t speed);
 	void Stop(int stopTime);
@@ -29,7 +30,6 @@ public:
 	void SetBrake(speed_t brake) {};
 	long GetMotorMode() {return _motorMode;};
 	void SetMotorMode(long val);
-	void SetPidTargetSpeed(double val);
 	void SetPidPValue(double val);
 	void SetPidIValue(double val);
 	void SetPidDValue(double val);
@@ -37,18 +37,27 @@ public:
 	double GetPidIValue();
 	double GetPidDValue();
 	void UserChangedSpeed();
-	double GetPidTargetSpeed() {return _setpoint;};
+	void SetMinTargetSpeed(double val);
+	void SetMaxTargetSpeed(double val);
+	double GetMinTargetSpeed();
+	double GetMaxTargetSpeed();
+
 	void Update();
-	void ResetPositionCounter();
 	void UpdateDirection();
 private:
 	LokomotivSpeedometer* _speedometer;
 	Lokomotiv* _lokomotiv;
 	PID *_pid;
+	void _setDriverPWM(speed_t val);
 	long _motorMode;
 	double _setpoint;
 	double _input;
 	double _output;
+	double _minTargetSpeed;
+	double _maxTargetSpeed;
+	bool _targetSpeedReached;
+	double _targetSpeed;
+	int _speedTargetingDirection;
 	bool _isInterpolating;
 	speed_t _beginSpeed;
 	speed_t _endSpeed;

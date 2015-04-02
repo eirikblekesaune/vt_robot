@@ -265,9 +265,15 @@ void LokomotivWIFIParser::_executeCommand()
 		case COMMAND_TRACKING_POLLING_INTERVAL:
 			_robot->SetTrackingPollingInterval(_decodeIntegerValue(_value));
 			break;
-		case COMMAND_PID_TARGET_SPEED:
-			_robot->SetPidTargetSpeed(_decodeDecimalValue(_value));
+		case COMMAND_MIN_TARGET_SPEED:
+			_robot->SetMinTargetSpeed(_decodeDecimalValue(_value));
 			break;
+		case COMMAND_MAX_TARGET_SPEED:
+			_robot->SetMaxTargetSpeed(_decodeDecimalValue(_value));
+			break;
+//		case COMMAND_PID_TARGET_SPEED:
+//			_robot->SetPidTargetSpeed(_decodeDecimalValue(_value));
+//			break;
 		case COMMAND_TRACKING_STATE:
 			_robot->SetTrackingState(_decodeIntegerValue(_value));
 			break;
@@ -329,11 +335,17 @@ void LokomotivWIFIParser::_executeCommand()
 		case COMMAND_TRACKING_POLLING_INTERVAL:
 			SendMsg(COMMAND_TRACKING_POLLING_INTERVAL,_robot->GetTrackingPollingInterval());
 			break;
-		case COMMAND_PID_TARGET_SPEED:
-			SendMsg(COMMAND_PID_TARGET_SPEED, _robot->GetPidTargetSpeed());
+		case COMMAND_MIN_TARGET_SPEED:
+			SendMsg(COMMAND_MIN_TARGET_SPEED, _robot->GetMinTargetSpeed());
 			break;
+		case COMMAND_MAX_TARGET_SPEED:
+			SendMsg(COMMAND_MAX_TARGET_SPEED, _robot->GetMaxTargetSpeed());
+			break;
+//		case COMMAND_PID_TARGET_SPEED:
+//			SendMsg(COMMAND_PID_TARGET_SPEED, _robot->GetPidTargetSpeed());
+//			break;
 		case COMMAND_TRACKING_DATA:
-			//SendMsg(COMMAND_TRACKING_DATA, _robot->GetTrackingData());
+			_robot->SendTrackingData();
 			break;
 		case COMMAND_TRACKING_STATE:
 			SendMsg(COMMAND_TRACKING_STATE, _robot->GetTrackingState());

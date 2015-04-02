@@ -25,9 +25,10 @@ public:
 	double GetPidDValue();
 	long GetTrackingPollingInterval();
 	long GetTrackingState();
+	long GetTrackingData();
 	long GetMotorMode() {return static_cast<long>(_motor->GetMotorMode());};
-	double GetPidTargetSpeed() {return static_cast<double>(_motor->GetPidTargetSpeed());};
-	//long GetTrackingData();
+	double GetMinTargetSpeed() {return _motor->GetMinTargetSpeed();};
+	double GetMaxTargetSpeed() {return _motor->GetMaxTargetSpeed();};
 
 	void SetBipolarSpeed(long val);
 	void SetEndSpeed(long val) {_motor->SetEndSpeed(static_cast<speed_t>(val));};
@@ -43,7 +44,8 @@ public:
 	void SetTrackingPollingInterval(long val);
 	void SetTrackingState(long val);
 	void SetMotorMode(long val);
-	void SetPidTargetSpeed(double val);
+	void SetMinTargetSpeed(double val) {_motor->SetMinTargetSpeed(val);};
+	void SetMaxTargetSpeed(double val) {_motor->SetMaxTargetSpeed(val);};
 
 	void Stop(long val) {_motor->Stop(static_cast<int16_t>(val));};
 	void Init();
@@ -51,6 +53,7 @@ public:
 	void GotAddr(long val);
 	void UserChangedSpeed() {_motor->UserChangedSpeed();};
 	void SendTrackingData(int32_t dist);
+	void SendTrackingData();
 	void StateChanged(stateChange_t newState);
 
 private:

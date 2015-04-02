@@ -129,11 +129,6 @@ void Lokomotiv::SetMotorMode(long val)
 	_motor->SetMotorMode(val);
 }
 
-void Lokomotiv::SetPidTargetSpeed(double val)
-{
-	_motor->SetPidTargetSpeed(static_cast<double>(val));
-}
-
 void Lokomotiv::SetTargetPosition(long val){_targetPosition = val;}
 
 void Lokomotiv::SetPeripheral(long data)
@@ -208,6 +203,10 @@ void Lokomotiv::Update()
 		SendTrackingData(dist);
 	}
 	}
+}
+
+void Lokomotiv::SendTrackingData() {
+	SendTrackingData(GetDistanceFromLastAddress());
 }
 
 void Lokomotiv::SendTrackingData(int32_t dist)

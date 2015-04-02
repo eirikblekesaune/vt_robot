@@ -16,7 +16,10 @@ LokomotivMotor::LokomotivMotor(LokomotivSpeedometer* speedometer, Lokomotiv* lok
 	_endSpeed(50),
 	_lastSpeedUpdateTime(0),
 	_isInterpolating(false),
-	_cruiseControlActive(false)
+	_cruiseControlActive(false),
+	_minTargetSpeed(1.5),
+	_maxTargetSpeed(50.0),
+	_targetSpeedReached(false)
 {
 	pinMode(_INA, OUTPUT);
 	pinMode(_INB, OUTPUT);
@@ -91,7 +94,7 @@ void LokomotivMotor::Update()
 						//no need to activate pid when motor is not moving
 						if((_speed != 0) && (_input > 1.5))
 						{
-							SetPidTargetSpeed(_input);
+							_setpoint = _input;
 							_output = _speed;
 							_pid->SetMode(AUTOMATIC);
 							_pid->Compute();
@@ -113,66 +116,29 @@ void LokomotivMotor::Update()
 				}
 				break;
 			case TARGET_SPEED_MODE:
-				if(_pid->Compute())
-				{
-					if(_setpoint > 1.5)
+				if(_targetSpeedReached) {
+					//compute pid when target speed has been reached
+					if(_pid->Compute())
 					{
-						SetSpeed(static_cast<long>(_output));
-					} else {
-						SetSpeed(0);
+						_setDriverPWM(static_cast<long>(_output));
+					}
+				} else {
+					//interpolate to target speed
+
+					//check if target speed has been reached
+					if( ((_speedTargetingDirection == SPEED_INCREASING) && (_targetSpeed < _input)) || 
+							((_speedTargetingDirection == SPEED_DECREASING) && (_targetSpeed > _input)) ) 
+					{
+						_setpoint = _targetSpeed;
+						_output = _speed;//not really sure about this line..
+						_pid->SetMode(AUTOMATIC);
+						_pid->Compute();
+						_targetSpeedReached = true;
 					}
 				}
 				break;
 		}
 	}
-	/*
-	if(_isInterpolating)
-	{
-	if((_lastSpeedUpdateTime + kSpeedUpdateInterval) < millis())
-	{
-		if(_hasReachedEndSpeed())
-		{
-		SetSpeed(_endSpeed);
-		_isInterpolating = false;
-		} else {
-		SetSpeed(_speed + _speedInterpolationDelta);
-		}
-		_lastSpeedUpdateTime = millis();
-	}
-	} else {
-	if(_pid->GetMode())//if mode is automatic
-	{
-		//dynamic pid tuning
-		if((abs(_input - _setpoint)) > 10.0)
-		{
-		_pid->SetTunings(1.3, 5.0, 0.01);
-		} else {
-		_pid->SetTunings(1.3, 0.3, 0.01);
-		}
-		if(_pid->Compute())
-		{
-		long newSpeed;
-		newSpeed = static_cast<long>(_output);
-		//DebugPrint(_output);
-		SetSpeed(newSpeed);
-		}
-	} else {
-		if((_motorMode == CRUISE_CONTROL_MODE) && ((lastSpeedSetTime + millisBeforePIDEnable) <= millis()))
-		{
-		//no need to activate pid when motor is not moving
-		if((_speed != 0) && (_input > 1.5))
-		{
-			SetPidTargetSpeed(_input);
-			//DebugPrint("PID activated");
-			//DebugPrint(_input);
-			_output = _speed;
-			_pid->SetMode(AUTOMATIC);
-			_pid->Compute();
-		}
-		}
-	}
-	}
-	*/
 }
 
 void LokomotivMotor::SetSpeed(speed_t newSpeed)
@@ -182,7 +148,22 @@ void LokomotivMotor::SetSpeed(speed_t newSpeed)
 	if(newSpeed < kSpeedMin)
 		newSpeed = kSpeedMin;
 	_speed = newSpeed;
-	OCR1B = _speed;
+	if(_motorMode == TARGET_SPEED_MODE) {
+		_targetSpeed = map(static_cast<double>(_speed), 0.0, 511.0, _minTargetSpeed, _maxTargetSpeed);
+		_targetSpeedReached = false;
+		_pid->SetMode(MANUAL);
+		if(_targetSpeed < _speedometer->GetMeasuredSpeed()) {
+			_speedTargetingDirection = SPEED_INCREASING;
+		} else {
+			_speedTargetingDirection = SPEED_DECREASING;
+		}
+	} else {
+		_setDriverPWM(_speed);
+	}
+}
+
+void LokomotivMotor::_setDriverPWM(speed_t val) {
+	OCR1B = val;
 	if (_speed == 0)
 	{
 		digitalWrite(_INA, LOW);	 // Make the motor coast no
@@ -191,6 +172,11 @@ void LokomotivMotor::SetSpeed(speed_t newSpeed)
 		UpdateDirection();
 	}
 }
+
+void LokomotivMotor::SetMinTargetSpeed(double val) {_minTargetSpeed = val;}
+void LokomotivMotor::SetMaxTargetSpeed(double val) {_maxTargetSpeed = val;}
+double LokomotivMotor::GetMinTargetSpeed() {return _minTargetSpeed;}
+double LokomotivMotor::GetMaxTargetSpeed() {return _maxTargetSpeed;}
 
 void LokomotivMotor::UserChangedSpeed()
 {
@@ -217,11 +203,6 @@ double LokomotivMotor::GetPidPValue() { return _pid->GetKp(); }
 double LokomotivMotor::GetPidIValue() { return _pid->GetKi(); }
 double LokomotivMotor::GetPidDValue() { return _pid->GetKd(); }
 
-void LokomotivMotor::SetPidTargetSpeed(double val)
-{
-	_setpoint = val;
-}
-
 void LokomotivMotor::SetMotorMode(long val)
 {
 	//The internal mode for PID is set here.
@@ -237,7 +218,10 @@ void LokomotivMotor::SetMotorMode(long val)
 			break;
 		case TARGET_SPEED_MODE:
 			_motorMode = TARGET_SPEED_MODE;
-			_pid->SetMode(AUTOMATIC);
+			//_pid->SetMode(AUTOMATIC);
+			_pid->SetMode(MANUAL);
+			_targetSpeedReached = false;
+			SetSpeed(GetSpeed());//setting speed with target speed state
 			break;
 	}
 }
@@ -284,10 +268,10 @@ void LokomotivMotor::InterpolateSpeed(speed_t begin, speed_t target, int duratio
 	if(_beginSpeed >= _endSpeed) // if deaccelarating
 	{
 		if(_speedInterpolationDelta == 0)
-		_speedInterpolationDelta = -1;
+			_speedInterpolationDelta = -1;
 	} else {
 		if(_speedInterpolationDelta == 0)
-		_speedInterpolationDelta = 1;
+			_speedInterpolationDelta = 1;
 	}
 	_isInterpolating = true;
 	} else {
@@ -320,10 +304,4 @@ bool LokomotivMotor::_hasReachedEndSpeed()
 		result = true;
 	}
 	return result;
-}
-
-
-void LokomotivMotor::ResetPositionCounter()
-{
-
 }
