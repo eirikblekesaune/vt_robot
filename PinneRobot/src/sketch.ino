@@ -17,6 +17,7 @@ void setup()
   parser = new PinneAPIParser(robot);
   robot->init();
 }
+
 void loop()
 {
   if(Serial1.available())
@@ -24,5 +25,5 @@ void loop()
     parser->parseIncomingByte(Serial1.read());
   }
   robot->update();
-  delay(LOOP_UPDATE_RATE);
+  //delay(LOOP_UPDATE_RATE);
 }
