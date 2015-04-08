@@ -28,7 +28,8 @@ Lokomotiv::Lokomotiv() :
 	_pidIValue(0),
 	_pidDValue(0),
 	_trackingPollingEnabled(false),
-	_trackingPollingInterval(0)
+	_trackingPollingInterval(0),
+	_clockCalibration(0)
 {
 	_speedometer = new LokomotivSpeedometer();
 	_motor = new LokomotivMotor(_speedometer, this);

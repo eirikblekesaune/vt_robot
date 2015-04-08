@@ -29,6 +29,7 @@ public:
 	long GetMotorMode() {return static_cast<long>(_motor->GetMotorMode());};
 	double GetMinTargetSpeed() {return _motor->GetMinTargetSpeed();};
 	double GetMaxTargetSpeed() {return _motor->GetMaxTargetSpeed();};
+	long GetClockCalibration() {return _clockCalibration;};
 
 	void SetBipolarSpeed(long val);
 	void SetEndSpeed(long val) {_motor->SetEndSpeed(static_cast<speed_t>(val));};
@@ -46,6 +47,7 @@ public:
 	void SetMotorMode(long val);
 	void SetMinTargetSpeed(double val) {_motor->SetMinTargetSpeed(val);};
 	void SetMaxTargetSpeed(double val) {_motor->SetMaxTargetSpeed(val);};
+	void SetClockCalibration(long val) {_clockCalibration = val;};
 
 	void Stop(long val) {_motor->Stop(static_cast<int16_t>(val));};
 	void Init();
@@ -62,6 +64,7 @@ private:
 	LokomotivSpeedometer *_speedometer;
 	long _lastDetectedAddressUpdate;
 	long _encoderCounterAtLastAddress;
+	long _clockCalibration;
 	static const long _beaconAddressUpdateInterval;
 
 	long _targetPosition;

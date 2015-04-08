@@ -280,6 +280,9 @@ void LokomotivWIFIParser::_executeCommand()
 		case COMMAND_WHOAREYOU:
 		case COMMAND_PARSER_ERROR:
 			break;
+		case COMMAND_CLOCK_CALIBRATION:
+			_robot->SetClockCalibration(_decodeIntegerValue(_value));
+			break;
 		default:
 			DebugPrint("Unknown command");
 			DebugPrint(_currentCommand);
@@ -356,6 +359,9 @@ void LokomotivWIFIParser::_executeCommand()
 			WhoAreYou();
 			break;
 		case COMMAND_PARSER_ERROR:
+			break;
+		case COMMAND_CLOCK_CALIBRATION:
+			SendMsg(COMMAND_CLOCK_CALIBRATION, _robot->GetClockCalibration());
 			break;
 		default:
 			DebugPrint("Unknown command");
