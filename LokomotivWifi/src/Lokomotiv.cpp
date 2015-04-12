@@ -210,9 +210,13 @@ void Lokomotiv::SendTrackingData() {
 	SendTrackingData(GetDistanceFromLastAddress());
 }
 
+long Lokomotiv::GetTimestamp() {
+	return millis() + _clockCalibration;
+}
+
 void Lokomotiv::SendTrackingData(int32_t dist)
 {
-	SendTrackingDataMsg(dist, _speedometer->GetMeasuredSpeed());
+	SendTrackingDataMsg(dist, GetTimestamp());
 	lastTrackingDistanceUpdateValue = dist;
 	lastTrackingUpdate = millis();
 }

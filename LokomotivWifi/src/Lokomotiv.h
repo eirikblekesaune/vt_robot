@@ -30,6 +30,7 @@ public:
 	double GetMinTargetSpeed() {return _motor->GetMinTargetSpeed();};
 	double GetMaxTargetSpeed() {return _motor->GetMaxTargetSpeed();};
 	long GetClockCalibration() {return _clockCalibration;};
+	long GetTimestamp();
 
 	void SetBipolarSpeed(long val);
 	void SetEndSpeed(long val) {_motor->SetEndSpeed(static_cast<speed_t>(val));};

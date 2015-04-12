@@ -124,17 +124,17 @@ static void SendMsg(command_t command, oscTypeTag_t typeTag, byte * value)
 	FrameMessage(msg, 16);
 }
 
-static void SendTrackingDataMsg(int32_t position, double speed) {
+static void SendTrackingDataMsg(int32_t position, int32_t time) {
 	byte * posByte = (byte *) &position;
-	byte * speedByte = (byte *) &speed;
+	byte * timestamp = (byte *) &time;
 	byte msg[20] = {
 		47,116,47,//path start -> '/t/t
 		COMMAND_TRACKING_DATA,
 		SET_MESSAGE,
 		0,0,0,//OSC path padding
-		44,105,102,0,//type tags for int and float
+		44,105,105,0,//type tags for int and float
 		posByte[3], posByte[2], posByte[1], posByte[0],
-		speedByte[3], speedByte[2], speedByte[1], speedByte[0]
+		timestamp[3], timestamp[2], timestamp[1], timestamp[0]
 	};
 
 	FrameMessage(msg, 20);
@@ -246,7 +246,7 @@ static void DebugPrint(uint32_t msg)
 }
 
 static void WhoAreYou() {
-	SendMsg(COMMAND_WHOAREYOU, "figur6");
+	SendMsg(COMMAND_WHOAREYOU, "figur5");
 }
 
 
