@@ -19,8 +19,8 @@ const int KoppMotor::DIRECTION_DOWN_INCREMENT = 1;
 const int KoppMotor::DIRECTION_UP_INCREMENT = -1;
 
 //variables for Sensor debouncing
-const unsigned long topSensorDebounceDelay = 150;
-const unsigned long slackSensorDebounceDelay = 350;
+const unsigned long topSensorDebounceDelay = 20;
+const unsigned long slackSensorDebounceDelay = 550;
 
 void encoderISR1()
 {
@@ -35,12 +35,7 @@ void encoderISR2()
 int KoppMotor::GetCurrentPosition()
 {
 	int value;
-	uint8_t data[sizeof(int)];
-	noInterrupts();
-	data[0] = (*_encoderCounter >> 7) & 0x7F;
-	data[1] = lowByte(*_encoderCounter) & 0x7F;
-	interrupts();
-	value = (data[0] << 7) | data[1];
+	value = *_encoderCounter;
 	return value;
 };
 
