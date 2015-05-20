@@ -26,6 +26,4 @@ void loop()
 		parser->parseIncomingByte(Serial.read());
 	}
 	robot->update();
-	//delay(1000);
-	//Serial.println("Hellof");
 }
