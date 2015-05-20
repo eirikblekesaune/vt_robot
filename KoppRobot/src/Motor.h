@@ -13,7 +13,7 @@ class KoppMotor
 	public:
 		KoppMotor(int topStopSensorPin, int slackStopSensorPin, int encoderInterruptIndex, VNH5019Driver* driver);
 		~KoppMotor() {};
-//		enum DIRECTION { DIRECTION_DOWN, DIRECTION_UP };
+		//		enum DIRECTION { DIRECTION_DOWN, DIRECTION_UP };
 		const static int DIRECTION_DOWN;
 		const static int DIRECTION_UP;
 		const static int TOP_SENSOR_IN;
@@ -24,8 +24,8 @@ class KoppMotor
 		const static int POSITION_DEFAULT_MAX;
 		const static int DIRECTION_DOWN_INCREMENT;
 		const static int DIRECTION_UP_INCREMENT;
-//		enum Sensor_POSITION { Sensor_IN, Sensor_OUT };
-//		enum POSITION { POSITION_ALL_UP = 0, POSITION_DEFAULT_MAX = 65535};
+		//		enum Sensor_POSITION { Sensor_IN, Sensor_OUT };
+		//		enum POSITION { POSITION_ALL_UP = 0, POSITION_DEFAULT_MAX = 65535};
 		const static position_t TARGET_NONE;
 		void init();
 

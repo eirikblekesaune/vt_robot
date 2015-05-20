@@ -41,14 +41,14 @@ int KoppMotor::GetCurrentPosition()
 
 
 KoppMotor::KoppMotor(int topStopSensorPin, int slackStopSensorPin, int encoderInterruptIndex, VNH5019Driver* driver) :
-_currentPosition(POSITION_ALL_UP),
-_targetPosition(TARGET_NONE),
-_minPosition(POSITION_ALL_UP),
-_maxPosition(POSITION_DEFAULT_MAX),
-_topStopSensorPin(topStopSensorPin),
-_slackStopSensorPin(slackStopSensorPin),
-_driver(driver),
-_encoderInterruptIndex(encoderInterruptIndex)
+	_currentPosition(POSITION_ALL_UP),
+	_targetPosition(TARGET_NONE),
+	_minPosition(POSITION_ALL_UP),
+	_maxPosition(POSITION_DEFAULT_MAX),
+	_topStopSensorPin(topStopSensorPin),
+	_slackStopSensorPin(slackStopSensorPin),
+	_driver(driver),
+	_encoderInterruptIndex(encoderInterruptIndex)
 {
 
 }
@@ -57,18 +57,18 @@ void KoppMotor::init()
 {
 	switch(_encoderInterruptIndex)
 	{
-	case 0:
-		attachInterrupt(0, encoderISR1, CHANGE);
-		_encoderCounter = &encoderCounter1;
-		_encoderIncrement = &encoderIncrement1;
-	pinMode(2, INPUT_PULLUP);
-		break;
-	case 1:
-		attachInterrupt(1, encoderISR2, CHANGE);
-		_encoderCounter = &encoderCounter2;
-		_encoderIncrement = &encoderIncrement2;
-	pinMode(3, INPUT_PULLUP);
-		break;
+		case 0:
+			attachInterrupt(0, encoderISR1, CHANGE);
+			_encoderCounter = &encoderCounter1;
+			_encoderIncrement = &encoderIncrement1;
+			pinMode(2, INPUT_PULLUP);
+			break;
+		case 1:
+			attachInterrupt(1, encoderISR2, CHANGE);
+			_encoderCounter = &encoderCounter2;
+			_encoderIncrement = &encoderIncrement2;
+			pinMode(3, INPUT_PULLUP);
+			break;
 	}
 	pinMode(_topStopSensorPin, INPUT_PULLUP);
 	pinMode(_slackStopSensorPin, INPUT_PULLUP);
@@ -85,9 +85,9 @@ void KoppMotor::init()
 		_SlackStopSensorOut();
 
 	_speedRamper = new SpeedRamping(
-		VNH5019Driver::SPEED_MAX * 0.115,
-		VNH5019Driver::SPEED_MAX
-	);
+			VNH5019Driver::SPEED_MAX * 0.115,
+			VNH5019Driver::SPEED_MAX
+			);
 }
 
 void KoppMotor::Stop()
@@ -205,17 +205,17 @@ void KoppMotor::UpdateState()
 					}
 				}
 			} else {
-					if((_targetPosition != TARGET_NONE) && (currPosition < _targetPosition))
+				if((_targetPosition != TARGET_NONE) && (currPosition < _targetPosition))
+				{
+					_TargetReached();
+				} else {
+					if(_state == GOING_TO_TARGET)
 					{
-						_TargetReached();
+						_UpdateSpeedRamp();
 					} else {
-						if(_state == GOING_TO_TARGET)
-						{
-							_UpdateSpeedRamp();
-						} else {
-							_GoingUp();
-						}
-				 }
+						_GoingUp();
+					}
+				}
 			}
 		}
 	}
@@ -308,7 +308,7 @@ void KoppMotor::_SlackStopSensorOut()
 
 void KoppMotor::_SlackStopSensorIn()
 {
- int direction;
+	int direction;
 	direction = GetDirection();
 	if(direction == DIRECTION_DOWN)
 	{

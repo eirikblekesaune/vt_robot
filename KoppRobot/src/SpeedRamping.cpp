@@ -51,13 +51,13 @@ boolean SpeedRamping::Calculate(int currPosition)
 				if(currPosition >= _halfwayPosition)
 				{
 					if(!_halfwayReached)
-					_halfwayReached = true;
+						_halfwayReached = true;
 				}
 			} else {
 				if(currPosition <= _halfwayPosition)
 				{
 					if(!_halfwayReached)
-					_halfwayReached = true;
+						_halfwayReached = true;
 				}
 			}
 			_currentFloatIndex = min(2.0, _currentFloatIndex + _riseDelta);

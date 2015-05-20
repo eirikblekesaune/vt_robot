@@ -7,13 +7,13 @@
 
 class KoppRobot
 {
-public:
+	public:
 
-	KoppRobot();
-	void init();
-	void update();
-	KoppMotor *motor;
-	void GoToParkingPosition();
+		KoppRobot();
+		void init();
+		void update();
+		KoppMotor *motor;
+		void GoToParkingPosition();
 };
 
 

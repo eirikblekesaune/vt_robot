@@ -31,16 +31,16 @@ class MotorDriver
 class L293Driver: public MotorDriver
 {
 	public:
-	 L293Driver(unsigned char INA, unsigned char INB, unsigned char PWM);
+		L293Driver(unsigned char INA, unsigned char INB, unsigned char PWM);
 
-	 const static speed_t SPEED_MIN;
-	 const static speed_t SPEED_MAX;
+		const static speed_t SPEED_MIN;
+		const static speed_t SPEED_MAX;
 
-	 void init();
-	 virtual void SetSpeed(speed_t speed);
-	 virtual void SetDirection(int direction);
-	 virtual void SetBrake(speed_t brake);
-	 void UpdateDirection();
+		void init();
+		virtual void SetSpeed(speed_t speed);
+		virtual void SetDirection(int direction);
+		virtual void SetBrake(speed_t brake);
+		void UpdateDirection();
 	private:
 		unsigned char _INA;
 		unsigned char _INB;
