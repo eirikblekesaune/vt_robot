@@ -286,8 +286,11 @@ void LokomotivMotor::InterpolateSpeed(speed_t begin, speed_t target, int duratio
 
 void LokomotivMotor::Stop(int stopTime)
 {
-	InterpolateSpeed(_speed, kSpeedStop, stopTime);
-	_lokomotiv->StateChanged(STATE_STOPPING);
+	if(GetSpeed() != 0)//No need to stop if already stopped
+	{
+		InterpolateSpeed(_speed, kSpeedStop, stopTime);
+		_lokomotiv->StateChanged(STATE_STOPPING);
+	}
 }
 
 void LokomotivMotor::GlideToSpeed(int startTime)
