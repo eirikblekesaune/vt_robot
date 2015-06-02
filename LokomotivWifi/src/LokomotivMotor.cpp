@@ -66,6 +66,7 @@ void LokomotivMotor::Update()
 					SendMsg(COMMAND_BIPOLAR_SPEED, 0);
 					if(_motorMode != MANUAL_MODE) {
 						_setpoint = 0;
+						_targetSpeed = 0;
 					}
 				} else {
 					if(_direction == DIRECTION_FORWARD) {
@@ -116,24 +117,27 @@ void LokomotivMotor::Update()
 				}
 				break;
 			case TARGET_SPEED_MODE:
-				if(_targetSpeedReached) {
-					//compute pid when target speed has been reached
-					if(_pid->Compute())
-					{
-						_setDriverPWM(static_cast<long>(_output));
-					}
-				} else {
-					//interpolate to target speed
+				if(_targetSpeed != 0)//only do comething when moving is intended
+				{
+					if(_targetSpeedReached) {
+						//compute pid when target speed has been reached
+						if(_pid->Compute())
+						{
+							_setDriverPWM(static_cast<long>(_output));
+						}
+					} else {
+						//interpolate to target speed
 
-					//check if target speed has been reached
-					if( ((_speedTargetingDirection == SPEED_INCREASING) && (_targetSpeed < _input)) || 
-							((_speedTargetingDirection == SPEED_DECREASING) && (_targetSpeed > _input)) ) 
-					{
-						_setpoint = _targetSpeed;
-						_output = _speed;//not really sure about this line..
-						_pid->SetMode(AUTOMATIC);
-						_pid->Compute();
-						_targetSpeedReached = true;
+						//check if target speed has been reached
+						if( ((_speedTargetingDirection == SPEED_INCREASING) && (_targetSpeed < _input)) || 
+								((_speedTargetingDirection == SPEED_DECREASING) && (_targetSpeed > _input)) ) 
+						{
+							_setpoint = _targetSpeed;
+							_output = _speed;//not really sure about this line..
+							_pid->SetMode(AUTOMATIC);
+							_pid->Compute();
+							_targetSpeedReached = true;
+						}
 					}
 				}
 				break;
@@ -148,7 +152,7 @@ void LokomotivMotor::SetSpeed(speed_t newSpeed)
 	if(newSpeed < kSpeedMin)
 		newSpeed = kSpeedMin;
 	_speed = newSpeed;
-	if(_motorMode == TARGET_SPEED_MODE) {
+	if((_motorMode == TARGET_SPEED_MODE) && (!_isInterpolating)) {
 		_targetSpeed = map(static_cast<double>(_speed), 0.0, 511.0, _minTargetSpeed, _maxTargetSpeed);
 		_targetSpeedReached = false;
 		_pid->SetMode(MANUAL);
