@@ -246,7 +246,7 @@ static void DebugPrint(uint32_t msg)
 }
 
 static void WhoAreYou() {
-	SendMsg(COMMAND_WHOAREYOU, "figur5");
+	SendMsg(COMMAND_WHOAREYOU, "figur1");
 }
 
 

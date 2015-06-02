@@ -232,6 +232,7 @@ void Lokomotiv::GotAddr(long addr)
 			//only stop if not already stopped
 		if(_motor->GetSpeed() != 0) {
 			SetBipolarSpeed(0);
+			_motor->UserChangedSpeed();//This is needed to deactivate the cruise control
 			SendMsg(COMMAND_STATE, STATE_STOPPED_AT_TARGET);
 			SendMsg(COMMAND_BIPOLAR_SPEED, 0);
 
