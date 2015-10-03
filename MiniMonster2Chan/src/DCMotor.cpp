@@ -1,34 +1,36 @@
 #include "DCMotor.h"
 
-DCMotor::DCMotor(int pulsePin, int stopButtonPinR, int stopButtonPinL) :
+DCMotor::DCMotor(int pulsePin, int topStopButtonPin, int bottomStopButtonPin, int number) :
 	_pulsePin(pulsePin),
-	_stopButtonPinR(stopButtonPinR),
-	_stopButtonPinL(stopButtonPinL)
+	_topStopButtonPin(topStopButtonPin),
+	_bottomStopButtonPin(bottomStopButtonPin),
+	_number(number),
+	_speed(0)
 {
 	//init pins
 	pinMode(_pulsePin, OUTPUT);
-	pinMode(_stopButtonPinR, INPUT_PULLUP);
-	pinMode(_stopButtonPinL, INPUT_PULLUP);
+	pinMode(_topStopButtonPin, INPUT_PULLUP);
+	pinMode(_bottomStopButtonPin, INPUT_PULLUP);
 	Update();
 }
 
-bool DCMotor::_canSetSpeed(int speed) {
-	bool result = true;
+bool DCMotor::_isBlocked(int speed) {
+	bool result = false;
 	
 	//we can always stop
 	if(speed != 0) {
-		//negative speed is L direction
+		//negative speed is L direction, or down
 		//if it is to be set to R direction (positive values)
-		if(GetDirection() == DIRECTION_R) {
+		if(speed > 0) {//going upwards
 			//and the R direction sensor value is PRESSED
-			if(_stopButtonR == BUTTON_PRESSED) {
-				result = false;//no can move
+			if(_state == STATE_AT_TOP) {
+				result = true;//is blocked indeed
 			}
-		} else {
-			//if is to be set to L direction (negative values)
+		} else if(speed < 0) {//going downwards
+			//if is to be set to L direction (negative values), or down direction
 			//and the L button is pressed
-			if(_stopButtonL == BUTTON_PRESSED) {
-				result = false;
+			if(_state == STATE_AT_BOTTOM) {
+				result = true;
 			}
 		}
 	}
@@ -37,7 +39,7 @@ bool DCMotor::_canSetSpeed(int speed) {
 
 void DCMotor::SetSpeed(int speed) {
 	int waitTime;
-	if(_canSetSpeed(speed)) {
+	if(!_isBlocked(speed)) {
 		if(speed < -512)
 			speed = -512;
 		if(speed > 512)
@@ -55,22 +57,62 @@ void DCMotor::Stop() {
 }
 
 void DCMotor::Update() {
-	_stopButtonR = digitalRead(_stopButtonPinR);
-	_stopButtonL = digitalRead(_stopButtonPinL);
-	if((_stopButtonR == LOW) && (GetDirection() == DIRECTION_R)) {
-		Stop();
+	_readButtons();
+	int newState;
+	if(_topStopButton == BUTTON_PRESSED)
+	{
+		if(_state == STATE_GOING_UP) {
+			Stop();
+		}
+		newState = STATE_AT_TOP;
+	} else if(_bottomStopButton == BUTTON_PRESSED) {
+		if(_state == STATE_GOING_DOWN) {
+			Stop();
+		}
+		newState = STATE_AT_BOTTOM;
+	} else {
+		if(_speed == 0) {
+			newState = STATE_STOPPED;
+		} else if(_speed > 0) {
+			newState = STATE_GOING_UP;
+		} else if(_speed < 0) {
+			newState = STATE_GOING_DOWN;
+		}
 	}
-	if((_stopButtonL == LOW) && (GetDirection() == DIRECTION_L)) {
-		Stop();
+	//check if state has changed
+	if(_state != newState) {
+		_state = newState;
+		Serial.print("s");
+		Serial.print(_number);
+		Serial.print(_state);
 	}
 }
 
 direction_t DCMotor::GetDirection() {
-	direction_t result = DIRECTION_R;
+	direction_t result = DIRECTION_UP;
 	if(_speed < 0)
-		result = DIRECTION_L;
+		result = DIRECTION_DOWN;
 	return result;
 }
 
-void DCMotor::_checkSensors() {
+void DCMotor::_readButtons()
+{
+	int newTopVal;
+	int newBottomVal;
+	newTopVal = digitalRead(_topStopButtonPin);
+	newBottomVal= digitalRead(_bottomStopButtonPin);
+	if(newTopVal != _topStopButton) {
+		_topStopButton = newTopVal;
+		Serial.print("bT");
+		Serial.print(_number);
+		Serial.print(_topStopButton);
+	}
+	if(newBottomVal != _bottomStopButton) {
+		_bottomStopButton = newBottomVal;
+		Serial.print("bB");
+		Serial.print(_number);
+		Serial.print(_bottomStopButton);
+	}
+	//_topStopButton = digitalRead(_topStopButtonPin);
+	//_bottomStopButton = digitalRead(_bottomStopButtonPin);
 }
